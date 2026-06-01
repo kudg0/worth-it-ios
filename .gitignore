@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+Package.resolved
+Sources/WorthItAPI/openapi.json.tmp
+Sources/WorthItAPI/GeneratedSources/
