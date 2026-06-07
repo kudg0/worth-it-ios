@@ -1,0 +1,162 @@
+import SwiftUI
+
+extension ScenarioOverviewView {
+    var costPerKmBreakdownSources: [CostPerKmBreakdownSource] {
+        var sources = costPerKmIncludedCostEvents.map { event in
+            CostPerKmBreakdownSource(
+                id: "cost-\(event.id.uuidString)",
+                date: event.date,
+                title: expenseTitle(for: event),
+                subtitle: "\(expenseDateFormatter.string(from: event.date)) • \(event.category.capitalized)",
+                value: expenseAmountPrecise(event),
+                status: "Added to Total",
+                systemName: expenseIconName(for: event.category),
+                accentColor: expenseAccentColor(for: event),
+                target: .expense(event.id)
+            )
+        }
+
+        if let financingSource = costPerKmFinancingSource {
+            sources.append(financingSource)
+        }
+
+        sources.append(contentsOf: costPerKmEffectiveOwnershipSources)
+
+        if costPerKmUsesTripDistance {
+            sources.append(contentsOf: costPerKmIncludedTripEvents.map { event in
+                CostPerKmBreakdownSource(
+                    id: "trip-\(event.id.uuidString)",
+                    date: event.date,
+                    title: event.note?.isEmpty == false ? event.note! : "Trip Added",
+                    subtitle: "\(expenseDateFormatter.string(from: event.date)) • Mileage",
+                    value: "\(formatDouble(event.distanceValue, fractionDigits: 0)) \(event.distanceUnit)",
+                    status: "Added to Dist",
+                    systemName: "point.topleft.down.curvedto.point.bottomright.up",
+                    accentColor: WorthItColor.primaryContainer,
+                    target: .mileage(event.id)
+                )
+            })
+        } else {
+            sources.append(contentsOf: costPerKmOdometerSources)
+        }
+
+        return sources.sorted { $0.date > $1.date }
+    }
+
+    var costPerKmEffectiveOwnershipSources: [CostPerKmBreakdownSource] {
+        guard costPerKmMode == .effective else { return [] }
+
+        var sources: [CostPerKmBreakdownSource] = []
+
+        if depreciationCost > 0 {
+            sources.append(
+                CostPerKmBreakdownSource(
+                    id: "depreciation-\(activeScenario.id.uuidString)",
+                    date: costPerKmBreakdownEnd,
+                    title: "Vehicle depreciation",
+                    subtitle: "Purchase minus current resale estimate",
+                    value: "\(currencySymbol)\(formatDouble(depreciationCost, fractionDigits: 0))",
+                    status: "Added to Total",
+                    systemName: "car.fill",
+                    accentColor: WorthItColor.accentGold,
+                    target: nil
+                )
+            )
+        }
+
+        let interest = accruedLoanInterest(to: costPerKmBreakdownEnd)
+        if interest > 0 {
+            sources.append(
+                CostPerKmBreakdownSource(
+                    id: "interest-\(activeScenario.id.uuidString)",
+                    date: costPerKmBreakdownEnd,
+                    title: "Loan interest accrued",
+                    subtitle: "Interest only, principal excluded",
+                    value: "\(currencySymbol)\(formatDouble(interest, fractionDigits: 0))",
+                    status: "Added to Total",
+                    systemName: "banknote",
+                    accentColor: WorthItColor.primaryContainer,
+                    target: nil
+                )
+            )
+        }
+
+        return sources
+    }
+
+    var costPerKmFinancingSource: CostPerKmBreakdownSource? {
+        guard costPerKmMode == .period, shouldIncludeFinancingInCostPerKm, loanMonthlyPayment > 0 else {
+            return nil
+        }
+
+        let periodCost = loanPaymentCost(from: costPerKmBreakdownStart, to: costPerKmBreakdownEnd)
+        let displayedCost = periodCost > 0 ? periodCost : doubleValue(loanMonthlyPayment)
+        let status = periodCost > 0 ? "Added to Total" : "Monthly payment"
+
+        return CostPerKmBreakdownSource(
+            id: "loan-\(costPerKmBreakdownStart.timeIntervalSince1970)",
+            date: costPerKmBreakdownStart,
+            title: "Loan / lease payment",
+            subtitle: "\(costPerKmBreakdownPeriodTitle) • Financing",
+            value: "\(currencySymbol)\(formatDouble(displayedCost, fractionDigits: 2))",
+            status: status,
+            systemName: "creditcard.fill",
+            accentColor: WorthItColor.primaryContainer,
+            target: nil
+        )
+    }
+
+    var costPerKmOdometerSources: [CostPerKmBreakdownSource] {
+        var sources: [CostPerKmBreakdownSource] = []
+
+        if let baseline = odometerReading(before: costPerKmBreakdownStart) {
+            sources.append(
+                CostPerKmBreakdownSource(
+                    id: "odometer-baseline-\(costPerKmBreakdownStart.timeIntervalSince1970)",
+                    date: baseline.date,
+                    title: "Odometer baseline",
+                    subtitle: "\(expenseDateFormatter.string(from: costPerKmBreakdownStart)) • Distance start",
+                    value: "\(formatDouble(baseline.value, fractionDigits: 0)) \(mileageDisplayUnit)",
+                    status: "Baseline",
+                    systemName: "speedometer",
+                    accentColor: WorthItColor.textSecondary,
+                    target: baseline.id.map { .mileage($0) }
+                )
+            )
+        }
+
+        if let current = odometerReading(before: costPerKmBreakdownEnd) {
+            sources.append(
+                CostPerKmBreakdownSource(
+                    id: "odometer-current-\(costPerKmBreakdownEnd.timeIntervalSince1970)",
+                    date: current.date,
+                    title: "Current odometer",
+                    subtitle: "\(expenseDateFormatter.string(from: min(current.date, Date()))) • Distance end",
+                    value: "\(formatDouble(current.value, fractionDigits: 0)) \(mileageDisplayUnit)",
+                    status: "+\(formatDouble(costPerKmBreakdownDistance, fractionDigits: 0)) \(mileageDisplayUnit)",
+                    systemName: "speedometer",
+                    accentColor: WorthItColor.primaryContainer,
+                    target: current.id.map { .mileage($0) }
+                )
+            )
+        }
+
+        return sources
+    }
+
+    func odometerReading(before date: Date) -> (id: UUID?, value: Double, date: Date)? {
+        let odometerEvents = usageEvents
+            .filter { $0.eventType == "odometer_update" && $0.date < date }
+            .sorted { $0.date < $1.date }
+
+        if let event = odometerEvents.last, let value = event.odometerValue {
+            return (event.id, value, event.date)
+        }
+
+        if let purchaseOdometer = activeScenario.purchaseOdometer {
+            return (nil, Double(purchaseOdometer), activeScenario.startDate)
+        }
+
+        return nil
+    }
+}

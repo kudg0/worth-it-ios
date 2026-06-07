@@ -32,3 +32,15 @@ targets:
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""
         GENERATE_INFOPLIST_FILE: YES
+  WorthItTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: WorthItTests
+    dependencies:
+      - target: WorthIt
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.worthit.app.tests
+        GENERATE_INFOPLIST_FILE: YES

@@ -72,6 +72,28 @@ struct ScenarioRepository: Sendable {
         try await client.post("/scenarios/\(apiId(scenarioId))/scheduled-services", body: request)
     }
 
+    func updateScheduledService(
+        scheduledServiceId: UUID,
+        request: UpdateScheduledServiceRequest
+    ) async throws -> ScheduledService {
+        try await client.patch("/scheduled-services/\(apiId(scheduledServiceId))", body: request)
+    }
+
+    func updateScheduledServiceCompletion(
+        scheduledServiceId: UUID,
+        request: UpdateScheduledServiceCompletionRequest
+    ) async throws -> ScheduledService {
+        try await client.patch("/scheduled-services/\(apiId(scheduledServiceId))", body: request)
+    }
+
+    func listScheduledServices(scenarioId: UUID) async throws -> [ScheduledService] {
+        try await client.get("/scenarios/\(apiId(scenarioId))/scheduled-services")
+    }
+
+    func listScheduledServiceDueStates(scenarioId: UUID) async throws -> ScheduledServicesDueResponse {
+        try await client.get("/scenarios/\(apiId(scenarioId))/scheduled-services/due")
+    }
+
     func createSmokeScenario() async throws -> ScenarioListItem {
         try await client.post(
             "/scenarios",

@@ -160,6 +160,7 @@ struct CreateCostEventRequest: Encodable {
     let currency: String
     let category: String
     let kind: String
+    let scheduledServiceId: UUID?
     let isSharedCost: Bool
     let note: String?
 }
@@ -170,6 +171,7 @@ struct UpdateCostEventRequest: Encodable {
     let currency: String?
     let category: String?
     let kind: String?
+    let scheduledServiceId: UUID?
     let isSharedCost: Bool?
     let note: String?
 }
@@ -181,6 +183,10 @@ struct ScheduledService: Decodable, Identifiable, Hashable {
     let category: String
     let status: String
     let triggerType: String
+    let baselineDate: Date?
+    let baselineOdometerValue: Double?
+    let baselineOdometerUnit: String?
+    let baselineOdometerKm: String?
     let dueDate: Date?
     let dueOdometerValue: Double?
     let dueOdometerUnit: String
@@ -198,14 +204,120 @@ struct ScheduledService: Decodable, Identifiable, Hashable {
     let updatedAt: Date
 }
 
+struct ScheduledServicesDueResponse: Decodable, Hashable {
+    let asOfDate: Date
+    let items: [ScheduledServiceDueItem]
+}
+
+struct ScheduledServiceDueItem: Decodable, Identifiable, Hashable {
+    let id: UUID
+    let scenarioId: UUID
+    let title: String
+    let category: String
+    let status: String
+    let triggerType: String
+    let dueState: String
+    let dueDate: Date?
+    let dueOdometerValue: Double?
+    let dueOdometerUnit: String
+    let dueOdometerKm: String?
+    let currentOdometerValue: Double?
+    let currentOdometerUnit: String
+    let currentOdometerKm: String?
+    let distanceRemainingValue: Double?
+    let distanceRemainingUnit: String
+    let kmRemaining: String?
+    let daysRemaining: Int?
+    let predictedDueDate: Date?
+    let predictionConfidence: String
+    let predictionBasis: String
+    let calendarEligible: Bool
+    let calendarSuggestedDate: Date?
+    let calendarTitle: String?
+    let calendarNotes: String?
+}
+
 struct CreateScheduledServiceRequest: Encodable {
     let title: String
     let category: String
     let triggerType: String
+    let baselineDate: Date?
+    let baselineOdometerValue: Double?
     let dueDate: Date?
     let dueOdometerValue: Double?
     let repeatIntervalMonths: Int?
     let repeatIntervalValue: Double?
     let leadTimeDays: Int
     let note: String?
+}
+
+struct UpdateScheduledServiceRequest: Encodable {
+    let title: String?
+    let category: String?
+    let status: String?
+    let triggerType: String?
+    let baselineDate: Date?
+    let baselineOdometerValue: Double?
+    let dueDate: Date?
+    let dueOdometerValue: Double?
+    let repeatIntervalMonths: Int?
+    let repeatIntervalValue: Double?
+    let leadTimeDays: Int?
+    let lastCompletedAt: Date?
+    let completedExpenseId: UUID?
+    let note: String?
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case category
+        case status
+        case triggerType
+        case baselineDate
+        case baselineOdometerValue
+        case dueDate
+        case dueOdometerValue
+        case repeatIntervalMonths
+        case repeatIntervalValue
+        case leadTimeDays
+        case lastCompletedAt
+        case completedExpenseId
+        case note
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(title, forKey: .title)
+        try container.encodeIfPresent(category, forKey: .category)
+        try container.encodeIfPresent(status, forKey: .status)
+        try container.encodeIfPresent(triggerType, forKey: .triggerType)
+        try container.encode(baselineDate, forKey: .baselineDate)
+        try container.encode(baselineOdometerValue, forKey: .baselineOdometerValue)
+        try container.encode(dueDate, forKey: .dueDate)
+        try container.encode(dueOdometerValue, forKey: .dueOdometerValue)
+        try container.encodeIfPresent(repeatIntervalMonths, forKey: .repeatIntervalMonths)
+        try container.encodeIfPresent(repeatIntervalValue, forKey: .repeatIntervalValue)
+        try container.encodeIfPresent(leadTimeDays, forKey: .leadTimeDays)
+        try container.encode(lastCompletedAt, forKey: .lastCompletedAt)
+        try container.encode(completedExpenseId, forKey: .completedExpenseId)
+        try container.encode(note, forKey: .note)
+    }
+}
+
+struct UpdateScheduledServiceCompletionRequest: Encodable {
+    let status: String
+    let lastCompletedAt: Date?
+    let completedExpenseId: UUID?
+
+    enum CodingKeys: String, CodingKey {
+        case status
+        case lastCompletedAt
+        case completedExpenseId
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(status, forKey: .status)
+        try container.encode(lastCompletedAt, forKey: .lastCompletedAt)
+        try container.encode(completedExpenseId, forKey: .completedExpenseId)
+    }
 }
