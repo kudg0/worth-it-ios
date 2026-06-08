@@ -7,6 +7,10 @@ extension ScenarioOverviewView {
             .map { item in
                 let usesEstimatedDate = item.dueDate == nil && item.predictedDueDate != nil
                 let effectiveDate = item.dueDate ?? item.predictedDueDate
+                let serviceNote = scheduledServices
+                    .first(where: { $0.id == item.id })?
+                    .note?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
 
                 return ScheduledServiceDisplayItem(
                     id: item.id,
@@ -17,7 +21,8 @@ extension ScenarioOverviewView {
                     isEstimatedDate: usesEstimatedDate,
                     distanceRemaining: item.distanceRemainingValue,
                     distanceUnit: item.distanceRemainingUnit,
-                    daysRemaining: item.daysRemaining
+                    daysRemaining: item.daysRemaining,
+                    note: serviceNote?.isEmpty == false ? serviceNote : nil
                 )
             }
             .sorted { lhs, rhs in

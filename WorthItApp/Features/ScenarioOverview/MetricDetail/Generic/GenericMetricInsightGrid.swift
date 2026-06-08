@@ -2,6 +2,7 @@ import SwiftUI
 
 struct GenericMetricInsightGrid: View {
     struct Model {
+        let wideTitle: String
         let seasonalText: String
         let volatilityValue: String
         let actionValue: String
@@ -48,7 +49,7 @@ struct GenericMetricInsightGrid: View {
                 .background(WorthItColor.accentGold.opacity(0.14), in: RoundedRectangle(cornerRadius: WorthItRadius.s))
 
             VStack(alignment: .leading, spacing: WorthItSpacing.s) {
-                Text("Seasonal Adjustment")
+                Text(model.wideTitle)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(WorthItColor.textPrimary)
 

@@ -47,6 +47,8 @@ enum ScenarioOverviewExpenseCategory: String, CaseIterable, Identifiable {
 enum ScenarioOverviewMetric: String, CaseIterable, Identifiable {
     case monthlyCost
     case costPerKm
+    case currentMonthCostPerKm
+    case totalExpenses
     case totalOwnership
     case projectedGain
     case expectedResale

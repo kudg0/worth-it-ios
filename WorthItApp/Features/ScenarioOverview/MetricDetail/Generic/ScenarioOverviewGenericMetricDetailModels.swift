@@ -30,6 +30,7 @@ extension ScenarioOverviewView {
                 ))
             ),
             insights: GenericMetricInsightGrid.Model(
+                wideTitle: metricInsightWideTitle,
                 seasonalText: metricSeasonalText,
                 volatilityValue: metricVolatilityValue,
                 actionValue: metricActionValue,

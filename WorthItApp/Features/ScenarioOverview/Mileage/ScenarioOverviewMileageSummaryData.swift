@@ -2,18 +2,9 @@ import Foundation
 
 extension ScenarioOverviewView {
     var currentOdometerValue: Int {
-        let latestOdometerEvent = usageEvents
-            .filter { $0.eventType == "odometer_update" }
-            .sorted { $0.date > $1.date }
-            .first
-        let baseOdometer = latestOdometerEvent?.odometerValue ?? Double(activeScenario.purchaseOdometer ?? 0)
-        let tripsAfterBase = usageEvents
-            .filter { event in
-                event.eventType == "trip" && latestOdometerEvent.map { event.date > $0.date } ?? true
-            }
-            .reduce(0) { $0 + $1.distanceValue }
+        let currentOdometer = Double(activeScenario.purchaseOdometer ?? 0) + usageEvents.reduce(0) { $0 + $1.distanceValue }
 
-        return max(Int((baseOdometer + tripsAfterBase).rounded()), 0)
+        return max(Int(currentOdometer.rounded()), 0)
     }
 
     var mileageDisplayUnit: String {
@@ -66,11 +57,12 @@ extension ScenarioOverviewView {
             return currentOdometerValue
         }
 
-        return usageEvents
-            .filter { $0.eventType == "odometer_update" && $0.date < editingUsageEvent.date }
-            .sorted { $0.date > $1.date }
-            .compactMap { $0.odometerValue.map { Int($0.rounded()) } }
-            .first ?? activeScenario.purchaseOdometer ?? 0
+        let baseOdometer = Double(activeScenario.purchaseOdometer ?? 0)
+        let distanceBeforeEntry = usageEvents
+            .filter { $0.id != editingUsageEvent.id && $0.date < editingUsageEvent.date }
+            .reduce(0) { $0 + $1.distanceValue }
+
+        return max(Int((baseOdometer + distanceBeforeEntry).rounded()), 0)
     }
 
     var previousOdometerText: String {
@@ -95,5 +87,4 @@ extension ScenarioOverviewView {
     func resetMileageValueForMode(_ mode: MileageMode) {
         mileageValue = mode == .odometer && currentOdometerValue > 0 ? "\(currentOdometerValue)" : ""
     }
-
 }

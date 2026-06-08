@@ -3,8 +3,6 @@ import SwiftUI
 struct CostPerKmDetailScreen: View {
     struct Model {
         let hero: CostPerKmDetailHero.Model
-        let mode: Binding<ScenarioOverviewView.CostPerKmMode>
-        let modeDescription: String
         let trend: CostPerKmTrendPanel.Model
         let summary: CostPerKmSummaryGrid.Model
         let showsEmptyNotice: Bool
@@ -19,7 +17,6 @@ struct CostPerKmDetailScreen: View {
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxxl) {
             CostPerKmDetailHero(model: model.hero)
-            CostPerKmModeControl(mode: model.mode, description: model.modeDescription)
             CostPerKmTrendPanel(model: model.trend)
             CostPerKmSummaryGrid(model: model.summary)
 

@@ -5,6 +5,7 @@ struct CostPerKmDetailHero: View {
         let periodTitle: String
         let value: String
         let mileageUnit: String
+        let isProjected: Bool
         let trend: ScenarioOverviewView.MetricTrend?
         let fallbackTrend: ScenarioOverviewView.MetricTrend?
     }
@@ -22,11 +23,11 @@ struct CostPerKmDetailHero: View {
             HStack(alignment: .lastTextBaseline, spacing: WorthItSpacing.xs) {
                 Text(model.value)
                     .font(.system(size: 48, weight: .heavy))
-                    .foregroundStyle(WorthItColor.primaryContainer)
+                    .foregroundStyle(model.isProjected ? WorthItColor.projectedBlue : WorthItColor.primaryContainer)
                     .tracking(-1.2)
                     .lineLimit(1)
                     .minimumScaleFactor(0.58)
-                    .shadow(color: WorthItColor.primaryContainer.opacity(0.32), radius: 8)
+                    .shadow(color: (model.isProjected ? WorthItColor.projectedBlue : WorthItColor.primaryContainer).opacity(0.28), radius: 8)
 
                 Text("/ \(model.mileageUnit)")
                     .font(.system(size: 18, weight: .medium))

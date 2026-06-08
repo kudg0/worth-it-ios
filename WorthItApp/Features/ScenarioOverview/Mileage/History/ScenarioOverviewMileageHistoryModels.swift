@@ -8,6 +8,7 @@ extension ScenarioOverviewView {
             focusedMileageId: focusedMileageId,
             currentMonthStart: currentMonthStart,
             groupTotal: mileageMonthTotalText,
+            onOpenMileage: openMileageDetail,
             onEditMileage: beginEditingMileage
         )
     }

@@ -7,6 +7,7 @@ struct MileageHistoryScreen: View {
         let focusedMileageId: UUID?
         let currentMonthStart: Date
         let groupTotal: (ScenarioOverviewView.MileageMonthGroup) -> String
+        let onOpenMileage: (UUID) -> Void
         let onEditMileage: (UUID) -> Void
     }
 
@@ -35,6 +36,7 @@ struct MileageHistoryScreen: View {
             focusedMileageId: model.focusedMileageId,
             currentMonthStart: model.currentMonthStart,
             groupTotal: model.groupTotal,
+            onOpenMileage: model.onOpenMileage,
             onEditMileage: model.onEditMileage
         )
     }

@@ -11,6 +11,7 @@ struct ScenarioMileageScreen: View {
     let logItems: [ScenarioOverviewView.MileageLogItem]
     let currentMonthItems: [ScenarioOverviewView.MileageLogItem]
     let onOpenHistory: () -> Void
+    let onOpenMileage: (UUID) -> Void
     let onEditMileage: (UUID) -> Void
 
     var body: some View {
@@ -120,7 +121,7 @@ struct ScenarioMileageScreen: View {
         } else {
             VStack(spacing: WorthItSpacing.l) {
                 ForEach(currentMonthItems) { item in
-                    ScenarioMileageLogRow(item: item, onEditMileage: onEditMileage)
+                    ScenarioMileageLogRow(item: item, onOpenMileage: onOpenMileage, onEditMileage: onEditMileage)
                 }
             }
         }

@@ -24,7 +24,8 @@ extension ScenarioOverviewView {
         mileageNotes = event.note ?? ""
 
         if mileageMode == .odometer {
-            mileageValue = event.odometerValue.map { formatEditableNumber($0) } ?? ""
+            let currentReading = Double(previousOdometerForMileageForm) + event.distanceValue
+            mileageValue = formatEditableNumber(currentReading)
         } else {
             mileageValue = formatEditableNumber(event.distanceValue)
         }
@@ -137,6 +138,9 @@ extension ScenarioOverviewView {
 
         do {
             try await repository.deleteUsageEvent(usageEventId: editingUsageEvent.id)
+            if selectedMileageDetailId == editingUsageEvent.id {
+                selectedMileageDetailId = nil
+            }
             await loadSummary()
             navigateAfterMileageSave()
             resetMileageForm()
@@ -159,10 +163,24 @@ extension ScenarioOverviewView {
     }
 
     func navigateAfterMileageSave() {
-        let destination: ScenarioTab = scenarioTabPath.contains(.mileageHistory) ? .mileageHistory : .mileage
+        let destination: ScenarioTab
+        if selectedMileageDetailId != nil, scenarioTabPath.contains(.mileageDetail) {
+            destination = .mileageDetail
+        } else if scenarioTabPath.contains(.mileageHistory) {
+            destination = .mileageHistory
+        } else {
+            destination = .mileage
+        }
 
         withAnimation(.easeInOut(duration: 0.20)) {
-            scenarioTabPath = destination == .mileageHistory ? [.mileage] : []
+            switch destination {
+            case .mileageDetail:
+                scenarioTabPath = [.mileage]
+            case .mileageHistory:
+                scenarioTabPath = [.mileage]
+            default:
+                scenarioTabPath = []
+            }
             selectedTab = destination
         }
     }

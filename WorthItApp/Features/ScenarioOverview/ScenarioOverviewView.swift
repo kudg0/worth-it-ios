@@ -4,7 +4,6 @@ struct ScenarioOverviewView: View {
     typealias ChartRange = ScenarioOverviewChartRange
     typealias MetricTrendRange = ScenarioOverviewMetricTrendRange
     typealias CostPerKmTrendScope = ScenarioOverviewCostPerKmTrendScope
-    typealias CostPerKmMode = ScenarioOverviewCostPerKmMode
     typealias CompareMetric = ScenarioOverviewCompareMetric
     typealias MetricTrendSwipeDirection = ScenarioOverviewMetricTrendSwipeDirection
     typealias MetricTrendDeltaDisplay = ScenarioOverviewMetricTrendDeltaDisplay
@@ -37,10 +36,12 @@ struct ScenarioOverviewView: View {
     let onEditScenario: (ScenarioListItem) -> Void
     let onExitScenario: () -> Void
 
-    @AppStorage("scenarioOverview.selectedMetric") var selectedMetricId = OverviewMetric.monthlyCost.rawValue
+    @AppStorage("scenarioOverview.selectedMetric") var selectedMetricId = OverviewMetric.costPerKm.rawValue
     @AppStorage("scenarioOverview.enabledMetrics") var enabledMetricIds = ""
     @AppStorage("scenarioOverview.costPerKmIncludesFinancing") var costPerKmIncludesFinancing = false
-    @AppStorage("scenarioOverview.costPerKmMode") var costPerKmModeRawValue = CostPerKmMode.effective.rawValue
+    @AppStorage("scenarioOverview.includesVehicleResidualValue") var includesVehicleResidualValue = true
+    @AppStorage("scenarioOverview.costPerKmBasis") var costPerKmBasisRawValue = ScenarioAnalyticsCostPerKmBasis.sincePurchase.rawValue
+    @AppStorage("scenarioOverview.analyticsDeltaDisplay") var analyticsDeltaDisplayRawValue = ScenarioAnalyticsDeltaDisplay.absolute.rawValue
     @State var selectedTab: ScenarioTab = .overview
     @State var expenseHistoryFilter: ExpenseHistoryFilter = .all
     @State var selectedExpenseHistoryBarLabel: String?
@@ -49,6 +50,8 @@ struct ScenarioOverviewView: View {
     @State var focusedMileageHistoryMonthStart: Date?
     @State var focusedExpenseId: UUID?
     @State var focusedMileageId: UUID?
+    @State var focusedComparableId: UUID?
+    @State var selectedMileageDetailId: UUID?
     @State var selectedDetailMetric: OverviewMetric = .monthlyCost
     @State var selectedMetricTrendDate: Date?
     @State var selectedMetricTrendRange: MetricTrendRange = .oneYear
@@ -91,14 +94,22 @@ struct ScenarioOverviewView: View {
     @State var chartRange: ChartRange = .month
     @State var displayedScenario: ScenarioListItem?
     @State var currentSummary: ScenarioSummary?
+    @State var currentComparison: ScenarioComparison?
     @State var previousMonthSummary: ScenarioSummary?
     @State var costEvents: [CostEvent] = []
     @State var usageEvents: [UsageEvent] = []
+    @State var alternatives: [AlternativeOption] = []
+    @State var comparisonVisibleAlternativeIds: Set<UUID> = []
+    @State var analyticsDraftIncludesResidualValue = true
+    @State var analyticsDraftDefaultMetric: ScenarioAnalyticsDefaultMetric = .perKm
+    @State var analyticsDraftCostPerKmBasis: ScenarioAnalyticsCostPerKmBasis = .sincePurchase
+    @State var analyticsDraftDeltaDisplay: ScenarioAnalyticsDeltaDisplay = .absolute
     @State var scheduledServices: [ScheduledService] = []
     @State var scheduledServiceDueItems: [ScheduledServiceDueItem] = []
     @State var summaryError: String?
     @State var costEventsError: String?
     @State var usageEventsError: String?
+    @State var alternativesError: String?
     @State var scheduledServicesError: String?
     @State var isUpdatingFavorite = false
     @State var isDeleting = false
@@ -106,13 +117,16 @@ struct ScenarioOverviewView: View {
     @State var showsDeleteConfirmation = false
     @State var actionError: String?
     @State var compareMetric: CompareMetric = .perKm
-    @State var comparableName = "Local Taxi Service"
-    @State var comparablePricingModel = "Per KM + Base Fare"
-    @State var comparableCurrency = "USD ($)"
-    @State var comparableBaseFare = "3.50"
-    @State var comparableCostPerKm = "1.20"
-    @State var comparableMonthlyKm = 450.0
-    @State var comparableMonthlyNote = ""
+    @State var editingAlternative: AlternativeOption?
+    @State var comparableName = ""
+    @State var comparablePricingModel: AlternativePricingMode = .distanceCurve
+    @State var comparablePricePerKm = ""
+    @State var comparablePricePerMinute = ""
+    @State var comparableCurvePoints = Self.emptyComparableCurvePoints()
+    @State var comparablePricePerMonth = ""
+    @State var comparableManualTotal = ""
+    @State var comparableNote = ""
+    @State var comparableInheritedCostCategories: Set<String> = []
     @State var isComparableIncluded = true
 
     var body: some View {
@@ -138,7 +152,8 @@ struct ScenarioOverviewView: View {
                     onAddEntry: openAddEntryChooserFromMaintenance,
                     onAddMileage: { openMileageForm() },
                     onAddComparable: openAddComparableOption,
-                    onRemoveComparable: closeComparableEditor
+                    onRemoveComparable: { Task { await deleteEditingComparable() } },
+                    onEditMileageDetail: editSelectedMileageDetail
                 )
 
                 if showsScenarioNavigation {
@@ -162,7 +177,7 @@ struct ScenarioOverviewView: View {
                     selectedTab: selectedTab,
                     onExit: onExitScenario,
                     onHome: openScenarioHome,
-                    onProfile: openProfile
+                    onSettings: openSettings
                 )
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .ignoresSafeArea(edges: .bottom)
@@ -201,9 +216,32 @@ struct ScenarioOverviewView: View {
             }
 
             if selectedTab == .addComparableOption {
-                AddComparableOptionFooter(onSave: closeComparableEditor)
+                AddComparableOptionFooter(
+                    title: editingAlternative == nil ? "Save Comparable" : "Save Changes",
+                    isLoading: isSavingEntry,
+                    onSave: { Task { await saveComparable() } }
+                )
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .ignoresSafeArea(edges: .bottom)
+            }
+
+            if selectedTab == .analyticsSettings {
+                analyticsModelScreen
+                    .footer
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
+            }
+
+            if selectedTab == .comparisonSettings {
+                ScenarioComparisonVisibilityScreen(
+                    alternatives: alternatives,
+                    isSaving: isSavingEntry,
+                    selectedIds: $comparisonVisibleAlternativeIds,
+                    onSave: { selectedIds in Task { await saveComparisonVisibility(selectedIds: selectedIds) } }
+                )
+                .footer
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                .ignoresSafeArea(edges: .bottom)
             }
 
             if let serviceId = activeScheduledServiceActionId {
@@ -291,6 +329,7 @@ struct ScenarioOverviewView: View {
                 logItems: mileageLogItems,
                 currentMonthItems: currentMonthMileageLogItems,
                 onOpenHistory: { openMileageHistory() },
+                onOpenMileage: openMileageDetail,
                 onEditMileage: beginEditingMileage
             )
         case .insights:
@@ -298,20 +337,44 @@ struct ScenarioOverviewView: View {
         case .compare:
             ScenarioCompareScreen(
                 selectedMetric: $compareMetric,
-                onAddComparable: openAddComparableOption
+                currency: activeScenario.currency,
+                summary: currentSummary,
+                ownershipCostPerKm: analyticsCostPerKmValue,
+                ownershipMonthlyCost: analyticsMonthlyCostValue,
+                comparison: currentComparison,
+                alternatives: alternatives,
+                alternativesError: alternativesError,
+                chartSeries: compareChartSeries,
+                scenarioStartDate: activeScenario.startDate,
+                focusedComparableId: focusedComparableId,
+                onAddComparable: openAddComparableOption,
+                onEditComparable: beginEditingComparable
             )
         case .addComparableOption:
             AddComparableOptionScreen(
+                isEditing: editingAlternative != nil,
                 name: $comparableName,
                 pricingModel: $comparablePricingModel,
-                currency: $comparableCurrency,
-                baseFare: $comparableBaseFare,
-                costPerKm: $comparableCostPerKm,
-                monthlyKm: $comparableMonthlyKm,
-                monthlyNote: $comparableMonthlyNote,
+                pricePerKm: $comparablePricePerKm,
+                pricePerMinute: $comparablePricePerMinute,
+                curvePoints: $comparableCurvePoints,
+                pricePerMonth: $comparablePricePerMonth,
+                manualTotal: $comparableManualTotal,
+                note: $comparableNote,
+                inheritedCostCategories: $comparableInheritedCostCategories,
+                currencyCode: activeScenario.currency,
                 isIncluded: $isComparableIncluded,
-                onRemove: closeComparableEditor
+                onRemove: { Task { await deleteEditingComparable() } }
             )
+        case .comparisonSettings:
+            ScenarioComparisonVisibilityScreen(
+                alternatives: alternatives,
+                isSaving: isSavingEntry,
+                selectedIds: $comparisonVisibleAlternativeIds,
+                onSave: { selectedIds in Task { await saveComparisonVisibility(selectedIds: selectedIds) } }
+            )
+        case .analyticsSettings:
+            analyticsModelScreen
         case .addEntryChooser:
             AddEntryChooserScreen(
                 selectedEntryKind: $selectedEntryKind,
@@ -325,6 +388,8 @@ struct ScenarioOverviewView: View {
             ExpenseHistoryScreen(model: expenseHistoryScreenModel)
         case .mileageHistory:
             MileageHistoryScreen(model: mileageHistoryScreenModel)
+        case .mileageDetail:
+            mileageDetailContent
         case .metricDetail:
             metricDetailContent
         case .logMileage:
@@ -346,8 +411,21 @@ struct ScenarioOverviewView: View {
                 onOpenTimePicker: { activeMileagePicker = .time },
                 onDelete: { Task { await deleteEditingMileage() } }
             )
-        case .profile:
-            ProfileView(defaultCurrency: activeScenario.currency)
+        case .settings:
+            ScenarioSettingsScreen(
+                scenarioName: activeScenario.name,
+                vehicleSummary: scenarioVehicleSummary,
+                acquisitionSummary: scenarioAcquisitionSummary,
+                resaleSummary: scenarioResaleSummary,
+                analyticsSummary: scenarioAnalyticsSummary,
+                comparisonSummary: scenarioComparisonSummary,
+                preferencesSummary: scenarioPreferencesSummary,
+                onEditScenario: { onEditScenario(activeScenario) },
+                onOpenAnalytics: { openAnalyticsSettings() },
+                onOpenComparison: { openComparisonSettings() },
+                onOpenPreferences: {},
+                onDeleteScenario: { showsDeleteConfirmation = true }
+            )
         }
     }
 
@@ -363,6 +441,14 @@ struct ScenarioOverviewView: View {
     var metricTrendPoints: [MetricTrendPoint] {
         if selectedDetailMetric == .costPerKm {
             return sortedTrendPoints(costPerKmMetricTrendPoints)
+        }
+
+        if selectedDetailMetric == .currentMonthCostPerKm {
+            return sortedTrendPoints(activeCostPerKmTrendRange == .oneYear ? monthlyEfficiencyTrendPoints(maxMonths: 12) : monthlyEfficiencyTrendPoints(maxMonths: nil))
+        }
+
+        if selectedDetailMetric == .totalOwnership {
+            return sortedTrendPoints(totalOwnershipTrendPoints(maxMonths: selectedMetricTrendRange == .oneYear ? 12 : nil))
         }
 
         let realPoints = realMetricTrendPoints
@@ -398,11 +484,7 @@ struct ScenarioOverviewView: View {
     }
 
     var costPerKmMetricTrendPoints: [MetricTrendPoint] {
-        if costPerKmMode == .effective {
-            return effectiveCostPerKmTrendPoints(maxMonths: activeCostPerKmTrendRange == .oneYear ? 12 : nil)
-        }
-
-        return sortedTrendPoints(activeCostPerKmTrendRange == .oneYear ? costPerKmSelectedMonthTrendPoints : costPerKmSelectedYearTrendPoints)
+        projectedCostPerKmTrendPoints(maxMonths: activeCostPerKmTrendRange == .oneYear ? 12 : nil)
     }
 
     func effectiveCostPerKmTrendPoints(maxMonths: Int?) -> [MetricTrendPoint] {
@@ -416,11 +498,16 @@ struct ScenarioOverviewView: View {
         }
     }
 
-    var costPerKmMonthlyComparisonTrendPoints: [MetricTrendPoint] {
-        if costPerKmMode == .effective {
-            return effectiveCostPerKmTrendPoints(maxMonths: nil).suffix(2).map { $0 }
-        }
+    func projectedCostPerKmTrendPoints(maxMonths: Int?) -> [MetricTrendPoint] {
+        let count = maxMonths ?? max(efficiencyMonthStarts(maxMonths: nil).count, 1)
+        return projectedEfficiencySnapshotTrendPoints(period: .month, count: count)
+    }
 
+    var costPerKmMonthlyComparisonTrendPoints: [MetricTrendPoint] {
+        effectiveCostPerKmTrendPoints(maxMonths: nil).suffix(2).map { $0 }
+    }
+
+    var currentMonthCostPerKmComparisonTrendPoints: [MetricTrendPoint] {
         let calendar = Calendar(identifier: .gregorian)
         let previousMonthStart = calendar.date(byAdding: .month, value: -1, to: currentMonthStart)
 
@@ -511,11 +598,12 @@ struct ScenarioOverviewView: View {
             return twoPointTrend(previous: previousMonthlySpendValue, current: monthlySpendValue)
         case .costPerKm:
             return costPerKmMonthlyComparisonTrendPoints
+        case .currentMonthCostPerKm:
+            return currentMonthCostPerKmComparisonTrendPoints
+        case .totalExpenses:
+            return totalExpensesTrendPoints(maxMonths: nil)
         case .totalOwnership:
-            return twoPointTrend(
-                previous: previousOwnershipNetCost.map { max($0, 0) },
-                current: totalOwnershipCost.map(doubleValue)
-            )
+            return totalOwnershipTrendPoints(maxMonths: nil)
         case .projectedGain, .expectedResale, .loanInterest:
             return []
         }
@@ -538,7 +626,7 @@ struct ScenarioOverviewView: View {
     }
 
     var usesScrollableMetricTrendChart: Bool {
-        if selectedDetailMetric == .costPerKm {
+        if selectedDetailMetric == .costPerKm || selectedDetailMetric == .currentMonthCostPerKm {
             return activeCostPerKmTrendRange == .all && metricTrendPoints.count > metricTrendVisiblePointCount
         }
 
@@ -546,7 +634,7 @@ struct ScenarioOverviewView: View {
     }
 
     var metricTrendVisiblePointCount: Int {
-        if selectedDetailMetric == .costPerKm {
+        if selectedDetailMetric == .costPerKm || selectedDetailMetric == .currentMonthCostPerKm {
             switch costPerKmTrendScope {
             case .day:
                 return 30
@@ -573,9 +661,11 @@ struct ScenarioOverviewView: View {
 
     var metricTrendTitle: String {
         switch selectedDetailMetric {
-        case .costPerKm:
+        case .costPerKm, .currentMonthCostPerKm:
             "\(costPerKmTrendScope.trendTitle) trend"
-        case .monthlyCost, .totalOwnership:
+        case .totalOwnership:
+            realMetricTrendPoints.count >= 2 ? "Cost inputs trend" : "Current cost inputs"
+        case .monthlyCost, .totalExpenses:
             realMetricTrendPoints.count >= 2 ? "Monthly trend" : "Current baseline"
         case .projectedGain, .expectedResale, .loanInterest:
             "Current snapshot"
@@ -587,7 +677,6 @@ struct ScenarioOverviewView: View {
             selectedMetricTrendDate ?? defaultMetricTrendPoint?.date
         } set: { newValue in
             guard let newValue else {
-                selectedMetricTrendDate = nil
                 return
             }
 
@@ -604,7 +693,7 @@ struct ScenarioOverviewView: View {
     }
 
     var defaultMetricTrendPoint: MetricTrendPoint? {
-        if selectedDetailMetric == .costPerKm {
+        if selectedDetailMetric == .costPerKm || selectedDetailMetric == .currentMonthCostPerKm {
             let calendar = Calendar(identifier: .gregorian)
             let currentBucketStart = calendar.dateInterval(of: metricTrendCalendarComponent, for: Date())?.start ?? Date()
             return nearestMetricTrendPoint(to: currentBucketStart) ?? metricTrendPoints.last
@@ -639,19 +728,23 @@ struct ScenarioOverviewView: View {
     }
 
     func moveCostPerKmTrendPeriod(direction: MetricTrendSwipeDirection) {
-        let calendar = Calendar(identifier: .gregorian)
-        let component: Calendar.Component = activeCostPerKmTrendRange == .oneYear ? .month : .year
-        let currentPeriodStart = activeCostPerKmTrendRange == .oneYear
-            ? costPerKmSelectedMonthStart
-            : costPerKmSelectedYearStart
-        let currentAllowedStart = calendar.dateInterval(of: component, for: Date())?.start ?? Date()
-        let scenarioAllowedStart = calendar.dateInterval(of: component, for: activeScenario.startDate)?.start ?? activeScenario.startDate
-        let delta = direction == .older ? -1 : 1
+        let points = metricTrendPoints.sorted { $0.date < $1.date }
+        guard !points.isEmpty else { return }
 
-        guard let next = calendar.date(byAdding: component, value: delta, to: currentPeriodStart) else { return }
-        let clamped = min(max(next, scenarioAllowedStart), currentAllowedStart)
+        let currentDate = selectedMetricTrendPoint?.date ?? defaultMetricTrendPoint?.date ?? points.last?.date ?? Date()
+        let currentIndex = points.enumerated().min { lhs, rhs in
+            abs(lhs.element.date.timeIntervalSince(currentDate)) < abs(rhs.element.date.timeIntervalSince(currentDate))
+        }?.offset ?? max(points.count - 1, 0)
 
-        selectedMetricTrendDate = clamped
+        let nextIndex: Int
+        switch direction {
+        case .older:
+            nextIndex = max(currentIndex - 1, 0)
+        case .newer:
+            nextIndex = min(currentIndex + 1, points.count - 1)
+        }
+
+        selectedMetricTrendDate = points[nextIndex].date
     }
 
     func nearestMetricTrendPoint(to date: Date) -> MetricTrendPoint? {
@@ -684,7 +777,7 @@ struct ScenarioOverviewView: View {
 
     func metricTrendPointValueLabel(_ point: MetricTrendPoint) -> String {
         switch selectedDetailMetric {
-        case .costPerKm:
+        case .costPerKm, .currentMonthCostPerKm:
             "\(currencySymbol)\(formatDouble(point.value, fractionDigits: 2))"
         default:
             "\(currencySymbol)\(formatDouble(point.value, fractionDigits: 0))"
@@ -697,6 +790,10 @@ struct ScenarioOverviewView: View {
             monthlySpendValue ?? 0
         case .costPerKm:
             currentCostPerDistanceValue ?? 0
+        case .currentMonthCostPerKm:
+            currentMonthlyCostPerDistanceValue ?? 0
+        case .totalExpenses:
+            totalLoggedExpensesValue
         case .totalOwnership:
             totalOwnershipCost.map(doubleValue) ?? 0
         case .projectedGain:
@@ -720,20 +817,20 @@ struct ScenarioOverviewView: View {
     func metricTrendAxisLabel(for date: Date) -> String {
         let calendar = Calendar(identifier: .gregorian)
 
-        if selectedDetailMetric == .costPerKm,
+        if (selectedDetailMetric == .costPerKm || selectedDetailMetric == .currentMonthCostPerKm),
            let currentBucketStart = calendar.dateInterval(of: metricTrendCalendarComponent, for: Date())?.start,
            calendar.isDate(date, equalTo: currentBucketStart, toGranularity: metricTrendCalendarComponent) {
             return "Present"
         }
 
-        if selectedDetailMetric != .costPerKm,
+        if selectedDetailMetric != .costPerKm && selectedDetailMetric != .currentMonthCostPerKm,
            calendar.isDate(date, equalTo: currentMonthStart, toGranularity: .month) {
             return "Present"
         }
 
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-        if selectedDetailMetric == .costPerKm {
+        if selectedDetailMetric == .costPerKm || selectedDetailMetric == .currentMonthCostPerKm {
             switch costPerKmTrendScope {
             case .day, .week:
                 formatter.dateFormat = "d MMM"
@@ -748,11 +845,11 @@ struct ScenarioOverviewView: View {
 
     var metricTrendCalendarComponent: Calendar.Component {
         if selectedDetailMetric == .costPerKm {
-            if costPerKmMode == .effective {
-                return .month
-            }
+            return .month
+        }
 
-            return activeCostPerKmTrendRange == .oneYear ? .day : .month
+        if selectedDetailMetric == .currentMonthCostPerKm {
+            return .month
         }
 
         switch costPerKmTrendScope {
@@ -778,6 +875,29 @@ struct ScenarioOverviewView: View {
         return min(selectedMonthEnd, Date())
     }
 
+    var costPerKmSelectedPeriodEnd: Date {
+        let calendar = Calendar(identifier: .gregorian)
+        guard let point = selectedMetricTrendPoint else {
+            return Date()
+        }
+
+        if !point.isProjected {
+            let periodEnd = calendar.date(byAdding: metricTrendCalendarComponent, value: 1, to: point.date) ?? Date()
+            if periodEnd >= Date() {
+                return Date()
+            }
+
+            return calendar.date(byAdding: .day, value: -1, to: periodEnd) ?? point.date
+        }
+
+        if calendar.isDate(point.date, inSameDayAs: currentYearEndDate(from: point.date, calendar: calendar)) {
+            return point.date
+        }
+
+        let nextPeriod = calendar.date(byAdding: metricTrendCalendarComponent, value: 1, to: point.date) ?? point.date
+        return calendar.date(byAdding: .day, value: -1, to: nextPeriod) ?? point.date
+    }
+
     var costPerKmSelectedYearStart: Date {
         let calendar = Calendar(identifier: .gregorian)
         let sourceDate = selectedMetricTrendDate ?? Date()
@@ -790,12 +910,11 @@ struct ScenarioOverviewView: View {
 
     var showsCostPerKmYearRangeToggle: Bool {
         let currentYearStart = Calendar(identifier: .gregorian).dateInterval(of: .year, for: Date())?.start ?? currentMonthStart
-
-        if costPerKmMode == .effective {
-            return effectiveCostPerKmTrendPoints(maxMonths: nil).contains { $0.date < currentYearStart }
+        if selectedDetailMetric == .currentMonthCostPerKm {
+            return monthlyEfficiencyTrendPoints(maxMonths: nil).contains { $0.date < currentYearStart }
         }
 
-        return monthlyEfficiencyTrendPoints(maxMonths: nil).contains { $0.date < currentYearStart }
+        return effectiveCostPerKmTrendPoints(maxMonths: nil).contains { $0.date < currentYearStart }
     }
 
     var monthlySpend: String {
@@ -808,10 +927,10 @@ struct ScenarioOverviewView: View {
 
     var monthlySpendValue: Double? {
         let currentExpenses = doubleValue(currentMonthExpenseTotal)
-        let loanPayment = doubleValue(loanMonthlyPayment)
+        let loanInterest = currentMonthLoanInterest
 
-        if loanPayment > 0 || currentExpenses > 0 {
-            return loanPayment + currentExpenses
+        if loanInterest > 0 || currentExpenses > 0 {
+            return loanInterest + currentExpenses
         }
 
         return monthlyCostValue(from: currentSummary)
@@ -838,13 +957,11 @@ struct ScenarioOverviewView: View {
     }
 
     var previousMonthlySpendValue: Double? {
-        guard previousMonthExpenseCount > 0 else { return nil }
-
         let previousExpenses = doubleValue(previousMonthExpenseTotal)
-        let loanPayment = doubleValue(loanMonthlyPayment)
+        let loanInterest = previousMonthLoanInterest
 
-        if loanPayment > 0 || previousExpenses > 0 {
-            return loanPayment + previousExpenses
+        if loanInterest > 0 || previousExpenses > 0 {
+            return loanInterest + previousExpenses
         }
 
         return monthlyCostValue(from: previousMonthSummary)
@@ -894,8 +1011,8 @@ struct ScenarioOverviewView: View {
     }
 
     var monthlySpendProgress: CGFloat {
-        if loanMonthlyPayment > 0 {
-            return normalizedProgress(doubleValue(loanMonthlyPayment) / max(doublePurchasePrice / 12, 1))
+        if let monthlySpendValue {
+            return normalizedProgress(monthlySpendValue / max(doublePurchasePrice / 12, 1))
         }
 
         if let currentSummary, currentSummary.includedCostsTotal > 0, currentSummary.ownershipWindow.monthsOwned > 0 {
@@ -908,6 +1025,11 @@ struct ScenarioOverviewView: View {
 
     var costPerKmProgress: CGFloat {
         guard let costPerKm = currentCostPerDistanceValue else { return 0 }
+        return normalizedProgress(costPerKm / 1.0)
+    }
+
+    var currentMonthCostPerKmProgress: CGFloat {
+        guard let costPerKm = currentMonthlyCostPerDistanceValue else { return 0 }
         return normalizedProgress(costPerKm / 1.0)
     }
 
@@ -950,23 +1072,132 @@ struct ScenarioOverviewView: View {
     static let dailyExpenseCategories: Set<String> = ["fuel", "wash"]
 
     var monthlyCostTrend: MetricTrend {
-        metricTrend(points: realMetricTrendPoints(for: .monthlyCost), lowerIsBetter: true)
+        metricTrend(points: realMetricTrendPoints(for: .monthlyCost), lowerIsBetter: true, deltaDisplay: analyticsMetricTrendDeltaDisplay)
     }
 
     var costPerKmTrend: MetricTrend {
-        metricTrend(points: realMetricTrendPoints(for: .costPerKm), lowerIsBetter: true, deltaDisplay: .currency)
+        metricTrend(points: realMetricTrendPoints(for: .costPerKm), lowerIsBetter: true, deltaDisplay: analyticsMetricTrendDeltaDisplay)
+    }
+
+    var currentMonthCostPerKmTrend: MetricTrend {
+        metricTrend(points: realMetricTrendPoints(for: .currentMonthCostPerKm), lowerIsBetter: true, deltaDisplay: analyticsMetricTrendDeltaDisplay)
     }
 
     var totalOwnershipTrend: MetricTrend {
-        metricTrend(points: realMetricTrendPoints(for: .totalOwnership), lowerIsBetter: true)
+        metricTrend(points: realMetricTrendPoints(for: .totalOwnership), lowerIsBetter: true, deltaDisplay: analyticsMetricTrendDeltaDisplay)
+    }
+
+    var totalLoggedExpensesValue: Double {
+        costEvents.reduce(0) { total, event in
+            total + doubleValue(decimalValue(event.amount))
+        }
+    }
+
+    var totalLoggedExpensesDisplay: String {
+        "\(currencySymbol)\(formatDouble(totalLoggedExpensesValue, fractionDigits: 0))"
+    }
+
+    var totalLoggedExpensesProgress: CGFloat {
+        normalizedProgress(totalLoggedExpensesValue / max(doublePurchasePrice, 1))
+    }
+
+    func totalExpensesTrendPoints(maxMonths: Int?) -> [MetricTrendPoint] {
+        let calendar = Calendar(identifier: .gregorian)
+        return efficiencyMonthStarts(maxMonths: maxMonths).map { monthStart in
+            let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) ?? monthStart
+            let total = costEvents
+                .filter { $0.date < monthEnd }
+                .reduce(0) { $0 + doubleValue(decimalValue($1.amount)) }
+            return MetricTrendPoint(date: monthStart, value: total)
+        }
+    }
+
+    var compareChartSeries: [ScenarioCompareChartSeries] {
+        if let backendSeries = backendCompareChartSeries, !backendSeries.isEmpty {
+            return backendSeries
+        }
+
+        return []
+    }
+
+    var backendCompareChartSeries: [ScenarioCompareChartSeries]? {
+        guard let series = currentComparison?.series else { return nil }
+
+        var result: [ScenarioCompareChartSeries] = []
+        let ownershipPoints = series.ownership.compactMap { point -> ScenarioCompareChartPoint? in
+            guard let value = compareChartValue(point) else { return nil }
+            return ScenarioCompareChartPoint(date: point.date, value: value)
+        }
+
+        if !ownershipPoints.isEmpty {
+            result.append(
+                ScenarioCompareChartSeries(
+                    id: "ownership",
+                    title: "Your car",
+                    color: WorthItColor.primaryContainer,
+                    points: ownershipPoints,
+                    isBenchmark: false
+                )
+            )
+        }
+
+        let visibleAlternativeIds = Set(alternatives.filter(\.isIncluded).map(\.id))
+        let colors = [
+            Color(hex: 0x7DD3FC),
+            Color(hex: 0xA7F3D0),
+            Color(hex: 0xC4B5FD),
+            Color(hex: 0xF9A8D4)
+        ]
+
+        result.append(
+            contentsOf: series.alternatives
+                .filter { visibleAlternativeIds.contains($0.id) }
+                .enumerated()
+                .compactMap { index, alternative -> ScenarioCompareChartSeries? in
+                    let points = alternative.points.compactMap { point -> ScenarioCompareChartPoint? in
+                        guard let value = compareChartValue(point) else { return nil }
+                        return ScenarioCompareChartPoint(date: point.date, value: value)
+                    }
+                    guard !points.isEmpty else { return nil }
+
+                    return ScenarioCompareChartSeries(
+                        id: alternative.id.uuidString,
+                        title: alternative.name,
+                        color: colors[index % colors.count].opacity(0.86),
+                        points: points,
+                        isBenchmark: true
+                    )
+                }
+        )
+
+        return result
+    }
+
+    func compareChartValue(_ point: ScenarioComparison.Series.Point) -> Double? {
+        switch compareMetric {
+        case .perKm:
+            return point.perKm
+        case .perMonth:
+            return point.perMonth
+        case .totalCost:
+            return point.total
+        }
+    }
+
+    func averageMonthlyOwnershipCost(asOf date: Date) -> Double? {
+        let calendar = Calendar(identifier: .gregorian)
+        let start = expenseHistoryMonthStart(for: activeScenario.startDate)
+        let end = min(max(date, start), Date())
+        let monthCount = max((calendar.dateComponents([.month], from: start, to: end).month ?? 0) + 1, 1)
+        return netOwnershipCost(to: end) / Double(monthCount)
     }
 
     var costPerKmBreakdownTrend: MetricTrend? {
-        if costPerKmMode == .period {
+        if selectedDetailMetric == .currentMonthCostPerKm {
             return costPerKmPeriodBreakdownTrend
         }
 
-        let points = sortedTrendPoints(costPerKmMetricTrendPoints.filter { !$0.isProjected })
+        let points = sortedTrendPoints(costPerKmMetricTrendPoints)
         guard let currentPoint = selectedMetricTrendPoint ?? points.last,
               let currentIndex = points.lastIndex(where: { $0.id == currentPoint.id }),
               currentIndex > 0
@@ -978,7 +1209,7 @@ struct ScenarioOverviewView: View {
             previousPoint: points[currentIndex - 1],
             currentPoint: currentPoint,
             lowerIsBetter: true,
-            deltaDisplay: .currency
+            deltaDisplay: analyticsMetricTrendDeltaDisplay
         )
     }
 
@@ -1001,7 +1232,7 @@ struct ScenarioOverviewView: View {
             previousPoint: MetricTrendPoint(date: previousStart, value: previous),
             currentPoint: MetricTrendPoint(date: costPerKmBreakdownStart, value: current),
             lowerIsBetter: true,
-            deltaDisplay: .currency
+            deltaDisplay: analyticsMetricTrendDeltaDisplay
         )
     }
 
@@ -1040,6 +1271,15 @@ struct ScenarioOverviewView: View {
         let deltaPercent = (delta / previous) * 100
         let neutralThreshold = 0.05
         let trend = trendPresentation(delta: deltaPercent, neutralThreshold: neutralThreshold, lowerIsBetter: lowerIsBetter)
+        let previousMonth = monthName(for: previousPoint.date).uppercased()
+        guard abs(deltaPercent) > neutralThreshold else {
+            return MetricTrend(
+                label: "NO CHANGE VS \(previousMonth)",
+                iconName: trend.iconName,
+                color: trend.color
+            )
+        }
+
         let sign = abs(deltaPercent) > neutralThreshold ? (deltaPercent > 0 ? "+" : "-") : ""
         let deltaLabel: String = switch deltaDisplay {
         case .percent:
@@ -1049,7 +1289,7 @@ struct ScenarioOverviewView: View {
         }
 
         return MetricTrend(
-            label: "\(deltaLabel) VS \(monthName(for: previousPoint.date).uppercased())",
+            label: "\(deltaLabel) VS \(previousMonth)",
             iconName: trend.iconName,
             color: trend.color
         )
@@ -1101,7 +1341,7 @@ struct ScenarioOverviewView: View {
     }
 
     var monthlyMetricTitle: String {
-        activeScenario.acquisitionType == "loan" ? "Loan Payment" : "Monthly Spend"
+        activeScenario.acquisitionType == "loan" ? "Monthly Cost" : "Monthly Spend"
     }
 
     var expectedResaleValue: Decimal {
@@ -1125,6 +1365,66 @@ struct ScenarioOverviewView: View {
 
         guard denominator > 0 else { return 0 }
         return Decimal(principalValue * monthlyRate / denominator)
+    }
+
+    var currentMonthLoanInterest: Double {
+        let calendar = Calendar(identifier: .gregorian)
+        let monthEnd = calendar.date(byAdding: .month, value: 1, to: currentMonthStart) ?? currentMonthStart
+        return loanInterestCost(from: currentMonthStart, to: monthEnd)
+    }
+
+    var previousMonthLoanInterest: Double {
+        let calendar = Calendar(identifier: .gregorian)
+        let monthStart = expenseHistoryMonthStart(for: previousMonthAsOfDate)
+        let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) ?? monthStart
+        return loanInterestCost(from: monthStart, to: monthEnd)
+    }
+
+    func loanInterestCost(from start: Date, to end: Date) -> Double {
+        guard activeScenario.acquisitionType == "loan",
+              let loanTermMonths = activeScenario.loanTermMonths,
+              loanTermMonths > 0
+        else {
+            return 0
+        }
+
+        let principal = doubleValue(decimalValue(activeScenario.loanAmount))
+        let annualRate = doubleValue(decimalValue(activeScenario.loanAnnualInterestRate) / 100)
+        let monthlyPayment = doubleValue(loanMonthlyPayment)
+        guard principal > 0, annualRate > 0, monthlyPayment > 0 else { return 0 }
+
+        let calendar = Calendar(identifier: .gregorian)
+        let loanStart = expenseHistoryMonthStart(for: activeScenario.startDate)
+        guard let loanEnd = calendar.date(byAdding: .month, value: loanTermMonths, to: loanStart) else { return 0 }
+
+        let intervalStart = max(start, loanStart)
+        let intervalEnd = min(end, loanEnd)
+        guard intervalStart < intervalEnd else { return 0 }
+
+        let monthlyRate = annualRate / 12
+        var cursor = expenseHistoryMonthStart(for: intervalStart)
+        var total = 0.0
+
+        while cursor < intervalEnd {
+            guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: cursor) else {
+                break
+            }
+
+            let monthOffset = max(calendar.dateComponents([.month], from: loanStart, to: cursor).month ?? 0, 0)
+            let balanceBeforeMonth = principal * pow(1 + monthlyRate, Double(monthOffset))
+                - monthlyPayment * ((pow(1 + monthlyRate, Double(monthOffset)) - 1) / monthlyRate)
+            let monthlyInterest = max(balanceBeforeMonth, 0) * monthlyRate
+            let overlapStart = max(intervalStart, cursor)
+            let overlapEnd = min(intervalEnd, nextMonth)
+
+            if overlapStart < overlapEnd {
+                total += monthlyInterest
+            }
+
+            cursor = nextMonth
+        }
+
+        return total
     }
 
     var loanInterestTotal: Decimal {
@@ -1172,22 +1472,6 @@ struct ScenarioOverviewView: View {
                 }
             }
         )
-    }
-
-    var costPerKmMode: CostPerKmMode {
-        CostPerKmMode(rawValue: costPerKmModeRawValue) ?? .effective
-    }
-
-    var costPerKmModeBinding: Binding<CostPerKmMode> {
-        Binding {
-            costPerKmMode
-        } set: { newValue in
-            withAnimation(.easeInOut(duration: 0.18)) {
-                costPerKmModeRawValue = newValue.rawValue
-                selectedEfficiencyChartDate = nil
-                selectedMetricTrendDate = nil
-            }
-        }
     }
 
 }

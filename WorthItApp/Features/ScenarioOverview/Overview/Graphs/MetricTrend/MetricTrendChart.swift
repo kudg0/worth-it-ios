@@ -91,29 +91,70 @@ struct MetricTrendChart: View {
     }
 
     private var dashedLineMarks: some ChartContent {
-        ForEach(model.dashedPoints) { point in
+        ForEach(projectedDashPoints) { point in
             LineMark(
                 x: .value(model.xValueName, point.date),
-                y: .value("Value", point.value)
+                y: .value("Projected value", point.value),
+                series: .value("Projection dash", point.series)
             )
-            .foregroundStyle(model.accentColor.opacity(0.70))
-            .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round, dash: [6, 6]))
-            .interpolationMethod(.monotone)
+            .foregroundStyle(WorthItColor.projectedBlue.opacity(0.68))
+            .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .butt, lineJoin: .miter))
+            .interpolationMethod(.linear)
         }
+    }
+
+    private var projectedDashPoints: [ProjectedDashPoint] {
+        Self.dashPoints(from: model.dashedPoints)
+    }
+
+    private static func dashPoints(from points: [ScenarioOverviewView.MetricTrendPoint]) -> [ProjectedDashPoint] {
+        guard points.count >= 2 else { return [] }
+
+        return points.indices.dropFirst().flatMap { index -> [ProjectedDashPoint] in
+            let start = points[index - 1]
+            let end = points[index]
+            let dashFractions: [(Double, Double)] = [(0.00, 0.34), (0.58, 0.92)]
+
+            return dashFractions.enumerated().flatMap { dashIndex, fraction -> [ProjectedDashPoint] in
+                let series = "\(index)-\(dashIndex)"
+                return [
+                    ProjectedDashPoint(
+                        id: "\(series)-start",
+                        series: series,
+                        date: interpolatedDate(from: start.date, to: end.date, fraction: fraction.0),
+                        value: interpolatedValue(from: start.value, to: end.value, fraction: fraction.0)
+                    ),
+                    ProjectedDashPoint(
+                        id: "\(series)-end",
+                        series: series,
+                        date: interpolatedDate(from: start.date, to: end.date, fraction: fraction.1),
+                        value: interpolatedValue(from: start.value, to: end.value, fraction: fraction.1)
+                    )
+                ]
+            }
+        }
+    }
+
+    private static func interpolatedDate(from start: Date, to end: Date, fraction: Double) -> Date {
+        start.addingTimeInterval(end.timeIntervalSince(start) * fraction)
+    }
+
+    private static func interpolatedValue(from start: Double, to end: Double, fraction: Double) -> Double {
+        start + (end - start) * fraction
     }
 
     @ChartContentBuilder
     private var selectedMarks: some ChartContent {
         if let selectedPoint = model.selectedPoint {
             RuleMark(x: .value(model.selectedRuleName, selectedPoint.date))
-                .foregroundStyle(WorthItColor.primaryContainer.opacity(0.28))
+                .foregroundStyle(selectedPoint.isProjected ? WorthItColor.projectedBlue.opacity(0.30) : WorthItColor.primaryContainer.opacity(0.28))
                 .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
 
             PointMark(
                 x: .value(model.selectedRuleName, selectedPoint.date),
                 y: .value(model.selectedValueName, selectedPoint.value)
             )
-            .foregroundStyle(model.accentColor)
+            .foregroundStyle(selectedPoint.isProjected ? WorthItColor.projectedBlue : model.accentColor)
             .symbolSize(model.selectedSymbolSize)
         }
     }
@@ -146,4 +187,11 @@ struct MetricTrendChart: View {
             }
         }
     }
+}
+
+private struct ProjectedDashPoint: Identifiable {
+    let id: String
+    let series: String
+    let date: Date
+    let value: Double
 }

@@ -20,13 +20,14 @@ extension ScenarioOverviewView {
             let monthEvents = costEvents.filter { event in
                 event.date >= monthStart && event.date < monthEnd
             }
+            let monthLoanInterest = expenseHistoryLoanInterest(for: monthStart)
             let total = costEvents.reduce(Decimal(0)) { partial, event in
                 if event.date >= monthStart && event.date < monthEnd {
                     return partial + decimalValue(event.amount)
                 }
 
                 return partial
-            }
+            } + Decimal(monthLoanInterest)
             let previousTotal = costEvents.reduce(Decimal(0)) { partial, event in
                 guard let previousMonthStart, let previousMonthEnd else { return partial }
                 if event.date >= previousMonthStart && event.date < previousMonthEnd {
@@ -34,7 +35,7 @@ extension ScenarioOverviewView {
                 }
 
                 return partial
-            }
+            } + Decimal(previousMonthStart.map(expenseHistoryLoanInterest(for:)) ?? 0)
 
             return ExpenseHistoryBar(
                 monthStart: monthStart,
@@ -42,7 +43,7 @@ extension ScenarioOverviewView {
                 label: expenseHistoryMonthLabel(for: monthStart),
                 total: doubleValue(total),
                 previousTotal: previousMonthStart == nil ? nil : doubleValue(previousTotal),
-                count: monthEvents.count,
+                count: monthEvents.count + (monthLoanInterest > 0 ? 1 : 0),
                 isCurrentMonth: expenseHistoryIsSameMonth(monthStart, currentMonthStart)
             )
         }
@@ -80,14 +81,50 @@ extension ScenarioOverviewView {
                 return expenseHistoryIsSameMonth(event.date, selectedExpenseHistoryBar.monthStart)
             }
             .sorted { $0.date > $1.date }
-        let grouped = Dictionary(grouping: filteredEvents) { event in
+        let groupedEvents = Dictionary(grouping: filteredEvents) { event in
             calendar.date(from: calendar.dateComponents([.year, .month], from: event.date)) ?? event.date
         }
 
-        return grouped
-            .map { monthStart, events in
-                ExpenseMonthGroup(monthStart: monthStart, events: events.sorted { $0.date > $1.date })
+        let eventMonthStarts = Set(groupedEvents.keys)
+        let syntheticMonthStarts = expenseHistoryFilter == .all
+            ? expenseHistoryBars.filter { $0.total > 0 }.map(\.monthStart)
+            : []
+        let monthStarts = Set(eventMonthStarts).union(syntheticMonthStarts)
+
+        return monthStarts
+            .map { monthStart in
+                let events = groupedEvents[monthStart] ?? []
+                let syntheticItems = expenseHistorySyntheticItems(for: monthStart)
+                return ExpenseMonthGroup(
+                    monthStart: monthStart,
+                    events: events.sorted { $0.date > $1.date },
+                    syntheticItems: expenseHistoryFilter == .all ? syntheticItems : []
+                )
             }
             .sorted { $0.monthStart > $1.monthStart }
+    }
+
+    func expenseHistorySyntheticItems(for monthStart: Date) -> [ExpenseMonthGroup.SyntheticItem] {
+        let loanInterest = expenseHistoryLoanInterest(for: monthStart)
+        guard loanInterest > 0 else { return [] }
+
+        return [
+            ExpenseMonthGroup.SyntheticItem(
+                id: "loan-interest-\(expenseHistoryMonthIdentifier(for: monthStart))",
+                title: "Loan interest accrued",
+                subtitle: "Financing cost • \(expenseHistoryMonthLabel(for: monthStart))",
+                value: loanInterest,
+                valueText: "\(currencySymbol)\(formatDouble(loanInterest, fractionDigits: 2))",
+                detail: "Loan interest",
+                systemIcon: "building.columns.fill",
+                accentColor: "finance"
+            )
+        ]
+    }
+
+    func expenseHistoryLoanInterest(for monthStart: Date) -> Double {
+        let calendar = Calendar(identifier: .gregorian)
+        let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) ?? monthStart
+        return loanInterestCost(from: monthStart, to: monthEnd)
     }
 }

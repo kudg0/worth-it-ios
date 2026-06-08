@@ -15,10 +15,16 @@ extension ScenarioOverviewView {
             datePart = "Mileage estimate pending"
         }
 
+        var parts = [datePart]
+
         if let distanceRemaining = item.distanceRemaining {
-            return "\(datePart) • in \(formatDouble(max(distanceRemaining, 0), fractionDigits: 0)) \(item.distanceUnit)"
+            parts.append("in \(formatDouble(max(distanceRemaining, 0), fractionDigits: 0)) \(item.distanceUnit)")
         }
 
-        return datePart
+        if let note = item.note {
+            parts.append(note)
+        }
+
+        return parts.joined(separator: " • ")
     }
 }

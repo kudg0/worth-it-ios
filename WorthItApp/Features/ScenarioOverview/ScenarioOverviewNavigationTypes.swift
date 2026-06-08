@@ -37,24 +37,14 @@ enum ScenarioOverviewCostPerKmTrendScope: Hashable {
     }
 }
 
-enum ScenarioOverviewCostPerKmMode: String, Hashable {
-    case effective
-    case period
-
-    var title: String {
-        switch self {
-        case .effective: "Effective"
-        case .period: "Period"
-        }
-    }
-}
-
 enum ScenarioOverviewCompareMetric: String, CaseIterable, Identifiable {
     case perKm
     case perMonth
     case totalCost
 
     var id: String { rawValue }
+
+    static let compareVisibleCases: [ScenarioOverviewCompareMetric] = [.perKm, .perMonth]
 
     var title: String {
         switch self {
@@ -75,6 +65,27 @@ enum ScenarioOverviewMetricTrendDeltaDisplay {
     case currency
 }
 
+enum ScenarioAnalyticsDeltaDisplay: String, CaseIterable, Identifiable {
+    case absolute
+    case percent
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .absolute: "Absolute"
+        case .percent: "Percent"
+        }
+    }
+
+    var metricTrendDisplay: ScenarioOverviewMetricTrendDeltaDisplay {
+        switch self {
+        case .absolute: .currency
+        case .percent: .percent
+        }
+    }
+}
+
 enum ScenarioOverviewTab: Hashable {
     case overview
     case expenses
@@ -82,14 +93,17 @@ enum ScenarioOverviewTab: Hashable {
     case insights
     case compare
     case addComparableOption
+    case analyticsSettings
+    case comparisonSettings
     case addEntryChooser
     case logExpense
     case scheduleService
     case expenseHistory
     case mileageHistory
+    case mileageDetail
     case metricDetail
     case logMileage
-    case profile
+    case settings
 }
 
 enum ScenarioOverviewEntryKind: Hashable {

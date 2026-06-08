@@ -6,6 +6,7 @@ struct MileageHistoryList: View {
         let focusedMileageId: UUID?
         let currentMonthStart: Date
         let groupTotal: (ScenarioOverviewView.MileageMonthGroup) -> String
+        let onOpenMileage: (UUID) -> Void
         let onEditMileage: (UUID) -> Void
     }
 
@@ -33,7 +34,7 @@ struct MileageHistoryList: View {
     private func rows(_ group: ScenarioOverviewView.MileageMonthGroup) -> some View {
         VStack(spacing: WorthItSpacing.l) {
             ForEach(group.items) { item in
-                ScenarioMileageLogRow(item: item, onEditMileage: model.onEditMileage)
+                ScenarioMileageLogRow(item: item, onOpenMileage: model.onOpenMileage, onEditMileage: model.onEditMileage)
                     .id(rowId(item.id))
                     .overlay {
                         RoundedRectangle(cornerRadius: WorthItRadius.l)

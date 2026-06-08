@@ -3,10 +3,9 @@ import SwiftUI
 extension ScenarioOverviewView {
     var selectedEfficiencyChartDateBinding: Binding<Date?> {
         Binding {
-            selectedEfficiencyChartDate ?? efficiencyChartPoints.last?.date
+            selectedEfficiencyChartDate ?? latestFactualEfficiencyChartPoint?.date
         } set: { newValue in
             guard let newValue else {
-                selectedEfficiencyChartDate = nil
                 return
             }
 
@@ -16,10 +15,14 @@ extension ScenarioOverviewView {
 
     var selectedEfficiencyChartPoint: MetricTrendPoint? {
         guard let selectedEfficiencyChartDate else {
-            return efficiencyChartPoints.last
+            return latestFactualEfficiencyChartPoint
         }
 
         return nearestEfficiencyChartPoint(to: selectedEfficiencyChartDate)
+    }
+
+    var latestFactualEfficiencyChartPoint: MetricTrendPoint? {
+        efficiencyChartPoints.last(where: { !$0.isProjected }) ?? efficiencyChartPoints.last
     }
 
     func nearestEfficiencyChartPoint(to date: Date) -> MetricTrendPoint? {

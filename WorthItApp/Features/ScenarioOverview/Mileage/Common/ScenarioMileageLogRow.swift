@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ScenarioMileageLogRow: View {
     let item: ScenarioOverviewView.MileageLogItem
+    let onOpenMileage: (UUID) -> Void
     let onEditMileage: (UUID) -> Void
 
     var body: some View {
@@ -13,8 +14,11 @@ struct ScenarioMileageLogRow: View {
         .background(Color(hex: 0x171B28), in: RoundedRectangle(cornerRadius: WorthItRadius.l))
         .contentShape(RoundedRectangle(cornerRadius: WorthItRadius.l))
         .onTapGesture {
-            onEditMileage(item.id)
+            onOpenMileage(item.id)
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityLabel(item.kind == .trip ? "Open trip detail" : "Edit odometer entry")
     }
 
     private var header: some View {
@@ -41,12 +45,13 @@ struct ScenarioMileageLogRow: View {
             Button {
                 onEditMileage(item.id)
             } label: {
-                Image(systemName: "pencil")
+                Image(systemName: "ellipsis")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(WorthItColor.textTertiary)
                     .frame(width: 24, height: 24)
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("Edit mileage entry")
         }
     }
 
@@ -72,23 +77,25 @@ struct ScenarioMileageLogRow: View {
     private var value: some View {
         switch item.kind {
         case .odometer:
-            HStack(spacing: WorthItSpacing.s) {
-                Text(item.previousOdometer.map(Self.formatInt) ?? "-")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(WorthItColor.textSecondary)
-
-                Image(systemName: "arrow.right")
-                    .font(.system(size: 8, weight: .bold))
-                    .foregroundStyle(WorthItColor.textTertiary)
-
-                Text(item.currentOdometer.map { "\(Self.formatInt($0)) \(item.unit)" } ?? "-")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(WorthItColor.primaryContainer)
-            }
-        case .trip:
             Text("+\(Self.formatDouble(item.distance ?? 0, fractionDigits: 1)) \(item.unit)")
                 .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(WorthItColor.accentGold)
+                .foregroundStyle(WorthItColor.primaryContainer)
+        case .trip:
+            HStack(spacing: WorthItSpacing.s) {
+                Text("+\(Self.formatDouble(item.distance ?? 0, fractionDigits: 1)) \(item.unit)")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(WorthItColor.accentGold)
+
+                if let estimatedCostLabel = item.estimatedCostLabel {
+                    Text("|")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(WorthItColor.textTertiary.opacity(0.55))
+
+                    Text(estimatedCostLabel)
+                        .font(.system(size: 12, weight: .semibold).italic())
+                        .foregroundStyle(WorthItColor.textSecondary.opacity(0.78))
+                }
+            }
         }
     }
 

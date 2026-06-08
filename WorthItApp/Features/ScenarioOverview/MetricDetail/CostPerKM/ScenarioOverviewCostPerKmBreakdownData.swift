@@ -1,40 +1,32 @@
 import SwiftUI
 
 extension ScenarioOverviewView {
-    var costPerKmBreakdownStart: Date {
-        if costPerKmMode == .effective {
-            return activeScenario.startDate
-        }
+    var usesEffectiveCostPerKmBreakdown: Bool {
+        selectedDetailMetric == .costPerKm
+    }
 
-        if usesThreeMonthAverageCostPerKm {
-            return costPerKmThreeMonthAverageStart
+    var costPerKmBreakdownStart: Date {
+        if usesEffectiveCostPerKmBreakdown {
+            return activeScenario.startDate
         }
 
         let calendar = Calendar(identifier: .gregorian)
         let selectedDate = selectedMetricTrendPoint?.date ?? currentMonthStart
-        if activeCostPerKmTrendRange == .oneYear {
-            return calendar.dateInterval(of: .month, for: selectedDate)?.start ?? selectedDate
-        }
-
-        return calendar.dateInterval(of: metricTrendCalendarComponent, for: selectedDate)?.start ?? selectedDate
+        return calendar.dateInterval(of: .month, for: selectedDate)?.start ?? currentMonthStart
     }
 
     var costPerKmBreakdownEnd: Date {
-        if costPerKmMode == .effective {
+        if usesEffectiveCostPerKmBreakdown {
             return effectiveCostPerKmSelectedEnd
         }
 
-        if usesThreeMonthAverageCostPerKm {
-            return costPerKmThreeMonthAverageEnd
-        }
-
         let calendar = Calendar(identifier: .gregorian)
-        let component: Calendar.Component = activeCostPerKmTrendRange == .oneYear ? .month : metricTrendCalendarComponent
-        return calendar.date(byAdding: component, value: 1, to: costPerKmBreakdownStart) ?? Date()
+        let monthEnd = calendar.date(byAdding: .month, value: 1, to: costPerKmBreakdownStart) ?? Date()
+        return min(monthEnd, Date())
     }
 
     var costPerKmBreakdownCost: Double {
-        if costPerKmMode == .effective {
+        if usesEffectiveCostPerKmBreakdown {
             return effectiveOwnershipCost(to: costPerKmBreakdownEnd)
         }
 
@@ -47,6 +39,29 @@ extension ScenarioOverviewView {
 
     var costPerKmBreakdownDistance: Double {
         mileageDistance(from: costPerKmBreakdownStart, to: costPerKmBreakdownEnd)
+    }
+
+    var costPerKmBreakdownCostSubtitle: String {
+        let expenseCount = costPerKmIncludedCostEvents.count
+        let virtualCostCount = costPerKmVirtualCostSourceCount
+
+        if virtualCostCount == 0 {
+            return "\(expenseCount) \(expenseCount == 1 ? "expense" : "expenses")"
+        }
+
+        if expenseCount == 0 {
+            return "\(virtualCostCount) virtual \(virtualCostCount == 1 ? "cost" : "costs")"
+        }
+
+        return "\(expenseCount) expenses + \(virtualCostCount) virtual"
+    }
+
+    var costPerKmVirtualCostSourceCount: Int {
+        if usesEffectiveCostPerKmBreakdown {
+            return costPerKmEffectiveOwnershipSources.count
+        }
+
+        return costPerKmFinancingSource == nil ? 0 : 1
     }
 
     var costPerKmIncludedCostEvents: [CostEvent] {
@@ -75,40 +90,35 @@ extension ScenarioOverviewView {
     }
 
     var costPerKmBreakdownPeriodTitle: String {
-        if costPerKmMode == .effective {
-            return "Since purchase"
+        if usesEffectiveCostPerKmBreakdown {
+            guard let point = selectedMetricTrendPoint else {
+                return "Since purchase"
+            }
+
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.dateFormat = "MMM yyyy"
+
+            if point.isProjected {
+                return "Projected \(formatter.string(from: point.date))"
+            }
+
+            let calendar = Calendar(identifier: .gregorian)
+            if calendar.isDate(point.date, equalTo: Date(), toGranularity: .month) {
+                return "Since purchase"
+            }
+
+            return "Through \(formatter.string(from: point.date))"
         }
 
-        if usesThreeMonthAverageCostPerKm {
-            return "Previous 3 month average"
+        let calendar = Calendar(identifier: .gregorian)
+        if calendar.isDate(costPerKmBreakdownStart, equalTo: currentMonthStart, toGranularity: .month) {
+            return "This month"
         }
 
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
-
-        switch metricTrendCalendarComponent {
-        case .day:
-            if activeCostPerKmTrendRange == .oneYear {
-                formatter.dateFormat = "d MMM"
-                let start = formatter.string(from: costPerKmBreakdownStart)
-                let endDate = Calendar(identifier: .gregorian).date(byAdding: .day, value: -1, to: costPerKmBreakdownEnd) ?? costPerKmBreakdownEnd
-                let end = formatter.string(from: endDate)
-                let yearFormatter = DateFormatter()
-                yearFormatter.locale = Locale(identifier: "en_US_POSIX")
-                yearFormatter.dateFormat = "yyyy"
-                return "\(start) - \(end) \(yearFormatter.string(from: costPerKmBreakdownStart))"
-            }
-
-            formatter.dateFormat = "d MMM yyyy"
-        case .weekOfYear:
-            formatter.dateFormat = "d MMM"
-            let start = formatter.string(from: costPerKmBreakdownStart)
-            let end = formatter.string(from: Calendar(identifier: .gregorian).date(byAdding: .day, value: -1, to: costPerKmBreakdownEnd) ?? costPerKmBreakdownEnd)
-            return "\(start) - \(end)"
-        default:
-            formatter.dateFormat = "LLLL yyyy"
-        }
-
+        formatter.dateFormat = "LLLL yyyy"
         return formatter.string(from: costPerKmBreakdownStart)
     }
 
@@ -117,32 +127,39 @@ extension ScenarioOverviewView {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "MMM d"
 
-        if costPerKmMode == .effective {
-            let calendar = Calendar(identifier: .gregorian)
-            let now = Date()
+        let calendar = Calendar(identifier: .gregorian)
+        if usesEffectiveCostPerKmBreakdown {
+            let selectedEnd = costPerKmSelectedPeriodEnd
             let endLabel: String
-            if calendar.isDate(costPerKmBreakdownEnd, inSameDayAs: now) {
+            if calendar.isDate(selectedEnd, inSameDayAs: Date()) {
                 endLabel = "Today"
             } else {
-                let inclusiveEnd = calendar.date(byAdding: .day, value: -1, to: costPerKmBreakdownEnd) ?? costPerKmBreakdownEnd
-                endLabel = formatter.string(from: inclusiveEnd)
+                endLabel = formatter.string(from: selectedEnd)
             }
-            return "\(formatter.string(from: activeScenario.startDate)) - \(endLabel)"
+
+            return "\(formatter.string(from: costPerKmBreakdownStart)) - \(endLabel)"
         }
 
-        let inclusiveEnd = Calendar(identifier: .gregorian).date(byAdding: .day, value: -1, to: costPerKmBreakdownEnd) ?? costPerKmBreakdownEnd
-        return "\(formatter.string(from: costPerKmBreakdownStart)) - \(formatter.string(from: inclusiveEnd))"
+        let now = Date()
+        let endLabel: String
+        if calendar.isDate(costPerKmBreakdownEnd, inSameDayAs: now) {
+            endLabel = "Today"
+        } else {
+            let inclusiveEnd = calendar.date(byAdding: .day, value: -1, to: costPerKmBreakdownEnd) ?? costPerKmBreakdownEnd
+            endLabel = formatter.string(from: inclusiveEnd)
+        }
+        return "\(formatter.string(from: costPerKmBreakdownStart)) - \(endLabel)"
     }
 
     var costPerKmFormulaPrefix: String {
-        if costPerKmMode == .effective {
-            return "effective "
-        }
-
-        return usesThreeMonthAverageCostPerKm ? "3-mo avg " : ""
+        usesEffectiveCostPerKmBreakdown ? "effective " : ""
     }
 
     var costPerKmFormulaValue: String {
+        if usesEffectiveCostPerKmBreakdown, let point = selectedMetricTrendPoint {
+            return "\(currencySymbol)\(formatDouble(point.value, fractionDigits: 2))/\(mileageDisplayUnit)"
+        }
+
         guard costPerKmBreakdownDistance > 0 else {
             return "—"
         }
@@ -150,7 +167,19 @@ extension ScenarioOverviewView {
         return "\(currencySymbol)\(formatDouble(costPerKmBreakdownCost / costPerKmBreakdownDistance, fractionDigits: 2))/\(mileageDisplayUnit)"
     }
 
+    var costPerKmFormulaText: String? {
+        guard usesEffectiveCostPerKmBreakdown, let point = selectedMetricTrendPoint, point.isProjected else {
+            return nil
+        }
+
+        return "\(costPerKmFormulaValue) projected from current ownership trend"
+    }
+
     var costPerKmBreakdownDisplayValue: String {
+        if usesEffectiveCostPerKmBreakdown, let point = selectedMetricTrendPoint {
+            return "\(currencySymbol)\(formatDouble(point.value, fractionDigits: 2))"
+        }
+
         guard costPerKmBreakdownDistance > 0 else {
             return "—"
         }

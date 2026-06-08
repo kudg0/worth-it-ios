@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct AddComparableOptionFooter: View {
+    var title = "Save Changes"
+    var isLoading = false
     let onSave: () -> Void
 
     var body: some View {
@@ -17,7 +19,7 @@ struct AddComparableOptionFooter: View {
             .frame(height: 48)
             .allowsHitTesting(false)
 
-            WIButton(title: "Save Changes", height: 60, action: onSave)
+            WIButton(title: isLoading ? "Saving..." : title, height: 60, action: onSave)
                 .padding(.horizontal, WorthItSpacing.xxl)
                 .padding(.bottom, 32)
                 .background {

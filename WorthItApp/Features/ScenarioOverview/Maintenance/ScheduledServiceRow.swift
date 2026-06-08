@@ -10,52 +10,51 @@ struct ScheduledServiceRow: View {
     let onOpenActions: (UUID) -> Void
 
     var body: some View {
-        Button {
-            onEdit(item.id)
-        } label: {
-            HStack(alignment: .center, spacing: WorthItSpacing.m) {
-                Image(systemName: serviceIconName(item.category))
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(serviceStateColor(item.dueState))
-                    .frame(width: 44, height: 44)
-                    .background(serviceStateColor(item.dueState).opacity(0.10), in: RoundedRectangle(cornerRadius: WorthItRadius.m))
+        HStack(alignment: .center, spacing: WorthItSpacing.m) {
+            Image(systemName: serviceIconName(item.category))
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(serviceStateColor(item.dueState))
+                .frame(width: 44, height: 44)
+                .background(serviceStateColor(item.dueState).opacity(0.10), in: RoundedRectangle(cornerRadius: WorthItRadius.m))
 
-                VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
-                    Text(item.title)
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundStyle(WorthItColor.textPrimary)
-                        .lineLimit(1)
+            VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
+                Text(item.title)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(WorthItColor.textPrimary)
+                    .lineLimit(1)
 
-                    Text(dueSubtitle(item))
-                        .font(.system(size: 11, weight: .regular))
-                        .foregroundStyle(WorthItColor.textSecondary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .layoutPriority(1)
-
-                Spacer(minLength: WorthItSpacing.m)
-
-                Text(serviceStateTitle(item.dueState))
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(serviceStateColor(item.dueState))
-                    .tracking(0.4)
-                    .textCase(.uppercase)
-                    .padding(.horizontal, WorthItSpacing.s)
-                    .frame(height: 24)
-                    .background(serviceStateColor(item.dueState).opacity(0.10), in: Capsule())
-                    .fixedSize(horizontal: true, vertical: false)
+                Text(dueSubtitle(item))
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(WorthItColor.textSecondary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.trailing, 40)
-            .padding(WorthItSpacing.l)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(RoundedRectangle(cornerRadius: WorthItRadius.l))
-            .background(WorthItColor.surfaceContainerLow, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
+            .layoutPriority(1)
+
+            Spacer(minLength: WorthItSpacing.m)
+
+            Text(serviceStateTitle(item.dueState))
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(serviceStateColor(item.dueState))
+                .tracking(0.4)
+                .textCase(.uppercase)
+                .padding(.horizontal, WorthItSpacing.s)
+                .frame(height: 24)
+                .background(serviceStateColor(item.dueState).opacity(0.10), in: Capsule())
+                .fixedSize(horizontal: true, vertical: false)
         }
-        .buttonStyle(.plain)
+        .padding(.trailing, 40)
+        .padding(WorthItSpacing.l)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(RoundedRectangle(cornerRadius: WorthItRadius.l))
+        .background(WorthItColor.surfaceContainerLow, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
+        .onTapGesture {
+            onEdit(item.id)
+        }
         .overlay(alignment: .trailing) {
             ScheduledServiceMenu(serviceId: item.id, onOpenActions: onOpenActions)
                 .padding(.trailing, WorthItSpacing.m)
+                .zIndex(1)
         }
     }
 }

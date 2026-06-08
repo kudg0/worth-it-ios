@@ -104,6 +104,180 @@ struct ScenarioSummary: Decodable, Hashable {
     let costBreakdownByCategory: CostBreakdown
 }
 
+enum AlternativePricingMode: String, Codable, CaseIterable, Identifiable {
+    case perDistance = "per_distance"
+    case distanceCurve = "distance_curve"
+    case perPeriod = "per_period"
+    case perTime = "per_time"
+    case mixed
+    case manualEquivalent = "manual_equivalent"
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .perDistance: "Per KM"
+        case .distanceCurve: "Distance Curve"
+        case .perPeriod: "Per Month"
+        case .perTime: "Per Minute"
+        case .mixed: "Per KM + Per Minute"
+        case .manualEquivalent: "Manual Total"
+        }
+    }
+}
+
+struct AlternativePricePoint: Codable, Hashable, Identifiable {
+    var id: Double { distanceKm }
+
+    let distanceKm: Double
+    let totalPrice: Double
+}
+
+struct ComparableCurveInputPoint: Identifiable, Hashable {
+    let id: UUID
+    var distanceKm: String
+    var totalPrice: String
+
+    init(id: UUID = UUID(), distanceKm: String = "", totalPrice: String = "") {
+        self.id = id
+        self.distanceKm = distanceKm
+        self.totalPrice = totalPrice
+    }
+}
+
+struct AlternativeParams: Codable, Hashable {
+    let pricePerKm: Double?
+    let pricePoints: [AlternativePricePoint]?
+    let pricePerMonth: Double?
+    let pricePerMinute: Double?
+    let fixedPerMonth: Double?
+    let kind: String?
+    let value: Double?
+    let includedCostCategories: [String]?
+
+    init(
+        pricePerKm: Double? = nil,
+        pricePoints: [AlternativePricePoint]? = nil,
+        pricePerMonth: Double? = nil,
+        pricePerMinute: Double? = nil,
+        fixedPerMonth: Double? = nil,
+        kind: String? = nil,
+        value: Double? = nil,
+        includedCostCategories: [String]? = nil
+    ) {
+        self.pricePerKm = pricePerKm
+        self.pricePoints = pricePoints
+        self.pricePerMonth = pricePerMonth
+        self.pricePerMinute = pricePerMinute
+        self.fixedPerMonth = fixedPerMonth
+        self.kind = kind
+        self.value = value
+        self.includedCostCategories = includedCostCategories
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(pricePerKm, forKey: .pricePerKm)
+        try container.encodeIfPresent(pricePoints, forKey: .pricePoints)
+        try container.encodeIfPresent(pricePerMonth, forKey: .pricePerMonth)
+        try container.encodeIfPresent(pricePerMinute, forKey: .pricePerMinute)
+        try container.encodeIfPresent(fixedPerMonth, forKey: .fixedPerMonth)
+        try container.encodeIfPresent(kind, forKey: .kind)
+        try container.encodeIfPresent(value, forKey: .value)
+        try container.encodeIfPresent(includedCostCategories, forKey: .includedCostCategories)
+    }
+}
+
+struct AlternativeOption: Decodable, Identifiable, Hashable {
+    let id: UUID
+    let scenarioId: UUID
+    let name: String
+    let pricingMode: AlternativePricingMode
+    let paramsJson: AlternativeParams
+    let note: String?
+    let isIncluded: Bool
+    let createdAt: Date
+    let updatedAt: Date
+}
+
+struct CreateAlternativeRequest: Encodable {
+    let name: String
+    let pricingMode: AlternativePricingMode
+    let paramsJson: AlternativeParams
+    let note: String?
+    let isIncluded: Bool
+}
+
+struct UpdateAlternativeRequest: Encodable {
+    let name: String
+    let pricingMode: AlternativePricingMode
+    let paramsJson: AlternativeParams
+    let note: String?
+    let isIncluded: Bool
+}
+
+struct ScenarioComparison: Decodable, Hashable {
+    struct AlternativeResult: Decodable, Identifiable, Hashable {
+        let id: UUID
+        let name: String
+        let pricingMode: AlternativePricingMode
+        let isIncluded: Bool
+        let estimatedTotalCost: Double
+        let costBreakdown: CostBreakdown
+        let deltaVsOwnership: Double
+    }
+
+    struct CostBreakdown: Decodable, Hashable {
+        let pricingTotal: Double
+        let inheritedCostsTotal: Double
+        let total: Double
+        let perKm: Double?
+        let perMonth: Double?
+        let inputs: CostBreakdownInputs
+    }
+
+    struct CostBreakdownInputs: Decodable, Hashable {
+        let totalDistanceKm: Double
+        let monthsOwned: Double
+        let totalDurationMinutes: Double
+        let pricePerKm: Double?
+        let pricePerMonth: Double?
+        let pricePerMinute: Double?
+        let fixedPerMonth: Double?
+        let averageCurvePricePerKm: Double?
+        let curvePointRates: [Double]?
+        let manualKind: String?
+        let manualValue: Double?
+    }
+
+    struct Series: Decodable, Hashable {
+        struct Point: Decodable, Identifiable, Hashable {
+            let date: Date
+            let total: Double
+            let perKm: Double?
+            let perMonth: Double?
+
+            var id: Date { date }
+        }
+
+        struct Alternative: Decodable, Identifiable, Hashable {
+            let id: UUID
+            let name: String
+            let pricingMode: AlternativePricingMode
+            let isIncluded: Bool
+            let points: [Point]
+        }
+
+        let period: String
+        let ownership: [Point]
+        let alternatives: [Alternative]
+    }
+
+    let summary: ScenarioSummary
+    let alternatives: [AlternativeResult]
+    let series: Series?
+}
+
 struct CostEvent: Decodable, Identifiable, Hashable {
     let id: UUID
     let scenarioId: UUID

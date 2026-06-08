@@ -51,6 +51,6 @@ extension ScenarioOverviewView {
     }
 
     var showsMetricTrendArea: Bool {
-        !(selectedDetailMetric == .costPerKm && costPerKmMode == .effective)
+        selectedDetailMetric != .costPerKm
     }
 }

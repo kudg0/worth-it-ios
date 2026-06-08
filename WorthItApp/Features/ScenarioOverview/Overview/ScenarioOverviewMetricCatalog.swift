@@ -20,7 +20,9 @@ extension ScenarioOverviewView {
             return Set(OverviewMetric.allCases.map(\.rawValue))
         }
 
-        return Set(storedIds)
+        var enabled = Set(storedIds)
+        enabled.insert(OverviewMetric.currentMonthCostPerKm.rawValue)
+        return enabled
     }
 
     var selectedMetricBinding: Binding<String> {
@@ -68,6 +70,34 @@ extension ScenarioOverviewView {
                 footerColor: trend.color,
                 progress: costPerKmProgress,
                 accentColor: WorthItColor.primaryContainer.opacity(0.42)
+            )
+        case .currentMonthCostPerKm:
+            let trend = currentMonthlyCostPerDistanceValue == nil
+                ? MetricTrend(label: "LOG THIS MONTH DATA", iconName: "plus", color: WorthItColor.textTertiary)
+                : currentMonthCostPerKmTrend
+            return MetricSlide(
+                id: metric,
+                title: "This Month / KM",
+                value: currentMonthCostPerKm,
+                subtitle: nil,
+                footer: trend.label,
+                footerIcon: trend.iconName,
+                footerColor: trend.color,
+                progress: currentMonthCostPerKmProgress,
+                accentColor: Color(hex: 0x2DD4BF).opacity(0.50)
+            )
+        case .totalExpenses:
+            guard totalLoggedExpensesValue > 0 else { return nil }
+            return MetricSlide(
+                id: metric,
+                title: "Total Expenses",
+                value: totalLoggedExpensesDisplay,
+                subtitle: "\(costEvents.count) entries",
+                footer: "OPEN HISTORY",
+                footerIcon: "list.bullet.rectangle",
+                footerColor: WorthItColor.textTertiary,
+                progress: totalLoggedExpensesProgress,
+                accentColor: WorthItColor.primaryContainer.opacity(0.58)
             )
         case .totalOwnership:
             guard totalOwnershipCost != nil else { return nil }

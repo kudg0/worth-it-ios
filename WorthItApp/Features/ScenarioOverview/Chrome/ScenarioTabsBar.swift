@@ -20,7 +20,7 @@ struct ScenarioTabsBar: View {
             .scrollIndicators(.hidden)
             .background(WorthItColor.pageBackground.opacity(0.46))
             .onChange(of: selectedTab) { _, tab in
-                guard tab != .profile else { return }
+                guard tab != .settings else { return }
 
                 withAnimation(.easeInOut(duration: 0.20)) {
                     proxy.scrollTo(tab, anchor: .center)

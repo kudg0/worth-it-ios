@@ -44,11 +44,11 @@ extension ScenarioOverviewView {
     }
 
     var costPerKmEffectiveOwnershipSources: [CostPerKmBreakdownSource] {
-        guard costPerKmMode == .effective else { return [] }
+        guard usesEffectiveCostPerKmBreakdown else { return [] }
 
         var sources: [CostPerKmBreakdownSource] = []
 
-        if depreciationCost > 0 {
+        if includesVehicleResidualValue, depreciationCost > 0 {
             sources.append(
                 CostPerKmBreakdownSource(
                     id: "depreciation-\(activeScenario.id.uuidString)",
@@ -85,22 +85,25 @@ extension ScenarioOverviewView {
     }
 
     var costPerKmFinancingSource: CostPerKmBreakdownSource? {
-        guard costPerKmMode == .period, shouldIncludeFinancingInCostPerKm, loanMonthlyPayment > 0 else {
+        guard !usesEffectiveCostPerKmBreakdown,
+              shouldIncludeFinancingInCostPerKm
+        else {
             return nil
         }
 
-        let periodCost = loanPaymentCost(from: costPerKmBreakdownStart, to: costPerKmBreakdownEnd)
-        let displayedCost = periodCost > 0 ? periodCost : doubleValue(loanMonthlyPayment)
-        let status = periodCost > 0 ? "Added to Total" : "Monthly payment"
+        let interest = loanInterestCost(from: costPerKmBreakdownStart, to: costPerKmBreakdownEnd)
+        guard interest > 0 else {
+            return nil
+        }
 
         return CostPerKmBreakdownSource(
-            id: "loan-\(costPerKmBreakdownStart.timeIntervalSince1970)",
-            date: costPerKmBreakdownStart,
-            title: "Loan / lease payment",
-            subtitle: "\(costPerKmBreakdownPeriodTitle) • Financing",
-            value: "\(currencySymbol)\(formatDouble(displayedCost, fractionDigits: 2))",
-            status: status,
-            systemName: "creditcard.fill",
+            id: "interest-\(expenseHistoryMonthIdentifier(for: costPerKmBreakdownStart))",
+            date: costPerKmBreakdownEnd,
+            title: "Loan interest accrued",
+            subtitle: "Interest only, principal excluded",
+            value: "\(currencySymbol)\(formatDouble(interest, fractionDigits: 2))",
+            status: "Added to Total",
+            systemName: "banknote",
             accentColor: WorthItColor.primaryContainer,
             target: nil
         )
@@ -149,7 +152,8 @@ extension ScenarioOverviewView {
             .filter { $0.eventType == "odometer_update" && $0.date < date }
             .sorted { $0.date < $1.date }
 
-        if let event = odometerEvents.last, let value = event.odometerValue {
+        if let event = odometerEvents.last {
+            let value = Double(activeScenario.purchaseOdometer ?? 0) + mileageDistance(from: activeScenario.startDate, to: event.date.addingTimeInterval(0.001))
             return (event.id, value, event.date)
         }
 

@@ -2,9 +2,13 @@ import SwiftUI
 
 extension ScenarioOverviewView {
     func expenseHistoryGroupTotal(_ group: ExpenseMonthGroup) -> String {
-        let total = group.events.reduce(Decimal(0)) { partial, event in
+        let loggedTotal = group.events.reduce(Decimal(0)) { partial, event in
             partial + decimalValue(event.amount)
         }
+        let syntheticTotal = group.syntheticItems.reduce(Decimal(0)) { partial, item in
+            partial + Decimal(item.value)
+        }
+        let total = loggedTotal + syntheticTotal
 
         return "\(currencySymbol)\(formatDecimal(total, fractionDigits: 2))"
     }

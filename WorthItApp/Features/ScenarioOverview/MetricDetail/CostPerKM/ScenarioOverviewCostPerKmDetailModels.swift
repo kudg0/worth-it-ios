@@ -7,11 +7,10 @@ extension ScenarioOverviewView {
                 periodTitle: costPerKmBreakdownPeriodTitle,
                 value: costPerKmBreakdownDisplayValue,
                 mileageUnit: mileageDisplayUnit,
+                isProjected: selectedMetricTrendPoint?.isProjected == true,
                 trend: costPerKmBreakdownTrend,
                 fallbackTrend: costPerKmHeroFallbackTrend(metric)
             ),
-            mode: costPerKmModeBinding,
-            modeDescription: costPerKmModeDescription,
             trend: CostPerKmTrendPanel.Model(
                 rangeLabel: costPerKmBreakdownRangeLabel,
                 chart: AnyView(metricTrendChart(
@@ -32,7 +31,7 @@ extension ScenarioOverviewView {
                     title: "Total Costs",
                     value: "\(currencySymbol)\(formatDouble(costPerKmBreakdownCost, fractionDigits: 0))",
                     unit: nil,
-                    subtitle: "\(costPerKmIncludedCostEvents.count) expenses",
+                    subtitle: costPerKmBreakdownCostSubtitle,
                     systemName: "receipt",
                     accentColor: WorthItColor.accentGold,
                     progress: costPerKmBreakdownCostProgress,
@@ -57,7 +56,8 @@ extension ScenarioOverviewView {
                 prefix: costPerKmFormulaPrefix,
                 currencySymbol: currencySymbol,
                 cost: formatDouble(costPerKmBreakdownCost, fractionDigits: 0),
-                distance: formatDouble(costPerKmBreakdownDistance, fractionDigits: 0)
+                distance: formatDouble(costPerKmBreakdownDistance, fractionDigits: 0),
+                formulaText: costPerKmFormulaText
             ),
             timeline: CostPerKmSourceTimeline.Model(
                 periodTitle: costPerKmBreakdownPeriodTitle,
@@ -65,7 +65,7 @@ extension ScenarioOverviewView {
                 onOpenSource: openBreakdownSource
             ),
             info: CostPerKmInfoPanel.Model(
-                mode: costPerKmMode,
+                usesEffectiveOwnership: usesEffectiveCostPerKmBreakdown,
                 hasActiveFinancing: hasActiveFinancing,
                 includesFinancing: costPerKmFinancingBinding,
                 mileageUnit: mileageDisplayUnit
@@ -76,15 +76,6 @@ extension ScenarioOverviewView {
     func costPerKmHeroFallbackTrend(_ metric: MetricSlide?) -> MetricTrend? {
         guard let metric, let footer = metric.footer else { return nil }
         return MetricTrend(label: footer, iconName: metric.footerIcon, color: metric.footerColor)
-    }
-
-    var costPerKmModeDescription: String {
-        switch costPerKmMode {
-        case .effective:
-            "Effective since purchase: logged costs, depreciation, accrued interest, and all tracked distance."
-        case .period:
-            "Period view: only costs and distance from the selected period."
-        }
     }
 
     func openBreakdownSource(_ source: CostPerKmBreakdownSource) {

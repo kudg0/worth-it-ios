@@ -5,12 +5,15 @@ extension ScenarioOverviewView {
         summaryError = nil
         costEventsError = nil
         usageEventsError = nil
+        alternativesError = nil
         scheduledServicesError = nil
         previousMonthSummary = nil
 
         async let summaryTask = repository.getSummary(scenarioId: activeScenario.id)
+        async let comparisonTask = repository.getComparison(scenarioId: activeScenario.id)
         async let costEventsTask = repository.listCostEvents(scenarioId: activeScenario.id)
         async let usageEventsTask = repository.listUsageEvents(scenarioId: activeScenario.id)
+        async let alternativesTask = repository.listAlternatives(scenarioId: activeScenario.id)
         async let scheduledServicesTask = repository.listScheduledServices(scenarioId: activeScenario.id)
         async let scheduledDueTask = repository.listScheduledServiceDueStates(scenarioId: activeScenario.id)
 
@@ -18,6 +21,13 @@ extension ScenarioOverviewView {
             currentSummary = try await summaryTask
         } catch {
             summaryError = String(describing: error)
+        }
+
+        do {
+            currentComparison = try await comparisonTask
+        } catch {
+            currentComparison = nil
+            alternativesError = String(describing: error)
         }
 
         do {
@@ -32,6 +42,13 @@ extension ScenarioOverviewView {
         } catch {
             usageEvents = []
             usageEventsError = String(describing: error)
+        }
+
+        do {
+            alternatives = try await alternativesTask
+        } catch {
+            alternatives = []
+            alternativesError = alternativesError ?? String(describing: error)
         }
 
         do {

@@ -1,16 +1,29 @@
 import Foundation
 
 extension ScenarioOverviewView {
+    var metricInsightWideTitle: String {
+        switch selectedDetailMetric {
+        case .totalOwnership:
+            "Resale Buffer"
+        case .expectedResale, .projectedGain:
+            "Market Timing"
+        default:
+            "Signal Quality"
+        }
+    }
+
     var metricDetailSubtitle: String {
         switch selectedDetailMetric {
         case .monthlyCost:
-            "Shows the current monthly ownership load from loan payments and logged costs."
+            "Shows the current monthly ownership load from loan interest and logged costs."
         case .costPerKm:
-            costPerKmMode == .effective
-                ? "Shows effective cost since purchase from logged costs, depreciation, accrued interest, and usage."
-                : "Shows period cost per kilometer from costs and usage inside the selected period."
+            "Shows effective cost since purchase from logged costs, depreciation, accrued interest, and usage."
+        case .currentMonthCostPerKm:
+            "Shows this month's logged costs divided by this month's tracked distance."
+        case .totalExpenses:
+            "Shows every logged car expense across the full ownership period."
         case .totalOwnership:
-            "Shows the net cost of owning this car after purchase, known costs, and expected resale."
+            "Net ownership cost after expected resale. The trend below shows accumulated logged costs, loan interest, and depreciation from the first logged expense month."
         case .projectedGain:
             "Shows potential upside after resale value exceeds purchase, interest, and non-daily costs."
         case .expectedResale:
@@ -26,14 +39,16 @@ extension ScenarioOverviewView {
             "Market timing can move this metric. Seasonal demand may improve resale assumptions when the car remains in good condition."
         case .monthlyCost, .loanInterest:
             "Loan terms make this metric predictable, while logged maintenance can still create short-term spikes."
-        case .costPerKm, .totalOwnership:
+        case .costPerKm, .currentMonthCostPerKm, .totalExpenses:
             "More usage data will make this trajectory more reliable and reduce noise from one-off expenses."
+        case .totalOwnership:
+            "The hero value subtracts expected resale, while the chart shows the cost inputs building up over time. This keeps early expenses visible instead of hiding them behind resale value."
         }
     }
 
     var metricMissingDataText: String {
         switch selectedDetailMetric {
-        case .costPerKm:
+        case .costPerKm, .currentMonthCostPerKm:
             "Mileage history is needed for a precise trend."
         case .expectedResale, .projectedGain:
             "Condition and market comps will improve accuracy."
@@ -44,7 +59,7 @@ extension ScenarioOverviewView {
 
     var metricActionValue: String {
         switch selectedDetailMetric {
-        case .costPerKm:
+        case .costPerKm, .currentMonthCostPerKm:
             "Mileage"
         case .expectedResale, .projectedGain:
             "Market"
@@ -57,7 +72,7 @@ extension ScenarioOverviewView {
         switch selectedDetailMetric {
         case .monthlyCost, .loanInterest:
             "Low"
-        case .costPerKm, .totalOwnership:
+        case .costPerKm, .currentMonthCostPerKm, .totalExpenses, .totalOwnership:
             "Medium"
         case .projectedGain, .expectedResale:
             "Low"
@@ -70,8 +85,12 @@ extension ScenarioOverviewView {
             "Your monthly cost is mostly shaped by fixed payments and this month’s logged expenses. Keep logging maintenance so spikes are visible instead of hidden."
         case .costPerKm:
             "Add mileage history next. Once usage is known, this metric becomes one of the clearest signals for whether ownership is still worth it."
+        case .currentMonthCostPerKm:
+            "Use this as a month-to-month trip-cost signal. It reflects current spending and current usage, so it can spike before the long-term ownership economics move."
+        case .totalExpenses:
+            "Open expense history to inspect which entries make up the total. This metric is pure logged spend, without resale or vehicle value assumptions."
         case .totalOwnership:
-            "Track resale and non-daily maintenance separately. This gives the cleanest view of real ownership cost over time."
+            "Keep resale and large maintenance entries fresh. The headline is net cost after resale; the chart is the accumulated cost base behind it."
         case .projectedGain:
             "Projected gain should stay conservative. Daily running costs are excluded, but loan interest and non-daily maintenance still matter."
         case .expectedResale:

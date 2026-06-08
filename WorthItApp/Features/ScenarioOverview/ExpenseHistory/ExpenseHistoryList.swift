@@ -38,6 +38,10 @@ struct ExpenseHistoryList: View {
 
     private func rows(_ group: ScenarioOverviewView.ExpenseMonthGroup) -> some View {
         VStack(spacing: WorthItSpacing.m) {
+            ForEach(group.syntheticItems) { item in
+                syntheticRow(item)
+            }
+
             ForEach(group.events) { event in
                 row(event)
                     .id(rowId(event.id))
@@ -86,6 +90,22 @@ struct ExpenseHistoryList: View {
         }
     }
 
+    private func syntheticRow(_ item: ScenarioOverviewView.ExpenseMonthGroup.SyntheticItem) -> some View {
+        let accentColor = Color(hex: 0xBAC6EC)
+
+        return WIInfoListRow(
+            title: item.title,
+            subtitle: item.subtitle,
+            value: item.valueText,
+            detail: item.detail,
+            systemIcon: item.systemIcon,
+            accentColor: accentColor,
+            detailColor: accentColor,
+            action: {}
+        )
+        .allowsHitTesting(false)
+    }
+
     private func rowId(_ id: UUID) -> String {
         "expense-history-\(id.uuidString)"
     }
@@ -105,4 +125,5 @@ struct ExpenseHistoryList: View {
         formatter.dateFormat = "MMMM yyyy"
         return formatter
     }()
+
 }

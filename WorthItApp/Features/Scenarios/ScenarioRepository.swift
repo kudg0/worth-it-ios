@@ -33,6 +33,36 @@ struct ScenarioRepository: Sendable {
         return try await client.get("/scenarios/\(apiId(scenarioId))/summary", queryItems: queryItems)
     }
 
+    func getComparison(scenarioId: UUID, asOfDate: Date? = nil) async throws -> ScenarioComparison {
+        var queryItems: [URLQueryItem] = []
+
+        if let asOfDate {
+            queryItems.append(URLQueryItem(name: "asOfDate", value: ISO8601DateFormatter.api.string(from: asOfDate)))
+        }
+
+        if queryItems.isEmpty {
+            return try await client.get("/scenarios/\(apiId(scenarioId))/comparison")
+        }
+
+        return try await client.get("/scenarios/\(apiId(scenarioId))/comparison", queryItems: queryItems)
+    }
+
+    func listAlternatives(scenarioId: UUID) async throws -> [AlternativeOption] {
+        try await client.get("/scenarios/\(apiId(scenarioId))/alternatives")
+    }
+
+    func createAlternative(scenarioId: UUID, request: CreateAlternativeRequest) async throws -> AlternativeOption {
+        try await client.post("/scenarios/\(apiId(scenarioId))/alternatives", body: request)
+    }
+
+    func updateAlternative(alternativeId: UUID, request: UpdateAlternativeRequest) async throws -> AlternativeOption {
+        try await client.patch("/alternatives/\(apiId(alternativeId))", body: request)
+    }
+
+    func deleteAlternative(alternativeId: UUID) async throws {
+        try await client.delete("/alternatives/\(apiId(alternativeId))")
+    }
+
     func listCostEvents(scenarioId: UUID) async throws -> [CostEvent] {
         try await client.get("/scenarios/\(apiId(scenarioId))/cost-events")
     }

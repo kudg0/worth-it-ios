@@ -17,6 +17,7 @@ struct ScenarioTopBar: View {
     let onAddMileage: () -> Void
     let onAddComparable: () -> Void
     let onRemoveComparable: () -> Void
+    let onEditMileageDetail: () -> Void
 
     var body: some View {
         HStack(spacing: WorthItSpacing.m) {
@@ -65,6 +66,8 @@ struct ScenarioTopBar: View {
     private var trailingAction: some View {
         if selectedTab == .addComparableOption {
             iconButton(systemName: "trash", accessibilityLabel: "Remove comparable", action: onRemoveComparable)
+        } else if selectedTab == .mileageDetail {
+            iconButton(systemName: "pencil", accessibilityLabel: "Edit trip", action: onEditMileageDetail)
         } else if usesEntryTitleStyle {
             Color.clear.frame(width: 28, height: 40)
         } else {

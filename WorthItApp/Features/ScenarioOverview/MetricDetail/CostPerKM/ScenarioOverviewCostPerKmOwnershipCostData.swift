@@ -2,19 +2,61 @@ import Foundation
 
 extension ScenarioOverviewView {
     func effectiveCostPerDistanceValue(asOf date: Date) -> Double? {
+        effectiveCostPerDistanceValue(asOf: date, includesResidualValue: includesVehicleResidualValue)
+    }
+
+    func effectiveCostPerDistanceValue(asOf date: Date, includesResidualValue: Bool) -> Double? {
         let end = min(max(date, activeScenario.startDate), Date())
         let distance = mileageDistance(from: activeScenario.startDate, to: end)
         guard distance > 0 else { return nil }
 
-        let cost = effectiveOwnershipCost(to: end)
+        let cost = effectiveOwnershipCost(to: end, includesResidualValue: includesResidualValue)
         guard cost > 0 else { return nil }
 
         return cost / distance
     }
 
     func effectiveOwnershipCost(to date: Date) -> Double {
+        effectiveOwnershipCost(to: date, includesResidualValue: includesVehicleResidualValue)
+    }
+
+    func effectiveOwnershipCost(to date: Date, includesResidualValue: Bool) -> Double {
         let loggedCosts = ownershipCost(from: activeScenario.startDate, to: date, includeFinancing: false)
-        return loggedCosts + depreciationCost + accruedLoanInterest(to: date)
+        let vehicleValueCost = includesResidualValue ? depreciationCost : 0
+        return loggedCosts + vehicleValueCost + accruedLoanInterest(to: date)
+    }
+
+    func netOwnershipCost(to date: Date) -> Double {
+        let end = min(max(date, activeScenario.startDate), Date())
+        let loggedCosts = ownershipCost(from: activeScenario.startDate, to: end, includeFinancing: false)
+
+        // Match summary semantics: vehicle value is principal; financing adds only interest.
+        return max(doublePurchasePrice + loggedCosts + doubleValue(loanInterestTotal) - doubleValue(expectedResaleValue), 0)
+    }
+
+    func totalOwnershipTrendPoints(maxMonths: Int?) -> [MetricTrendPoint] {
+        let calendar = Calendar(identifier: .gregorian)
+        let firstLoggedCostMonth = costEvents
+            .map { expenseHistoryMonthStart(for: $0.date) }
+            .min()
+
+        let monthStarts = efficiencyMonthStarts(maxMonths: maxMonths)
+            .filter { monthStart in
+                guard let firstLoggedCostMonth else { return true }
+                return monthStart >= firstLoggedCostMonth
+            }
+
+        let points = monthStarts.map { monthStart in
+            let monthEnd = calendar.date(byAdding: .month, value: 1, to: monthStart) ?? monthStart
+            let asOf = min(monthEnd, Date())
+            return MetricTrendPoint(date: monthStart, value: effectiveOwnershipCost(to: asOf, includesResidualValue: true))
+        }
+
+        guard let firstMeaningfulIndex = points.firstIndex(where: { $0.value > 0 }) else {
+            return []
+        }
+
+        return Array(points[firstMeaningfulIndex...])
     }
 
     var depreciationCost: Double {
@@ -73,7 +115,7 @@ extension ScenarioOverviewView {
             return loggedCosts
         }
 
-        return loggedCosts + loanPaymentCost(from: start, to: end)
+        return loggedCosts + loanInterestCost(from: start, to: end)
     }
 
     func loanPaymentCost(from start: Date, to end: Date) -> Double {
@@ -116,7 +158,7 @@ extension ScenarioOverviewView {
     }
 
     var shouldIncludeFinancingInCostPerKm: Bool {
-        hasActiveFinancing && costPerKmIncludesFinancing
+        activeScenario.acquisitionType == "loan" && loanEndDate != nil
     }
 
     var hasActiveFinancing: Bool {
@@ -138,7 +180,11 @@ extension ScenarioOverviewView {
     }
 
     func mileageDistance(from start: Date, to end: Date) -> Double {
-        max(tripDistance(from: start, to: end), odometerDelta(from: start, to: end))
+        usageEvents
+            .filter { event in
+                event.date >= start && event.date < end
+            }
+            .reduce(0) { $0 + $1.distanceValue }
     }
 
     func tripDistance(from start: Date, to end: Date) -> Double {
@@ -150,17 +196,10 @@ extension ScenarioOverviewView {
     }
 
     func odometerDelta(from start: Date, to end: Date) -> Double {
-        let odometerEvents = usageEvents
-            .filter { $0.eventType == "odometer_update" }
-            .sorted { $0.date < $1.date }
-
-        let baseline = odometerEvents
-            .last { $0.date < start }?
-            .odometerValue ?? Double(activeScenario.purchaseOdometer ?? 0)
-        let current = odometerEvents
-            .last { $0.date < end }?
-            .odometerValue ?? baseline
-
-        return max(current - baseline, 0)
+        usageEvents
+            .filter { event in
+                event.eventType == "odometer_update" && event.date >= start && event.date < end
+            }
+            .reduce(0) { $0 + $1.distanceValue }
     }
 }

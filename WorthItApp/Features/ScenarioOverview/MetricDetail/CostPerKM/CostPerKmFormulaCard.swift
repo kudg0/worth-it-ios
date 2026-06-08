@@ -8,6 +8,7 @@ struct CostPerKmFormulaCard: View {
         let currencySymbol: String
         let cost: String
         let distance: String
+        let formulaText: String?
     }
 
     let model: Model
@@ -22,7 +23,7 @@ struct CostPerKmFormulaCard: View {
                 .font(.system(size: 11, weight: .bold, design: .monospaced))
                 .foregroundStyle(WorthItColor.primaryContainer)
 
-            Text("\(model.value) = \(model.prefix)\(model.currencySymbol)\(model.cost) costs ÷ \(model.distance) \(model.mileageUnit)")
+            Text(model.formulaText ?? "\(model.value) = \(model.prefix)\(model.currencySymbol)\(model.cost) costs ÷ \(model.distance) \(model.mileageUnit)")
                 .font(.system(size: 11, weight: .regular, design: .monospaced))
                 .foregroundStyle(WorthItColor.textSecondary)
                 .lineLimit(1)

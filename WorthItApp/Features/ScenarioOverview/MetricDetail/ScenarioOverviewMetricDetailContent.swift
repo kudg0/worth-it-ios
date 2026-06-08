@@ -5,7 +5,7 @@ extension ScenarioOverviewView {
         let metric = selectedDetailMetricSlide ?? availableMetrics.first
 
         return Group {
-            if selectedDetailMetric == .costPerKm {
+            if selectedDetailMetric == .costPerKm || selectedDetailMetric == .currentMonthCostPerKm {
                 CostPerKmDetailScreen(model: costPerKmDetailModel(metric))
             } else {
                 GenericMetricDetailScreen(model: genericMetricDetailModel(metric))

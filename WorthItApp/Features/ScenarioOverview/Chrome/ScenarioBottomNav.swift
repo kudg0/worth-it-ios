@@ -4,7 +4,7 @@ struct ScenarioBottomNav: View {
     let selectedTab: ScenarioOverviewView.ScenarioTab
     let onExit: () -> Void
     let onHome: () -> Void
-    let onProfile: () -> Void
+    let onSettings: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -31,14 +31,14 @@ struct ScenarioBottomNav: View {
                 navItem(
                     systemName: "house.fill",
                     accessibilityLabel: "Scenario home",
-                    isSelected: selectedTab != .profile,
+                    isSelected: selectedTab != .settings,
                     action: onHome
                 )
                 navItem(
-                    systemName: "person.fill",
-                    accessibilityLabel: "Profile",
-                    isSelected: selectedTab == .profile,
-                    action: onProfile
+                    systemName: "gearshape.fill",
+                    accessibilityLabel: "Scenario settings",
+                    isSelected: selectedTab == .settings,
+                    action: onSettings
                 )
             }
             .frame(maxWidth: .infinity)

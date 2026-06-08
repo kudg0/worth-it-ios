@@ -1,8 +1,20 @@
 import Foundation
 
 struct ScenarioExpenseMonthGroup: Identifiable {
+    struct SyntheticItem: Identifiable {
+        let id: String
+        let title: String
+        let subtitle: String
+        let value: Double
+        let valueText: String
+        let detail: String
+        let systemIcon: String
+        let accentColor: String
+    }
+
     let monthStart: Date
     let events: [CostEvent]
+    let syntheticItems: [SyntheticItem]
 
     var id: Date { monthStart }
 }
@@ -44,6 +56,7 @@ struct ScenarioMileageLogItem: Identifiable {
     let previousOdometer: Int?
     let currentOdometer: Int?
     let distance: Double?
+    let estimatedCostLabel: String?
     let unit: String
     let date: Date
 }
@@ -65,4 +78,5 @@ struct ScenarioScheduledServiceDisplayItem: Identifiable {
     let distanceRemaining: Double?
     let distanceUnit: String
     let daysRemaining: Int?
+    let note: String?
 }
