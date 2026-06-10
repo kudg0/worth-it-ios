@@ -50,6 +50,7 @@ enum ScenarioOverviewMetric: String, CaseIterable, Identifiable {
     case currentMonthCostPerKm
     case totalExpenses
     case totalOwnership
+    case paybackDistance
     case projectedGain
     case expectedResale
     case loanInterest

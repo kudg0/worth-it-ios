@@ -227,6 +227,34 @@ struct ScenarioComparison: Decodable, Hashable {
         let deltaVsOwnership: Double
     }
 
+    struct AlternativeBreakEven: Decodable, Identifiable, Hashable {
+        let alternativeId: UUID
+        let alternativeName: String
+        let status: Status
+        let reason: String?
+        let currentDistanceKm: Double
+        let breakEvenDistanceKm: Double?
+        let remainingDistanceKm: Double?
+        let progress: Double
+        let fixedOwnershipCost: Double
+        let carRunningCostPerKm: Double?
+        let alternativeCostPerKm: Double?
+        let alternativeCostPerKmMin: Double?
+        let alternativeCostPerKmMax: Double?
+        let carTotalCost: Double?
+        let alternativeTotalCost: Double?
+        let savingsAmount: Double?
+
+        var id: UUID { alternativeId }
+
+        enum Status: String, Decodable, Hashable {
+            case reachable
+            case alreadyReached = "already_reached"
+            case unreachable
+            case insufficientData = "insufficient_data"
+        }
+    }
+
     struct CostBreakdown: Decodable, Hashable {
         let pricingTotal: Double
         let inheritedCostsTotal: Double
@@ -246,6 +274,9 @@ struct ScenarioComparison: Decodable, Hashable {
         let fixedPerMonth: Double?
         let averageCurvePricePerKm: Double?
         let curvePointRates: [Double]?
+        let curveUsedMinPricePerKm: Double?
+        let curveUsedMaxPricePerKm: Double?
+        let curveTripCount: Double?
         let manualKind: String?
         let manualValue: Double?
     }
@@ -275,6 +306,7 @@ struct ScenarioComparison: Decodable, Hashable {
 
     let summary: ScenarioSummary
     let alternatives: [AlternativeResult]
+    let alternativeBreakEvens: [AlternativeBreakEven]
     let series: Series?
 }
 

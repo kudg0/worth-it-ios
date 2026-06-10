@@ -25,6 +25,7 @@ extension ScenarioOverviewView {
 
         do {
             currentComparison = try await comparisonTask
+            normalizeSelectedBreakEvenAlternative()
         } catch {
             currentComparison = nil
             alternativesError = String(describing: error)
@@ -73,5 +74,40 @@ extension ScenarioOverviewView {
                 previousMonthSummary = nil
             }
         }
+    }
+
+    func selectedBreakEvenStorageKey(for scenarioId: UUID) -> String {
+        "scenarioOverview.breakEvenBenchmark.\(scenarioId.uuidString)"
+    }
+
+    func normalizeSelectedBreakEvenAlternative() {
+        let rows = currentComparison?.alternativeBreakEvens ?? []
+        guard !rows.isEmpty else {
+            selectedBreakEvenAlternativeId = nil
+            return
+        }
+
+        if let selectedBreakEvenAlternativeId,
+           rows.contains(where: { $0.alternativeId == selectedBreakEvenAlternativeId }) {
+            return
+        }
+
+        let key = selectedBreakEvenStorageKey(for: activeScenario.id)
+        if let stored = UserDefaults.standard.string(forKey: key),
+           let storedId = UUID(uuidString: stored),
+           rows.contains(where: { $0.alternativeId == storedId }) {
+            selectedBreakEvenAlternativeId = storedId
+            return
+        }
+
+        selectedBreakEvenAlternativeId = rows.first?.alternativeId
+        if let selectedBreakEvenAlternativeId {
+            UserDefaults.standard.set(selectedBreakEvenAlternativeId.uuidString, forKey: key)
+        }
+    }
+
+    func selectBreakEvenAlternative(_ id: UUID) {
+        selectedBreakEvenAlternativeId = id
+        UserDefaults.standard.set(id.uuidString, forKey: selectedBreakEvenStorageKey(for: activeScenario.id))
     }
 }

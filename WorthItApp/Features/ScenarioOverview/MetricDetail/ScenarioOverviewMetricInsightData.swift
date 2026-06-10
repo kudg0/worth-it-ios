@@ -3,6 +3,8 @@ import Foundation
 extension ScenarioOverviewView {
     var metricInsightWideTitle: String {
         switch selectedDetailMetric {
+        case .paybackDistance:
+            "Savings"
         case .totalOwnership:
             "Resale Buffer"
         case .expectedResale, .projectedGain:
@@ -24,6 +26,8 @@ extension ScenarioOverviewView {
             "Shows every logged car expense across the full ownership period."
         case .totalOwnership:
             "Net ownership cost after expected resale. The trend below shows accumulated logged costs, loan interest, and depreciation from the first logged expense month."
+        case .paybackDistance:
+            "Shows how much money this car saved or lost against the selected comparison option for the same distance."
         case .projectedGain:
             "Shows potential upside after resale value exceeds purchase, interest, and non-daily costs."
         case .expectedResale:
@@ -35,6 +39,8 @@ extension ScenarioOverviewView {
 
     var metricSeasonalText: String {
         switch selectedDetailMetric {
+        case .paybackDistance:
+            "Savings changes when tracked distance, ownership cost, resale basis, or selected alternative pricing changes."
         case .expectedResale, .projectedGain:
             "Market timing can move this metric. Seasonal demand may improve resale assumptions when the car remains in good condition."
         case .monthlyCost, .loanInterest:
@@ -48,7 +54,7 @@ extension ScenarioOverviewView {
 
     var metricMissingDataText: String {
         switch selectedDetailMetric {
-        case .costPerKm, .currentMonthCostPerKm:
+        case .costPerKm, .currentMonthCostPerKm, .paybackDistance:
             "Mileage history is needed for a precise trend."
         case .expectedResale, .projectedGain:
             "Condition and market comps will improve accuracy."
@@ -59,7 +65,7 @@ extension ScenarioOverviewView {
 
     var metricActionValue: String {
         switch selectedDetailMetric {
-        case .costPerKm, .currentMonthCostPerKm:
+        case .costPerKm, .currentMonthCostPerKm, .paybackDistance:
             "Mileage"
         case .expectedResale, .projectedGain:
             "Market"
@@ -72,7 +78,7 @@ extension ScenarioOverviewView {
         switch selectedDetailMetric {
         case .monthlyCost, .loanInterest:
             "Low"
-        case .costPerKm, .currentMonthCostPerKm, .totalExpenses, .totalOwnership:
+        case .costPerKm, .currentMonthCostPerKm, .totalExpenses, .totalOwnership, .paybackDistance:
             "Medium"
         case .projectedGain, .expectedResale:
             "Low"
@@ -91,6 +97,8 @@ extension ScenarioOverviewView {
             "Open expense history to inspect which entries make up the total. This metric is pure logged spend, without resale or vehicle value assumptions."
         case .totalOwnership:
             "Keep resale and large maintenance entries fresh. The headline is net cost after resale; the chart is the accumulated cost base behind it."
+        case .paybackDistance:
+            "Use this as a comparison signal. Positive means owning the car cost less than the selected alternative for your tracked distance; negative means the alternative would have been cheaper."
         case .projectedGain:
             "Projected gain should stay conservative. Daily running costs are excluded, but loan interest and non-daily maintenance still matter."
         case .expectedResale:

@@ -3,10 +3,12 @@ import SwiftUI
 struct WIIsland<Content: View>: View {
     let title: String
     var systemIcon: String = "car.fill"
+    var spacing: CGFloat = WorthItSpacing.xxl
+    var padding: CGFloat = WorthItSpacing.xxl
     @ViewBuilder let content: Content
 
     var body: some View {
-        VStack(alignment: .leading, spacing: WorthItSpacing.xxl) {
+        VStack(alignment: .leading, spacing: spacing) {
             HStack(spacing: WorthItSpacing.m) {
                 Image(systemName: systemIcon)
                     .font(.system(size: 13, weight: .semibold))
@@ -21,7 +23,7 @@ struct WIIsland<Content: View>: View {
 
             content
         }
-        .padding(WorthItSpacing.xxl)
+        .padding(padding)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(WorthItColor.surfaceIsland, in: RoundedRectangle(cornerRadius: WorthItRadius.xxl))
     }

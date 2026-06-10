@@ -22,6 +22,7 @@ extension ScenarioOverviewView {
 
         var enabled = Set(storedIds)
         enabled.insert(OverviewMetric.currentMonthCostPerKm.rawValue)
+        enabled.insert(OverviewMetric.paybackDistance.rawValue)
         return enabled
     }
 
@@ -113,6 +114,20 @@ extension ScenarioOverviewView {
                 progress: totalOwnershipProgress,
                 accentColor: WorthItColor.accentGold
             )
+        case .paybackDistance:
+            guard let selected = selectedAlternativeBreakEven else { return nil }
+            let snapshot = alternativeSavingsSnapshot(for: selected)
+            return MetricSlide(
+                id: metric,
+                title: "Savings",
+                value: savingsHeroValue(for: snapshot),
+                subtitle: "vs \(selected.alternativeName)",
+                footer: savingsStatusPill(for: snapshot),
+                footerIcon: snapshot?.isSaving == false ? "arrow.down.right" : "arrow.up.right",
+                footerColor: savingsColor(for: snapshot),
+                progress: normalizedProgress(abs(snapshot?.savings ?? 0) / max(abs(snapshot?.alternativeTotal ?? 1), 1)),
+                accentColor: savingsColor(for: snapshot)
+            )
         case .projectedGain:
             guard projectedGain > 0 else { return nil }
             return MetricSlide(
@@ -154,4 +169,5 @@ extension ScenarioOverviewView {
             )
         }
     }
+
 }

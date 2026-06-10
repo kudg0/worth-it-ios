@@ -54,6 +54,7 @@ struct ScenarioOverviewView: View {
     @State var selectedMileageDetailId: UUID?
     @State var selectedDetailMetric: OverviewMetric = .monthlyCost
     @State var selectedMetricTrendDate: Date?
+    @State var selectedBreakEvenAlternativeId: UUID?
     @State var selectedMetricTrendRange: MetricTrendRange = .oneYear
     @State var costPerKmTrendScope: CostPerKmTrendScope = .month
     @State var selectedEfficiencyChartDate: Date?
@@ -604,6 +605,10 @@ struct ScenarioOverviewView: View {
             return totalExpensesTrendPoints(maxMonths: nil)
         case .totalOwnership:
             return totalOwnershipTrendPoints(maxMonths: nil)
+        case .paybackDistance:
+            return selectedAlternativeBreakEven.flatMap(alternativeSavingsSnapshot).map {
+                [MetricTrendPoint(date: Date(), value: $0.savings)]
+            } ?? []
         case .projectedGain, .expectedResale, .loanInterest:
             return []
         }
@@ -667,7 +672,7 @@ struct ScenarioOverviewView: View {
             realMetricTrendPoints.count >= 2 ? "Cost inputs trend" : "Current cost inputs"
         case .monthlyCost, .totalExpenses:
             realMetricTrendPoints.count >= 2 ? "Monthly trend" : "Current baseline"
-        case .projectedGain, .expectedResale, .loanInterest:
+        case .paybackDistance, .projectedGain, .expectedResale, .loanInterest:
             "Current snapshot"
         }
     }
@@ -779,6 +784,8 @@ struct ScenarioOverviewView: View {
         switch selectedDetailMetric {
         case .costPerKm, .currentMonthCostPerKm:
             "\(currencySymbol)\(formatDouble(point.value, fractionDigits: 2))"
+        case .paybackDistance:
+            "\(currencySymbol)\(formatDouble(point.value, fractionDigits: 0))"
         default:
             "\(currencySymbol)\(formatDouble(point.value, fractionDigits: 0))"
         }
@@ -796,6 +803,8 @@ struct ScenarioOverviewView: View {
             totalLoggedExpensesValue
         case .totalOwnership:
             totalOwnershipCost.map(doubleValue) ?? 0
+        case .paybackDistance:
+            selectedAlternativeBreakEven.flatMap(alternativeSavingsSnapshot)?.savings ?? 0
         case .projectedGain:
             doubleValue(projectedGain)
         case .expectedResale:

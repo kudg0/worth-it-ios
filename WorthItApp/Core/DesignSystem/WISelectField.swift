@@ -19,6 +19,7 @@ struct WISelectSheet: View {
     let onSelect: (WISelectSheetOption) -> Void
 
     @Environment(\.dismiss) private var dismiss
+    @State private var searchText = ""
 
     var body: some View {
         NavigationStack {
@@ -27,7 +28,12 @@ struct WISelectSheet: View {
 
                 ScrollView {
                     VStack(spacing: WorthItSpacing.s) {
-                        ForEach(options) { option in
+                        if shouldShowSearch {
+                            searchField
+                                .padding(.bottom, WorthItSpacing.s)
+                        }
+
+                        ForEach(filteredOptions) { option in
                             selectOptionRow(option)
                         }
                     }
@@ -43,6 +49,48 @@ struct WISelectSheet: View {
         }
         .environment(\.colorScheme, .dark)
         .preferredColorScheme(.dark)
+    }
+
+    private var shouldShowSearch: Bool {
+        options.count > 10
+    }
+
+    private var filteredOptions: [WISelectSheetOption] {
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !query.isEmpty else { return options }
+
+        return options.filter {
+            $0.title.localizedCaseInsensitiveContains(query)
+        }
+    }
+
+    private var searchField: some View {
+        HStack(spacing: WorthItSpacing.s) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(WorthItColor.textTertiary)
+
+            ZStack(alignment: .leading) {
+                if searchText.isEmpty {
+                    Text("Search")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(WorthItColor.textTertiary.opacity(0.72))
+                }
+
+                TextField("", text: $searchText)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(WorthItColor.textPrimary)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+            }
+        }
+        .padding(.horizontal, WorthItSpacing.l)
+        .frame(height: 52)
+        .background(WorthItColor.surfaceLowest, in: RoundedRectangle(cornerRadius: WorthItRadius.m))
+        .overlay {
+            RoundedRectangle(cornerRadius: WorthItRadius.m)
+                .stroke(WorthItColor.outlineInput, lineWidth: 1)
+        }
     }
 
     private func selectOptionRow(_ option: WISelectSheetOption) -> some View {
