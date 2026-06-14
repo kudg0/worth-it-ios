@@ -10,7 +10,8 @@ struct MaintenanceSection: View {
         let serviceStateTitle: (String) -> String
         let serviceStateColor: (String) -> Color
         let serviceIconName: (String) -> String
-        let onEditScheduledService: (UUID) -> Void
+        let onOpenScheduledServices: () -> Void
+        let onOpenScheduledService: (UUID) -> Void
         let onOpenScheduledServiceActions: (UUID) -> Void
     }
 
@@ -31,20 +32,24 @@ struct MaintenanceSection: View {
 
     private var scheduledServicesSection: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            MaintenanceSectionHeader(title: "Scheduled Services")
+            MaintenanceSectionHeader(
+                title: "Scheduled Services",
+                showsViewAll: !model.upcomingItems.isEmpty,
+                action: model.onOpenScheduledServices
+            )
 
             if model.upcomingItems.isEmpty {
                 ScenarioWideAction(title: "Scheduled Services", subtitle: "Upcoming service reminders will live here.", systemName: "calendar.badge.clock")
             } else {
                 VStack(spacing: WorthItSpacing.m) {
-                    ForEach(model.upcomingItems) { item in
+                    ForEach(Array(model.upcomingItems.prefix(5))) { item in
                         ScheduledServiceRow(
                             item: item,
                             dueSubtitle: model.dueSubtitle,
                             serviceStateTitle: model.serviceStateTitle,
                             serviceStateColor: model.serviceStateColor,
                             serviceIconName: model.serviceIconName,
-                            onEdit: model.onEditScheduledService,
+                            onOpen: model.onOpenScheduledService,
                             onOpenActions: model.onOpenScheduledServiceActions
                         )
                     }
@@ -76,13 +81,28 @@ struct MaintenanceSection: View {
 
 private struct MaintenanceSectionHeader: View {
     let title: String
+    var showsViewAll = false
+    var action: () -> Void = {}
 
     var body: some View {
-        Text(title)
-            .font(.system(size: 12, weight: .bold))
-            .foregroundStyle(WorthItColor.textSecondary)
-            .tracking(1.2)
-            .textCase(.uppercase)
-            .padding(.horizontal, WorthItSpacing.xs)
+        HStack {
+            Text(title)
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(WorthItColor.textSecondary)
+                .tracking(1.2)
+                .textCase(.uppercase)
+
+            Spacer()
+
+            if showsViewAll {
+                Button(action: action) {
+                    Text("View All")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(WorthItColor.primaryContainer)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, WorthItSpacing.xs)
     }
 }

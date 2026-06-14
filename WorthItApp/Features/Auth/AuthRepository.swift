@@ -48,6 +48,46 @@ struct AuthRepository {
         return response.session
     }
 
+    func updateProfile(_ draft: EditProfileDraft, token: String) async throws -> AuthUser {
+        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
+        let response: UserProfileResponse = try await client.patch(
+            "/me/profile",
+            body: UpdateUserProfileRequest(
+                name: draft.name,
+                email: draft.email,
+                image: draft.image
+            )
+        )
+
+        return response.user
+    }
+
+    func getSettings(token: String) async throws -> UserSettings {
+        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
+        let response: UserSettingsResponse = try await client.get("/me/settings")
+        return response.settings
+    }
+
+    func getSettingsOptions(token: String) async throws -> UserSettingsOptions {
+        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
+        let response: UserSettingsOptionsResponse = try await client.get("/me/settings/options")
+        return response.options
+    }
+
+    func updateSettings(_ patch: UserSettingsPatch, token: String) async throws -> UserSettings {
+        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
+        let response: UserSettingsResponse = try await client.patch(
+            "/me/settings",
+            body: UpdateUserSettingsRequest(
+                distanceUnit: patch.distanceUnit,
+                currency: patch.currency,
+                locale: patch.locale
+            )
+        )
+
+        return response.settings
+    }
+
     private func updateDefaults(for region: String, token: String) async throws {
         let defaults = RegionDefaults(regionName: region)
         let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
@@ -60,6 +100,31 @@ struct AuthRepository {
             )
         )
     }
+}
+
+struct UserSettings: Equatable {
+    let distanceUnit: String
+    let currency: String
+    let locale: String
+}
+
+struct UserSettingsPatch {
+    var distanceUnit: String? = nil
+    var currency: String? = nil
+    var locale: String? = nil
+}
+
+struct UserSettingsOption: Identifiable, Equatable {
+    let id: String
+    let title: String
+    let groupId: String?
+    let groupTitle: String?
+}
+
+struct UserSettingsOptions: Equatable {
+    let regions: [UserSettingsOption]
+    let currencies: [UserSettingsOption]
+    let distanceUnits: [UserSettingsOption]
 }
 
 private struct EmailSignInRequest: Encodable {
@@ -105,7 +170,8 @@ private struct AuthResponse: Decodable {
             user: AuthUser(
                 id: user.id,
                 name: user.name,
-                email: user.email
+                email: user.email,
+                image: user.image
             )
         )
     }
@@ -115,12 +181,36 @@ private struct AuthResponseUser: Decodable {
     let id: UUID
     let name: String
     let email: String
+    let image: String?
+}
+
+private struct UpdateUserProfileRequest: Encodable {
+    let name: String
+    let email: String
+    let image: String?
+}
+
+private struct UserProfileResponse: Decodable {
+    let id: UUID
+    let name: String
+    let email: String
+    let image: String?
+    let emailVerified: Bool
+
+    var user: AuthUser {
+        AuthUser(
+            id: id,
+            name: name,
+            email: email,
+            image: image
+        )
+    }
 }
 
 private struct UpdateUserSettingsRequest: Encodable {
-    let distanceUnit: String
-    let currency: String
-    let locale: String
+    let distanceUnit: String?
+    let currency: String?
+    let locale: String?
 }
 
 private struct UserSettingsResponse: Decodable {
@@ -128,6 +218,35 @@ private struct UserSettingsResponse: Decodable {
     let distanceUnit: String
     let currency: String
     let locale: String
+
+    var settings: UserSettings {
+        UserSettings(distanceUnit: distanceUnit, currency: currency, locale: locale)
+    }
+}
+
+private struct UserSettingsOptionsResponse: Decodable {
+    let regions: [UserSettingsOptionResponse]
+    let currencies: [UserSettingsOptionResponse]
+    let distanceUnits: [UserSettingsOptionResponse]
+
+    var options: UserSettingsOptions {
+        UserSettingsOptions(
+            regions: regions.map(\.option),
+            currencies: currencies.map(\.option),
+            distanceUnits: distanceUnits.map(\.option)
+        )
+    }
+}
+
+private struct UserSettingsOptionResponse: Decodable {
+    let id: String
+    let label: String
+    let groupId: String?
+    let groupLabel: String?
+
+    var option: UserSettingsOption {
+        UserSettingsOption(id: id, title: label, groupId: groupId, groupTitle: groupLabel)
+    }
 }
 
 private struct RegionDefaults {

@@ -3,12 +3,28 @@ import SwiftUI
 struct WISelectSheetOption: Identifiable, Hashable {
     let id: String
     let title: String
+    var subtitle: String?
     var systemName: String?
+    var textBadge: String?
+    var groupId: String?
+    var groupTitle: String?
 
-    init(id: String? = nil, title: String, systemName: String? = nil) {
+    init(
+        id: String? = nil,
+        title: String,
+        subtitle: String? = nil,
+        systemName: String? = nil,
+        textBadge: String? = nil,
+        groupId: String? = nil,
+        groupTitle: String? = nil
+    ) {
         self.id = id ?? title
         self.title = title
+        self.subtitle = subtitle
         self.systemName = systemName
+        self.textBadge = textBadge
+        self.groupId = groupId
+        self.groupTitle = groupTitle
     }
 }
 
@@ -95,38 +111,91 @@ struct WISelectSheet: View {
 
     private func selectOptionRow(_ option: WISelectSheetOption) -> some View {
         let isSelected = selectedId == option.id
+        let subtitle = displaySubtitle(for: option)
 
         return Button {
             onSelect(option)
             dismiss()
         } label: {
             HStack(spacing: WorthItSpacing.m) {
-                Image(systemName: option.systemName ?? (isSelected ? "checkmark.circle.fill" : "circle"))
-                    .font(.system(size: 18, weight: .semibold))
-                    .symbolRenderingMode(.hierarchical)
-                    .foregroundStyle(isSelected ? WorthItColor.primaryContainer : WorthItColor.textTertiary)
-                    .frame(width: 24)
+                selectOptionIcon(option, isSelected: isSelected)
 
-                Text(option.title)
-                    .font(.system(size: 16, weight: isSelected ? .bold : .semibold))
-                    .foregroundStyle(isSelected ? WorthItColor.textPrimary : WorthItColor.textSecondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(option.title)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(isSelected ? WorthItColor.textPrimary : WorthItColor.textSecondary)
+                        .lineLimit(subtitle == nil ? 2 : 1)
 
-                if isSelected, option.systemName != nil {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(WorthItColor.primaryContainer)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.system(size: 11, weight: .regular))
+                            .foregroundStyle(WorthItColor.textSecondary)
+                            .lineLimit(1)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                HStack(spacing: WorthItSpacing.s) {
+                    if let textBadge = option.textBadge {
+                        Text(textBadge)
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(WorthItColor.textPrimary)
+                            .lineLimit(1)
+                            .monospacedDigit()
+                    }
+
+                    if isSelected {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(WorthItColor.primaryContainer)
+                    }
+                }
+                .layoutPriority(1)
             }
-            .padding(.horizontal, WorthItSpacing.l)
-            .frame(height: 56)
+            .padding(.horizontal, WorthItSpacing.m)
+            .padding(.vertical, WorthItSpacing.s)
+            .frame(maxWidth: .infinity, minHeight: subtitle == nil ? 62 : 72, alignment: .leading)
             .background(isSelected ? WorthItColor.primaryContainer.opacity(0.12) : WorthItColor.surfaceContainerLow, in: RoundedRectangle(cornerRadius: WorthItRadius.m))
             .overlay {
                 RoundedRectangle(cornerRadius: WorthItRadius.m)
-                    .stroke(isSelected ? WorthItColor.primaryContainer.opacity(0.55) : WorthItColor.outlineInput, lineWidth: 1)
+                    .stroke(isSelected ? WorthItColor.primaryContainer.opacity(0.55) : WorthItColor.outlineSubtle, lineWidth: 1)
             }
+            .contentShape(RoundedRectangle(cornerRadius: WorthItRadius.m))
         }
         .buttonStyle(.plain)
+    }
+
+    private func displaySubtitle(for option: WISelectSheetOption) -> String? {
+        guard let subtitle = option.subtitle?.trimmingCharacters(in: .whitespacesAndNewlines), !subtitle.isEmpty else {
+            return nil
+        }
+
+        let title = option.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        if subtitle == title {
+            return nil
+        }
+
+        let repeatedTitlePrefix = "\(title) • "
+        if subtitle.hasPrefix(repeatedTitlePrefix) {
+            let trimmedSubtitle = String(subtitle.dropFirst(repeatedTitlePrefix.count))
+            return trimmedSubtitle.isEmpty ? nil : trimmedSubtitle
+        }
+
+        return subtitle
+    }
+
+    private func selectOptionIcon(_ option: WISelectSheetOption, isSelected: Bool) -> some View {
+        Image(systemName: option.systemName ?? (isSelected ? "checkmark.circle.fill" : "circle"))
+            .font(.system(size: 15, weight: .semibold))
+            .symbolRenderingMode(.hierarchical)
+            .foregroundStyle(isSelected ? WorthItColor.primaryContainer : WorthItColor.textTertiary)
+            .frame(width: 40, height: 40)
+            .background(WorthItColor.surfaceLowest, in: Circle())
+            .overlay {
+                Circle()
+                    .stroke(WorthItColor.outlineSubtle, lineWidth: 1)
+            }
     }
 }
 

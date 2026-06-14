@@ -1,6 +1,37 @@
 import SwiftUI
 
 extension ScenarioOverviewView {
+    var currentMonthRecentExpenseItems: [RecentExpenseItem] {
+        let expenseItems = currentMonthExpenseEvents.map { event in
+            RecentExpenseItem(
+                id: event.id.uuidString,
+                title: expenseTitle(for: event),
+                subtitle: expenseSubtitle(for: event),
+                value: expenseAmount(event),
+                detail: nil,
+                systemIcon: expenseIconName(for: event.category),
+                accentColor: expenseAccentColor(for: event),
+                action: { openExpenseDetail(event.id) }
+            )
+        }
+
+        let loanInterest = currentMonthLoanInterest
+        guard loanInterest > 0 else { return expenseItems }
+
+        let loanItem = RecentExpenseItem(
+            id: "loan-interest-\(expenseHistoryMonthIdentifier(for: currentMonthStart))",
+            title: "Loan interest accrued",
+            subtitle: "Financing cost • \(expenseHistoryMonthLabel(for: currentMonthStart))",
+            value: "\(currencySymbol)\(formatDouble(loanInterest, fractionDigits: 0))",
+            detail: "Loan interest",
+            systemIcon: "building.columns.fill",
+            accentColor: WorthItColor.primaryContainer,
+            action: { openMetricDetail(.loanInterest) }
+        )
+
+        return [loanItem] + expenseItems
+    }
+
     func expenseHistoryGroupTotal(_ group: ExpenseMonthGroup) -> String {
         let loggedTotal = group.events.reduce(Decimal(0)) { partial, event in
             partial + decimalValue(event.amount)
@@ -55,6 +86,45 @@ extension ScenarioOverviewView {
         default:
             return event.category
         }
+    }
+
+    func expenseKindTitle(for event: CostEvent) -> String {
+        switch event.kind {
+        case "recurring":
+            "Recurring"
+        default:
+            "One-off"
+        }
+    }
+
+    func expenseCategoryTitle(for category: String) -> String {
+        switch category {
+        case "fuel":
+            "Fuel"
+        case "maintenance":
+            "Maintenance"
+        case "repair":
+            "Repair"
+        case "tires":
+            "Tires"
+        case "insurance":
+            "Insurance"
+        case "parking":
+            "Parking"
+        case "tax":
+            "Tax"
+        case "wash":
+            "Wash"
+        case "accessories":
+            "Accessories"
+        default:
+            category.capitalized
+        }
+    }
+
+    func expenseLinkedServiceTitle(for event: CostEvent) -> String? {
+        guard let serviceId = event.scheduledServiceId else { return nil }
+        return scheduledServices.first(where: { $0.id == serviceId })?.title ?? "Scheduled service"
     }
 
     func expenseAccentColor(for event: CostEvent) -> Color {

@@ -16,6 +16,7 @@ extension ScenarioOverviewView {
             trigger: ScheduleServiceTriggerSection.Model(
                 trigger: $scheduleTrigger,
                 serviceDate: $serviceDate,
+                minimumServiceDate: minimumScheduledServiceDate,
                 serviceMileage: $serviceMileage,
                 mileageUnit: mileageDisplayUnit,
                 mileageMode: serviceMileageInputMode,

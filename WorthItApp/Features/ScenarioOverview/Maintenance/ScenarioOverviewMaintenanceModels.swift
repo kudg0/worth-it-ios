@@ -11,7 +11,8 @@ extension ScenarioOverviewView {
             serviceStateTitle: serviceStateTitle,
             serviceStateColor: serviceStateColor,
             serviceIconName: serviceIconName,
-            onEditScheduledService: beginEditingScheduledService,
+            onOpenScheduledServices: openScheduledServices,
+            onOpenScheduledService: openScheduledServiceDetail,
             onOpenScheduledServiceActions: openScheduledServiceActions
         )
     }

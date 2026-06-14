@@ -1,14 +1,12 @@
 import SwiftUI
 
-struct ScheduledServiceActionOverlay: View {
+struct ExpenseActionOverlay: View {
     let onDismiss: () -> Void
     let onEdit: () -> Void
-    let onCompleteWithExpense: () -> Void
 
     var body: some View {
         ScenarioBottomActionSheet(onDismiss: onDismiss) {
             actionButton(title: "Edit", systemName: "pencil", action: onEdit)
-            actionButton(title: "Complete with expense", systemName: "checkmark.circle", action: onCompleteWithExpense)
         }
     }
 

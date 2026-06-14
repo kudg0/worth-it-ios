@@ -1,14 +1,19 @@
 import SwiftUI
 
+struct RecentExpenseItem: Identifiable {
+    let id: String
+    let title: String
+    let subtitle: String
+    let value: String
+    let detail: String?
+    let systemIcon: String
+    let accentColor: Color
+    let action: (() -> Void)?
+}
+
 struct RecentExpensesList: View {
-    let events: [CostEvent]
-    let rowTitle: (CostEvent) -> String
-    let rowSubtitle: (CostEvent) -> String
-    let rowValue: (CostEvent) -> String
-    let rowIcon: (CostEvent) -> String
-    let rowAccentColor: (CostEvent) -> Color
+    let items: [RecentExpenseItem]
     let onOpenHistory: () -> Void
-    let onEditExpense: (CostEvent) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
@@ -23,18 +28,19 @@ struct RecentExpensesList: View {
                 .buttonStyle(.plain)
             }
 
-            if events.isEmpty {
+            if items.isEmpty {
                 CurrentMonthNoExpensesState()
             } else {
                 VStack(spacing: WorthItSpacing.m) {
-                    ForEach(events) { event in
+                    ForEach(items) { item in
                         WIInfoListRow(
-                            title: rowTitle(event),
-                            subtitle: rowSubtitle(event),
-                            value: rowValue(event),
-                            systemIcon: rowIcon(event),
-                            accentColor: rowAccentColor(event),
-                            action: { onEditExpense(event) }
+                            title: item.title,
+                            subtitle: item.subtitle,
+                            value: item.value,
+                            detail: item.detail,
+                            systemIcon: item.systemIcon,
+                            accentColor: item.accentColor,
+                            action: item.action
                         )
                     }
                 }

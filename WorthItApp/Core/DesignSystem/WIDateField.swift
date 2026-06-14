@@ -5,6 +5,7 @@ struct WIDateField: View {
     let placeholder: String
     @Binding var date: Date?
     var errorText: String?
+    var allowedRange: ClosedRange<Date>?
 
     @State private var isPickerPresented = false
     @State private var draftDate = Date()
@@ -14,7 +15,7 @@ struct WIDateField: View {
             fieldLabel(label)
 
             Button {
-                draftDate = date ?? Date()
+                draftDate = clampedDate(date ?? Date())
                 isPickerPresented = true
             } label: {
                 HStack(spacing: WorthItSpacing.s) {
@@ -64,11 +65,7 @@ struct WIDateField: View {
             ZStack {
                 WorthItColor.pageBackground.ignoresSafeArea()
 
-                DatePicker(
-                    label,
-                    selection: $draftDate,
-                    displayedComponents: .date
-                )
+                datePicker
                 .datePickerStyle(.graphical)
                 .tint(WorthItColor.primaryContainer)
                 .padding(WorthItSpacing.xl)
@@ -89,7 +86,7 @@ struct WIDateField: View {
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
-                        date = draftDate
+                        date = clampedDate(draftDate)
                         isPickerPresented = false
                     }
                     .foregroundStyle(WorthItColor.primaryContainer)
@@ -98,6 +95,29 @@ struct WIDateField: View {
         }
         .environment(\.colorScheme, .dark)
         .preferredColorScheme(.dark)
+    }
+
+    @ViewBuilder
+    private var datePicker: some View {
+        if let allowedRange {
+            DatePicker(
+                label,
+                selection: $draftDate,
+                in: allowedRange,
+                displayedComponents: .date
+            )
+        } else {
+            DatePicker(
+                label,
+                selection: $draftDate,
+                displayedComponents: .date
+            )
+        }
+    }
+
+    private func clampedDate(_ value: Date) -> Date {
+        guard let allowedRange else { return value }
+        return min(max(value, allowedRange.lowerBound), allowedRange.upperBound)
     }
 
     private static let formatter: DateFormatter = {

@@ -1,6 +1,11 @@
 import SwiftUI
 
 extension ScenarioOverviewView {
+    func beginEditingExpense(_ expenseId: UUID) {
+        guard let event = costEvents.first(where: { $0.id == expenseId }) else { return }
+        beginEditingExpense(event)
+    }
+
     func beginEditingExpense(_ event: CostEvent) {
         let returnTab = selectedTab
         editingCostEvent = event

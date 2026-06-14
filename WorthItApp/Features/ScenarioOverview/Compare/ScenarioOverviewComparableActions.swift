@@ -64,7 +64,7 @@ extension ScenarioOverviewView {
                         name: alternative.name,
                         pricingMode: alternative.pricingMode,
                         paramsJson: alternative.paramsJson,
-                        note: alternative.note ?? "",
+                        note: alternative.note?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? alternative.note : nil,
                         isIncluded: selectedIds.contains(alternative.id)
                     )
                 )

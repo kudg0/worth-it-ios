@@ -92,7 +92,7 @@ extension ScenarioOverviewView {
                 id: metric,
                 title: "Total Expenses",
                 value: totalLoggedExpensesDisplay,
-                subtitle: "\(costEvents.count) entries",
+                subtitle: totalExpenseEntriesSubtitle,
                 footer: "OPEN HISTORY",
                 footerIcon: "list.bullet.rectangle",
                 footerColor: WorthItColor.textTertiary,
@@ -184,13 +184,27 @@ extension ScenarioOverviewView {
             id: metric,
             title: card.title,
             value: heroValue(for: card),
-            subtitle: card.subtitle,
+            subtitle: metric == .totalExpenses ? totalExpenseEntriesSubtitle : card.subtitle,
             footer: footerText(for: card),
             footerIcon: footerIcon(for: card, metric: metric),
             footerColor: footerColor(for: card),
             progress: normalizedProgress(card.progress ?? 0),
             accentColor: accentColor(for: card, metric: metric)
         )
+    }
+
+    var totalExpenseEntriesSubtitle: String {
+        let count = totalExpenseEntryCount
+        let noun = count == 1 ? "entry" : "entries"
+        return "\(count) \(noun)"
+    }
+
+    var totalExpenseEntryCount: Int {
+        let syntheticLoanInterestCount = expenseHistoryBars.filter { bar in
+            expenseHistoryLoanInterest(for: bar.monthStart) > 0
+        }.count
+
+        return costEvents.count + syntheticLoanInterestCount
     }
 
     func heroValue(for card: ScenarioAnalyticsMetricPayload.Card) -> String {

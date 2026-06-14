@@ -15,7 +15,8 @@ extension ScenarioOverviewView {
             rowDetail: { expenseBadgeText(for: $0) },
             rowIcon: { expenseIconName(for: $0.category) },
             rowAccentColor: { expenseAccentColor(for: $0) },
-            onEditExpense: beginEditingExpense
+            onOpenExpense: { openExpenseDetail($0.id) },
+            onOpenSyntheticItem: { _ in openMetricDetail(.loanInterest) }
         )
     }
 

@@ -67,7 +67,14 @@ struct ScenarioOverviewView: View {
     @State var editingCostEvent: CostEvent?
     @State var editingUsageEvent: UsageEvent?
     @State var editingScheduledService: ScheduledService?
+    @State var activeExpenseActionId: UUID?
+    @State var activeExpenseDaySelection: ScenarioExpenseDaySelection?
     @State var activeScheduledServiceActionId: UUID?
+    @State var selectedExpenseDetailId: UUID?
+    @State var displayedExpenseDetailWeekStart: Date?
+    @State var selectedScheduledServiceDetailId: UUID?
+    @State var displayedScheduledServiceMonth: Date?
+    @State var selectedScheduledServiceDate: Date?
     @State var expenseNotes = ""
     @State var expenseCategory: ExpenseCategory = .fuel
     @State var isRecurringExpense = false
@@ -120,6 +127,7 @@ struct ScenarioOverviewView: View {
     @State var isUpdatingFavorite = false
     @State var isDeleting = false
     @State var isSavingEntry = false
+    @State var showsScenarioActions = false
     @State var showsDeleteConfirmation = false
     @State var actionError: String?
     @State var compareMetric: CompareMetric = .perKm
@@ -148,13 +156,9 @@ struct ScenarioOverviewView: View {
                     usesEntryTitleStyle: isEntryFlowScreen,
                     canGoBack: canGoBackInScenario,
                     selectedTab: selectedTab,
-                    activeScenario: activeScenario,
-                    isUpdatingFavorite: isUpdatingFavorite,
                     isDeleting: isDeleting,
                     onBack: popScenarioTab,
-                    onToggleFavorite: { Task { await toggleFavorite() } },
-                    onEditScenario: onEditScenario,
-                    onDeleteScenario: { showsDeleteConfirmation = true },
+                    onOpenScenarioActions: { showsScenarioActions = true },
                     onAddEntry: openAddEntryChooserFromMaintenance,
                     onAddMileage: { openMileageForm() },
                     onAddComparable: openAddComparableOption,
@@ -264,6 +268,39 @@ struct ScenarioOverviewView: View {
                 )
                     .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
+
+            if let expenseId = activeExpenseActionId {
+                ExpenseActionOverlay(
+                    onDismiss: { activeExpenseActionId = nil },
+                    onEdit: {
+                        activeExpenseActionId = nil
+                        beginEditingExpense(expenseId)
+                    }
+                )
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
+
+            if showsScenarioActions {
+                ScenarioActionsOverlay(
+                    scenario: activeScenario,
+                    isUpdatingFavorite: isUpdatingFavorite,
+                    isDeleting: isDeleting,
+                    onDismiss: { showsScenarioActions = false },
+                    onToggleFavorite: {
+                        showsScenarioActions = false
+                        Task { await toggleFavorite() }
+                    },
+                    onEditScenario: {
+                        showsScenarioActions = false
+                        onEditScenario(activeScenario)
+                    },
+                    onDeleteScenario: {
+                        showsScenarioActions = false
+                        showsDeleteConfirmation = true
+                    }
+                )
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
         }
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -297,6 +334,11 @@ struct ScenarioOverviewView: View {
                 .presentationDetents([.medium])
                 .presentationDragIndicator(.visible)
         }
+        .sheet(item: $activeExpenseDaySelection) { selection in
+            expenseDaySelectionSheet(selection)
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+        }
         .task(id: scenario.id) {
             displayedScenario = scenario
             selectedTab = .overview
@@ -305,6 +347,60 @@ struct ScenarioOverviewView: View {
         }
     }
 
+
+    @ViewBuilder
+    var scheduledServiceDetailContent: some View {
+        if let selectedScheduledServiceDetailId,
+           let item = upcomingServiceItems.first(where: { $0.id == selectedScheduledServiceDetailId }) {
+            ScheduledServiceDetailScreen(
+                item: item,
+                service: scheduledServices.first(where: { $0.id == selectedScheduledServiceDetailId }),
+                dueSubtitle: serviceDueSubtitle,
+                serviceStateTitle: serviceStateTitle,
+                serviceStateColor: serviceStateColor,
+                serviceIconName: serviceIconName,
+                onEdit: beginEditingScheduledService,
+                onCompleteWithExpense: beginCompletingScheduledService,
+                onOpenActions: openScheduledServiceActions
+            )
+        } else {
+            ScenarioWideAction(
+                title: "Service unavailable",
+                subtitle: "Open the schedule again to refresh this reminder.",
+                systemName: "calendar.badge.exclamationmark"
+            )
+        }
+    }
+
+    @ViewBuilder
+    var expenseDetailContent: some View {
+        if let selectedExpenseDetailId,
+           let event = costEvents.first(where: { $0.id == selectedExpenseDetailId }) {
+            ExpenseDetailScreen(
+                event: event,
+                scenarioName: activeScenario.name,
+                amountText: expenseAmountPrecise(event),
+                categoryTitle: expenseCategoryTitle(for: event.category),
+                categoryIconName: expenseIconName(for: event.category),
+                accentColor: expenseAccentColor(for: event),
+                dateText: Self.shortDateFormatter.string(from: event.date),
+                timeText: Self.timeFormatter.string(from: event.date),
+                kindText: expenseKindTitle(for: event),
+                monthText: expenseHistoryMonthLabel(for: event.date),
+                linkedServiceTitle: expenseLinkedServiceTitle(for: event),
+                weekRail: expenseWeekRailModel(for: event),
+                onMoveWeek: moveExpenseDetailWeek,
+                onSelectWeekDay: selectExpenseDetailDay,
+                onOpenActions: { activeExpenseActionId = event.id }
+            )
+        } else {
+            ScenarioWideAction(
+                title: "Expense unavailable",
+                subtitle: "Open expense history again to refresh this entry.",
+                systemName: "receipt"
+            )
+        }
+    }
 
     @ViewBuilder
     var tabContent: some View {
@@ -390,6 +486,23 @@ struct ScenarioOverviewView: View {
             LogExpenseScreen(model: logExpenseScreenModel)
         case .scheduleService:
             ScheduleServiceScreen(model: scheduleServiceScreenModel)
+        case .scheduledServices:
+            ScheduledServicesScreen(
+                month: scheduledServiceMonthBinding,
+                selectedDate: $selectedScheduledServiceDate,
+                ownershipStartDate: activeScenario.startDate,
+                items: upcomingServiceItems,
+                dueSubtitle: serviceDueSubtitle,
+                serviceStateTitle: serviceStateTitle,
+                serviceStateColor: serviceStateColor,
+                serviceIconName: serviceIconName,
+                onOpenScheduledService: openScheduledServiceDetail,
+                onOpenScheduledServiceActions: openScheduledServiceActions
+            )
+        case .scheduledServiceDetail:
+            scheduledServiceDetailContent
+        case .expenseDetail:
+            expenseDetailContent
         case .expenseHistory:
             ExpenseHistoryScreen(model: expenseHistoryScreenModel)
         case .mileageHistory:
@@ -940,11 +1053,10 @@ struct ScenarioOverviewView: View {
     }
 
     var monthlySpendValue: Double? {
-        let currentExpenses = doubleValue(currentMonthExpenseTotal)
-        let loanInterest = currentMonthLoanInterest
+        let currentSpend = doubleValue(currentMonthExpenseTotal)
 
-        if loanInterest > 0 || currentExpenses > 0 {
-            return loanInterest + currentExpenses
+        if currentSpend > 0 {
+            return currentSpend
         }
 
         return monthlyCostValue(from: currentSummary)
@@ -985,11 +1097,10 @@ struct ScenarioOverviewView: View {
     }
 
     var previousMonthlySpendValue: Double? {
-        let previousExpenses = doubleValue(previousMonthExpenseTotal)
-        let loanInterest = previousMonthLoanInterest
+        let previousSpend = doubleValue(previousMonthExpenseTotal)
 
-        if loanInterest > 0 || previousExpenses > 0 {
-            return loanInterest + previousExpenses
+        if previousSpend > 0 {
+            return previousSpend
         }
 
         return monthlyCostValue(from: previousMonthSummary)

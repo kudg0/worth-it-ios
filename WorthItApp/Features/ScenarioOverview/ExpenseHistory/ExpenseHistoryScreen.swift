@@ -14,7 +14,8 @@ struct ExpenseHistoryScreen: View {
         let rowDetail: (CostEvent) -> String
         let rowIcon: (CostEvent) -> String
         let rowAccentColor: (CostEvent) -> Color
-        let onEditExpense: (CostEvent) -> Void
+        let onOpenExpense: (CostEvent) -> Void
+        let onOpenSyntheticItem: (ScenarioOverviewView.ExpenseMonthGroup.SyntheticItem) -> Void
     }
 
     let model: Model
@@ -61,7 +62,8 @@ struct ExpenseHistoryScreen: View {
             rowDetail: model.rowDetail,
             rowIcon: model.rowIcon,
             rowAccentColor: model.rowAccentColor,
-            onEditExpense: model.onEditExpense
+            onOpenExpense: model.onOpenExpense,
+            onOpenSyntheticItem: model.onOpenSyntheticItem
         )
     }
 

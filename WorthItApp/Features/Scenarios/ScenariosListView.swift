@@ -12,12 +12,17 @@ struct ScenariosListView: View {
     let onCreateScenario: () -> Void
     let onOpenScenario: (ScenarioListItem) -> Void
     let onScenariosLoaded: ([ScenarioListItem]) -> Void
+    let onProfileUpdated: (EditProfileDraft) async throws -> AuthUser
+    let onLoadUserSettings: () async throws -> UserSettings
+    let onLoadUserSettingsOptions: () async throws -> UserSettingsOptions
+    let onUpdateUserSettings: (UserSettingsPatch) async throws -> UserSettings
     let onLogout: () -> Void
     private let stickyHeaderHeight: CGFloat = 154
     private let stickyFadeHeight: CGFloat = 42
 
     @State private var scenarios: [ScenarioListItem] = []
     @State private var selectedTab: Tab = .scenarios
+    @State private var isEditingProfile = false
     @State private var isLoading = false
     @State private var errorMessage: String?
 
@@ -26,27 +31,42 @@ struct ScenariosListView: View {
             WorthItColor.pageBackground.ignoresSafeArea()
             WITopSpotlight()
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: WorthItSpacing.xl) {
-                    content
+            if isEditingProfile {
+                EditProfileScreen(
+                    user: profileUser,
+                    onSave: { draft in
+                        let updatedUser = try await onProfileUpdated(draft)
+                        isEditingProfile = false
+                        return updatedUser
+                    },
+                    onDiscard: {
+                        isEditingProfile = false
+                    }
+                )
+                .transition(.move(edge: .trailing).combined(with: .opacity))
+            } else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: WorthItSpacing.xl) {
+                        content
+                    }
+                    .padding(WorthItSpacing.xl)
+                    .padding(.top, selectedTab == .scenarios ? stickyHeaderHeight : WorthItSpacing.xl)
+                    .padding(.bottom, 132)
                 }
-                .padding(WorthItSpacing.xl)
-                .padding(.top, selectedTab == .scenarios ? stickyHeaderHeight : WorthItSpacing.xl)
-                .padding(.bottom, 132)
-            }
 
-            if selectedTab == .scenarios {
-                VStack(spacing: 0) {
-                    stickyHeader
-                    stickyFade
-                    Spacer(minLength: 0)
+                if selectedTab == .scenarios {
+                    VStack(spacing: 0) {
+                        stickyHeader
+                        stickyFade
+                        Spacer(minLength: 0)
+                    }
+                    .zIndex(1)
                 }
-                .zIndex(1)
-            }
 
-            bottomNav
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-                .ignoresSafeArea(edges: .bottom)
+                bottomNav
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
+            }
         }
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -62,7 +82,18 @@ struct ScenariosListView: View {
         case .scenarios:
             scenariosContent
         case .profile:
-            ProfileView(user: profileUser, onLogout: onLogout)
+            ProfileView(
+                user: profileUser,
+                onLoadSettings: onLoadUserSettings,
+                onLoadSettingsOptions: onLoadUserSettingsOptions,
+                onUpdateSettings: onUpdateUserSettings,
+                onEditProfile: {
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        isEditingProfile = true
+                    }
+                },
+                onLogout: onLogout
+            )
         }
     }
 

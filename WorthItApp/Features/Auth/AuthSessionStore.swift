@@ -10,6 +10,7 @@ struct AuthUser: Codable, Equatable {
     let id: UUID
     let name: String
     let email: String
+    let image: String?
 }
 
 @MainActor
@@ -29,6 +30,14 @@ final class AuthSessionStore: ObservableObject {
     func replace(with session: AuthSession) {
         self.session = session
         try? keychain.save(session)
+    }
+
+    func updateUser(_ user: AuthUser) {
+        guard let session else { return }
+
+        let updatedSession = AuthSession(token: session.token, user: user)
+        self.session = updatedSession
+        try? keychain.save(updatedSession)
     }
 
     func clear() {

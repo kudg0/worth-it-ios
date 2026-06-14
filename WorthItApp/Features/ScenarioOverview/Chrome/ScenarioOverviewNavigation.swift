@@ -15,6 +15,12 @@ extension ScenarioOverviewView {
             editingCostEvent == nil ? "Log Expense" : "Edit Expense"
         case .scheduleService:
             editingScheduledService == nil ? "Schedule Service" : "Edit Service"
+        case .scheduledServices:
+            "Scheduled Services"
+        case .scheduledServiceDetail:
+            "Service Detail"
+        case .expenseDetail:
+            "Expense Detail"
         case .expenseHistory:
             "Expense History"
         case .mileageHistory:
@@ -37,16 +43,16 @@ extension ScenarioOverviewView {
     }
 
     var isEntryFlowScreen: Bool {
-        selectedTab == .addEntryChooser || selectedTab == .addComparableOption || selectedTab == .analyticsSettings || selectedTab == .comparisonSettings || selectedTab == .logExpense || selectedTab == .scheduleService || selectedTab == .expenseHistory || selectedTab == .mileageHistory || selectedTab == .mileageDetail || selectedTab == .metricDetail || selectedTab == .logMileage
+        selectedTab == .addEntryChooser || selectedTab == .addComparableOption || selectedTab == .analyticsSettings || selectedTab == .comparisonSettings || selectedTab == .logExpense || selectedTab == .scheduleService || selectedTab == .scheduledServices || selectedTab == .scheduledServiceDetail || selectedTab == .expenseDetail || selectedTab == .expenseHistory || selectedTab == .mileageHistory || selectedTab == .mileageDetail || selectedTab == .metricDetail || selectedTab == .logMileage
     }
 
     var showsScenarioNavigation: Bool {
-        selectedTab != .addEntryChooser && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .expenseHistory && selectedTab != .mileageHistory && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
+        selectedTab != .addEntryChooser && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .scheduledServices && selectedTab != .scheduledServiceDetail && selectedTab != .expenseDetail && selectedTab != .expenseHistory && selectedTab != .mileageHistory && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
             && selectedTab != .settings
     }
 
     var showsBottomNav: Bool {
-        selectedTab != .addEntryChooser && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
+        selectedTab != .addEntryChooser && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .scheduledServiceDetail && selectedTab != .expenseDetail && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
     }
 
     var scrollBottomPadding: CGFloat {
@@ -92,8 +98,20 @@ extension ScenarioOverviewView {
             if selectedTab == .logMileage {
                 resetMileageForm()
             }
+            if selectedTab == .scheduleService {
+                resetScheduledServiceForm()
+            }
             if selectedTab == .mileageDetail {
                 selectedMileageDetailId = nil
+            }
+            if selectedTab == .scheduledServiceDetail {
+                selectedScheduledServiceDetailId = nil
+            }
+            if selectedTab == .expenseDetail {
+                selectedExpenseDetailId = nil
+                activeExpenseActionId = nil
+                activeExpenseDaySelection = nil
+                displayedExpenseDetailWeekStart = nil
             }
             selectedTab = previousTab
         }
@@ -134,6 +152,37 @@ extension ScenarioOverviewView {
         withAnimation(.easeInOut(duration: 0.20)) {
             scenarioTabPath = [.expenses]
             selectedTab = .addEntryChooser
+        }
+    }
+
+    func openScheduledServices() {
+        displayedScheduledServiceMonth = scheduledServicesInitialMonth
+        selectedScheduledServiceDate = nil
+
+        withAnimation(.easeInOut(duration: 0.20)) {
+            pushScenarioTab(selectedTab)
+            selectedTab = .scheduledServices
+        }
+    }
+
+    func openScheduledServiceDetail(_ serviceId: UUID) {
+        guard upcomingServiceItems.contains(where: { $0.id == serviceId }) else { return }
+        selectedScheduledServiceDetailId = serviceId
+
+        withAnimation(.easeInOut(duration: 0.20)) {
+            pushScenarioTab(selectedTab)
+            selectedTab = .scheduledServiceDetail
+        }
+    }
+
+    func openExpenseDetail(_ expenseId: UUID) {
+        guard let event = costEvents.first(where: { $0.id == expenseId }) else { return }
+        selectedExpenseDetailId = expenseId
+        displayedExpenseDetailWeekStart = expenseDetailWeekStart(for: event.date)
+
+        withAnimation(.easeInOut(duration: 0.20)) {
+            pushScenarioTab(selectedTab)
+            selectedTab = .expenseDetail
         }
     }
 

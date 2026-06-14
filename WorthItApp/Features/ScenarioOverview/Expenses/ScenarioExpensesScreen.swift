@@ -5,15 +5,9 @@ struct ScenarioExpensesScreen: View {
         let costEventsError: String?
         let isEmpty: Bool
         let hero: ExpenseHero.Model
-        let currentMonthEvents: [CostEvent]
+        let currentMonthItems: [RecentExpenseItem]
         let maintenance: MaintenanceSection.Model
-        let rowTitle: (CostEvent) -> String
-        let rowSubtitle: (CostEvent) -> String
-        let rowValue: (CostEvent) -> String
-        let rowIcon: (CostEvent) -> String
-        let rowAccentColor: (CostEvent) -> Color
         let onOpenHistory: () -> Void
-        let onEditExpense: (CostEvent) -> Void
     }
 
     let model: Model
@@ -27,14 +21,8 @@ struct ScenarioExpensesScreen: View {
             } else {
                 ExpenseHero(model: model.hero)
                 RecentExpensesList(
-                    events: model.currentMonthEvents,
-                    rowTitle: model.rowTitle,
-                    rowSubtitle: model.rowSubtitle,
-                    rowValue: model.rowValue,
-                    rowIcon: model.rowIcon,
-                    rowAccentColor: model.rowAccentColor,
-                    onOpenHistory: model.onOpenHistory,
-                    onEditExpense: model.onEditExpense
+                    items: model.currentMonthItems,
+                    onOpenHistory: model.onOpenHistory
                 )
             }
 

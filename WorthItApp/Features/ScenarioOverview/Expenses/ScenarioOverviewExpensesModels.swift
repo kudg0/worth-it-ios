@@ -4,17 +4,11 @@ extension ScenarioOverviewView {
     var expensesScreenModel: ScenarioExpensesScreen.Model {
         ScenarioExpensesScreen.Model(
             costEventsError: costEventsError,
-            isEmpty: costEvents.isEmpty,
+            isEmpty: costEvents.isEmpty && currentMonthLoanInterest <= 0,
             hero: expenseHeroModel,
-            currentMonthEvents: currentMonthExpenseEvents,
+            currentMonthItems: currentMonthRecentExpenseItems,
             maintenance: maintenanceSectionModel,
-            rowTitle: { expenseTitle(for: $0) },
-            rowSubtitle: { expenseSubtitle(for: $0) },
-            rowValue: expenseAmount,
-            rowIcon: { expenseIconName(for: $0.category) },
-            rowAccentColor: { expenseAccentColor(for: $0) },
-            onOpenHistory: { openExpenseHistory() },
-            onEditExpense: beginEditingExpense
+            onOpenHistory: { openExpenseHistory() }
         )
     }
 

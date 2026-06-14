@@ -12,7 +12,8 @@ struct ExpenseHistoryList: View {
         let rowDetail: (CostEvent) -> String
         let rowIcon: (CostEvent) -> String
         let rowAccentColor: (CostEvent) -> Color
-        let onEditExpense: (CostEvent) -> Void
+        let onOpenExpense: (CostEvent) -> Void
+        let onOpenSyntheticItem: (ScenarioOverviewView.ExpenseMonthGroup.SyntheticItem) -> Void
     }
 
     let model: Model
@@ -82,7 +83,7 @@ struct ExpenseHistoryList: View {
             systemIcon: model.rowIcon(event),
             accentColor: accentColor,
             detailColor: accentColor,
-            action: { model.onEditExpense(event) }
+            action: { model.onOpenExpense(event) }
         )
         .overlay {
             RoundedRectangle(cornerRadius: WorthItRadius.m)
@@ -101,9 +102,8 @@ struct ExpenseHistoryList: View {
             systemIcon: item.systemIcon,
             accentColor: accentColor,
             detailColor: accentColor,
-            action: {}
+            action: { model.onOpenSyntheticItem(item) }
         )
-        .allowsHitTesting(false)
     }
 
     private func rowId(_ id: UUID) -> String {

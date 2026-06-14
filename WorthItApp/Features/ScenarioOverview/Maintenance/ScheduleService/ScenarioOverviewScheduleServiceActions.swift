@@ -9,7 +9,7 @@ extension ScenarioOverviewView {
         selectedServiceType = service.title
         serviceBaselineDate = service.baselineDate ?? service.createdAt
         serviceBaselineOdometer = service.baselineOdometerValue.map { formatEditableNumber($0) } ?? formatEditableNumber(Double(currentOdometerValue))
-        serviceDate = service.dueDate
+        serviceDate = normalizedScheduledServiceDate(service.dueDate)
         if let dueOdometer = service.dueOdometerValue, let baselineOdometer = service.baselineOdometerValue {
             serviceMileageInputMode = .interval
             serviceMileage = formatEditableNumber(max(dueOdometer - baselineOdometer, 0))
@@ -37,7 +37,7 @@ extension ScenarioOverviewView {
         }
 
         withAnimation(.easeInOut(duration: 0.20)) {
-            scenarioTabPath = [.expenses]
+            pushScenarioTab(selectedTab)
             selectedTab = .scheduleService
         }
     }
@@ -76,6 +76,13 @@ extension ScenarioOverviewView {
 
         if shouldSendDate && !hasDate {
             actionError = "Select service date."
+            return
+        }
+
+        if shouldSendDate,
+           let serviceDate,
+           serviceDate < minimumScheduledServiceDate {
+            actionError = "Service date cannot be earlier than today."
             return
         }
 

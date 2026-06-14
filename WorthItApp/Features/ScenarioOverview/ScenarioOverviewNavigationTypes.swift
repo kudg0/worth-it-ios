@@ -106,6 +106,9 @@ enum ScenarioOverviewTab: Hashable {
     case addEntryChooser
     case logExpense
     case scheduleService
+    case scheduledServices
+    case scheduledServiceDetail
+    case expenseDetail
     case expenseHistory
     case mileageHistory
     case mileageDetail

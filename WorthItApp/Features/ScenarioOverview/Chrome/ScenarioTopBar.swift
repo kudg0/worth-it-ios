@@ -6,13 +6,9 @@ struct ScenarioTopBar: View {
     let usesEntryTitleStyle: Bool
     let canGoBack: Bool
     let selectedTab: ScenarioOverviewView.ScenarioTab
-    let activeScenario: ScenarioListItem
-    let isUpdatingFavorite: Bool
     let isDeleting: Bool
     let onBack: () -> Void
-    let onToggleFavorite: () -> Void
-    let onEditScenario: (ScenarioListItem) -> Void
-    let onDeleteScenario: () -> Void
+    let onOpenScenarioActions: () -> Void
     let onAddEntry: () -> Void
     let onAddMileage: () -> Void
     let onAddComparable: () -> Void
@@ -39,9 +35,7 @@ struct ScenarioTopBar: View {
     private var backButton: some View {
         Button(action: onBack) {
             HStack(spacing: WorthItSpacing.m) {
-                Image(systemName: "arrow.left")
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(WorthItColor.primaryContainer)
+                headerIcon(systemName: "arrow.left", size: 18, weight: .semibold)
                     .frame(width: 28, height: 40)
 
                 titleText
@@ -73,7 +67,7 @@ struct ScenarioTopBar: View {
         } else {
             switch selectedTab {
             case .overview:
-                scenarioMenu
+                iconButton(systemName: "ellipsis", accessibilityLabel: "Scenario actions", action: onOpenScenarioActions)
             case .expenses:
                 iconButton(systemName: "plus", accessibilityLabel: "Add entry", action: onAddEntry)
             case .mileage:
@@ -86,53 +80,40 @@ struct ScenarioTopBar: View {
         }
     }
 
-    private var scenarioMenu: some View {
-        Menu {
-            Button {
-                onToggleFavorite()
-            } label: {
-                Label(
-                    activeScenario.isFavorite ? "Remove from Favorites" : "Mark as Favorite",
-                    systemImage: activeScenario.isFavorite ? "star.slash.fill" : "star.fill"
-                )
-            }
-            .disabled(isUpdatingFavorite || isDeleting)
-
-            Button {
-                onEditScenario(activeScenario)
-            } label: {
-                Label("Edit Scenario", systemImage: "pencil.circle.fill")
-            }
-            .disabled(isDeleting)
-
-            Divider()
-
-            Button(role: .destructive, action: onDeleteScenario) {
-                Label("Delete Scenario", systemImage: "trash.fill")
-            }
-            .disabled(isDeleting)
-        } label: {
-            Image(systemName: "ellipsis")
-                .font(.system(size: 16, weight: .bold))
-                .foregroundStyle(WorthItColor.textSecondary)
-                .frame(width: 28, height: 40)
-        }
-        .tint(Color(hex: 0x26324A))
-        .accessibilityLabel("More")
-    }
-
     private func iconButton(
         systemName: String,
         accessibilityLabel: String,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 18, weight: .bold))
-                .foregroundStyle(WorthItColor.primaryContainer)
-                .frame(width: 28, height: 40)
+            headerIcon(systemName: systemName, size: 19, weight: .bold)
+                .frame(width: 40, height: 40)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(accessibilityLabel)
+        .disabled(isDeleting)
+    }
+
+    private func headerIcon(systemName: String, size: CGFloat, weight: Font.Weight) -> some View {
+        ZStack {
+            RadialGradient(
+                colors: [
+                    WorthItColor.primaryContainer.opacity(0.20),
+                    WorthItColor.primaryContainer.opacity(0.07),
+                    .clear
+                ],
+                center: .center,
+                startRadius: 1,
+                endRadius: 26
+            )
+            .frame(width: 54, height: 54)
+            .blur(radius: 2)
+
+            Image(systemName: systemName)
+                .font(.system(size: size, weight: weight))
+                .foregroundStyle(WorthItColor.primaryContainer)
+                .shadow(color: WorthItColor.primaryContainer.opacity(0.28), radius: 10)
+        }
     }
 }

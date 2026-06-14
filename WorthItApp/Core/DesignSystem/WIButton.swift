@@ -4,6 +4,7 @@ struct WIButton: View {
     enum Style {
         case primary
         case secondary
+        case outline
     }
 
     let title: String
@@ -42,6 +43,8 @@ struct WIButton: View {
             Color(hex: 0x385283)
         case .secondary:
             WorthItColor.textPrimary
+        case .outline:
+            WorthItColor.textPrimary
         }
     }
 
@@ -51,6 +54,8 @@ struct WIButton: View {
             WorthItColor.primaryContainer
         case .secondary:
             WorthItColor.surfaceContainerHigh
+        case .outline:
+            Color.clear
         }
     }
 
@@ -60,6 +65,8 @@ struct WIButton: View {
             Color.clear
         case .secondary:
             WorthItColor.outlineSubtle
+        case .outline:
+            WorthItColor.outlineInput
         }
     }
 }

@@ -25,7 +25,7 @@ extension ScenarioOverviewView {
     var currentMonthExpenseTotal: Decimal {
         currentMonthExpenseEvents.reduce(Decimal(0)) { total, event in
             total + decimalValue(event.amount)
-        }
+        } + Decimal(currentMonthLoanInterest)
     }
 
     var currentMonthExpenseTotalDisplay: String {
@@ -33,17 +33,17 @@ extension ScenarioOverviewView {
     }
 
     var currentMonthExpenseCount: Int {
-        currentMonthExpenseEvents.count
+        currentMonthExpenseEvents.count + (currentMonthLoanInterest > 0 ? 1 : 0)
     }
 
     var previousMonthExpenseTotal: Decimal {
         previousMonthExpenseEvents.reduce(Decimal(0)) { total, event in
             total + decimalValue(event.amount)
-        }
+        } + Decimal(previousMonthLoanInterest)
     }
 
     var previousMonthExpenseCount: Int {
-        previousMonthExpenseEvents.count
+        previousMonthExpenseEvents.count + (previousMonthLoanInterest > 0 ? 1 : 0)
     }
 
     var currentMonthTrend: MetricTrend {

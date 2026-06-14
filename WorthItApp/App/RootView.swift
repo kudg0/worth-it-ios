@@ -39,6 +39,24 @@ struct RootView: View {
                 onScenariosLoaded: { scenarios in
                     restoreLastOpenScenarioIfNeeded(from: scenarios)
                 },
+                onProfileUpdated: { draft in
+                    let token = authSessionStore.session?.token ?? ""
+                    let user = try await AuthRepository(baseURL: apiBaseURL).updateProfile(draft, token: token)
+                    authSessionStore.updateUser(user)
+                    return user
+                },
+                onLoadUserSettings: {
+                    let token = authSessionStore.session?.token ?? ""
+                    return try await AuthRepository(baseURL: apiBaseURL).getSettings(token: token)
+                },
+                onLoadUserSettingsOptions: {
+                    let token = authSessionStore.session?.token ?? ""
+                    return try await AuthRepository(baseURL: apiBaseURL).getSettingsOptions(token: token)
+                },
+                onUpdateUserSettings: { patch in
+                    let token = authSessionStore.session?.token ?? ""
+                    return try await AuthRepository(baseURL: apiBaseURL).updateSettings(patch, token: token)
+                },
                 onLogout: {
                     handleLogout()
                 }

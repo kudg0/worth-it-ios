@@ -4,6 +4,7 @@ struct ScheduleServiceTriggerSection: View {
     struct Model {
         let trigger: Binding<ScenarioOverviewView.ScheduleTrigger>
         let serviceDate: Binding<Date?>
+        let minimumServiceDate: Date
         let serviceMileage: Binding<String>
         let mileageUnit: String
         let mileageMode: ScenarioOverviewView.ServiceMileageInputMode
@@ -34,7 +35,7 @@ struct ScheduleServiceTriggerSection: View {
             }
 
             if model.trigger.wrappedValue == .date {
-                WIDateField(label: "Service date", placeholder: "MM/DD/YY", date: model.serviceDate)
+                WIDateField(label: "Service date", placeholder: "MM/DD/YY", date: model.serviceDate, allowedRange: model.minimumServiceDate...Date.distantFuture)
                 optionalMileageBlock
             } else {
                 mileageInputBlock
@@ -59,7 +60,7 @@ struct ScheduleServiceTriggerSection: View {
             subtitle: "Use a date too, so the reminder fires by mileage or date, whichever comes first.",
             isEnabled: model.isOptionalDateEnabled
         ) {
-            WIDateField(label: "Service date", placeholder: "MM/DD/YY", date: model.serviceDate)
+            WIDateField(label: "Service date", placeholder: "MM/DD/YY", date: model.serviceDate, allowedRange: model.minimumServiceDate...Date.distantFuture)
         }
     }
 

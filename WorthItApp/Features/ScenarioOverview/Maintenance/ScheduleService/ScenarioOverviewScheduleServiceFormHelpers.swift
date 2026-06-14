@@ -23,6 +23,15 @@ extension ScenarioOverviewView {
         Double(serviceBaselineOdometer)
     }
 
+    var minimumScheduledServiceDate: Date {
+        Calendar(identifier: .gregorian).startOfDay(for: Date())
+    }
+
+    func normalizedScheduledServiceDate(_ date: Date?) -> Date? {
+        guard let date else { return nil }
+        return max(date, minimumScheduledServiceDate)
+    }
+
     var serviceIntervalValue: Double? {
         Double(serviceMileage)
     }

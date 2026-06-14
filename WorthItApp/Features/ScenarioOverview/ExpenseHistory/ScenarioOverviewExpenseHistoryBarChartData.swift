@@ -86,9 +86,18 @@ extension ScenarioOverviewView {
         }
 
         let eventMonthStarts = Set(groupedEvents.keys)
-        let syntheticMonthStarts = expenseHistoryFilter == .all
-            ? expenseHistoryBars.filter { $0.total > 0 }.map(\.monthStart)
-            : []
+        let syntheticMonthStarts: [Date]
+        if expenseHistoryFilter == .all {
+            syntheticMonthStarts = expenseHistoryBars
+                .filter { bar in
+                    guard bar.total > 0 else { return false }
+                    guard isExpenseHistoryMonthFiltered else { return true }
+                    return expenseHistoryIsSameMonth(bar.monthStart, selectedExpenseHistoryBar.monthStart)
+                }
+                .map(\.monthStart)
+        } else {
+            syntheticMonthStarts = []
+        }
         let monthStarts = Set(eventMonthStarts).union(syntheticMonthStarts)
 
         return monthStarts
