@@ -127,8 +127,10 @@ struct AuthTextField: View {
 }
 
 struct AuthWordmark: View {
+    @Environment(\.i18n) private var i18n
+
     var body: some View {
-        Text("Worth It")
+        Text(i18n.t(.brand.name))
             .font(.system(size: 14, weight: .bold))
             .foregroundStyle(WorthItColor.textPrimary)
     }

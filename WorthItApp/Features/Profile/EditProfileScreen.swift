@@ -11,6 +11,7 @@ struct EditProfileScreen: View {
     let onSave: (EditProfileDraft) async throws -> AuthUser
     let onDiscard: () -> Void
 
+    @Environment(\.i18n) private var i18n
     @State private var fullName: String
     @State private var email: String
     @State private var errorText: String?
@@ -37,7 +38,7 @@ struct EditProfileScreen: View {
                     identityCard
                     securitySection
                     if let errorText {
-                        WITipInfo(title: i18n.t("Profile not saved"), bodyText: errorText, size: .small, tone: .info)
+                        WITipInfo(title: i18n.t(.profile.edit.errors.profileNotSaved), bodyText: errorText, size: .small, tone: .info)
                     }
                     actionStack
                 }
@@ -61,7 +62,7 @@ struct EditProfileScreen: View {
 
     private var topBar: some View {
         ZStack {
-            Text("Edit Profile")
+            Text(i18n.t(.profile.edit.title))
                 .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(WorthItColor.textPrimary)
 
@@ -74,7 +75,7 @@ struct EditProfileScreen: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Back")
+                .accessibilityLabel(i18n.t(.profile.edit.accessibility.back))
 
                 Spacer()
             }
@@ -95,13 +96,13 @@ struct EditProfileScreen: View {
 
             VStack(spacing: WorthItSpacing.xl) {
                 AccountProfileField(
-                    label: i18n.t("FULL NAME"),
+                    label: i18n.t(.profile.edit.fields.fullName.label),
                     text: $fullName,
                     systemName: "person"
                 )
 
                 AccountProfileField(
-                    label: i18n.t("EMAIL ADDRESS"),
+                    label: i18n.t(.profile.edit.fields.email.label),
                     text: $email,
                     systemName: "envelope",
                     keyboardType: .emailAddress
@@ -157,13 +158,13 @@ struct EditProfileScreen: View {
                     .shadow(color: .black.opacity(0.20), radius: 12, y: 6)
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("Change profile photo")
+            .accessibilityLabel(i18n.t(.profile.edit.accessibility.changePhoto))
         }
     }
 
     private var securitySection: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            Text("SECURITY & LINKED ACCOUNTS")
+            Text(i18n.t(.profile.edit.sections.securityLinkedAccounts))
                 .font(.system(size: 12, weight: .bold))
                 .foregroundStyle(WorthItColor.textSecondary.opacity(0.80))
                 .tracking(1.2)
@@ -171,8 +172,8 @@ struct EditProfileScreen: View {
 
             VStack(spacing: 0) {
                 AccountInfoRow(
-                    title: i18n.t("Account Status"),
-                    value: "Verified",
+                    title: i18n.t(.profile.edit.rows.accountStatus),
+                    value: i18n.t(.profile.edit.values.verified),
                     systemName: "shield.checkered",
                     valueColor: WorthItColor.accentGold
                 )
@@ -182,7 +183,7 @@ struct EditProfileScreen: View {
                     .padding(.leading, 72)
 
                 AccountInfoRow(
-                    title: i18n.t("Linked Identity"),
+                    title: i18n.t(.profile.edit.rows.linkedIdentity),
                     value: linkedIdentity,
                     systemName: "link"
                 )
@@ -198,13 +199,13 @@ struct EditProfileScreen: View {
 
     private var actionStack: some View {
         VStack(spacing: WorthItSpacing.m) {
-            WIButton(title: i18n.t("SAVE CHANGES"), height: 56) {
+            WIButton(title: i18n.t(.profile.edit.actions.saveChanges), height: 56) {
                 save()
             }
             .opacity(isSaving ? 0.62 : 1)
             .allowsHitTesting(!isSaving)
 
-            WIButton(title: i18n.t("DISCARD"), style: .outline, height: 56, action: onDiscard)
+            WIButton(title: i18n.t(.profile.edit.actions.discard), style: .outline, height: 56, action: onDiscard)
         }
         .padding(.top, WorthItSpacing.xxxl)
     }
@@ -220,7 +221,7 @@ struct EditProfileScreen: View {
     }
 
     private var linkedIdentity: String {
-        email.isEmpty ? "Apple ID" : "Email"
+        email.isEmpty ? i18n.t(.profile.edit.values.appleId) : i18n.t(.profile.edit.values.email)
     }
 
     private func save() {
@@ -230,12 +231,12 @@ struct EditProfileScreen: View {
         let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !trimmedName.isEmpty else {
-            errorText = "Name cannot be empty."
+            errorText = i18n.t(.profile.edit.errors.nameEmpty)
             return
         }
 
         guard trimmedEmail.contains("@") else {
-            errorText = "Enter a valid email address."
+            errorText = i18n.t(.profile.edit.errors.invalidEmail)
             return
         }
 
@@ -260,18 +261,18 @@ struct EditProfileScreen: View {
     private func profileSaveErrorText(_ error: Error) -> String {
         if case APIError.requestFailed(let statusCode, let body) = error {
             if statusCode == 409 || body.contains("EMAIL_ALREADY_IN_USE") {
-                return "This email is already used by another account."
+                return i18n.t(.profile.edit.errors.emailInUse)
             }
 
-            return "Backend rejected the profile update. Status \(statusCode)."
+            return "\(i18n.t(.profile.edit.errors.backendRejectedWithStatus)) \(statusCode)."
         }
 
-        return "Could not reach backend. Check connection and try again."
+        return i18n.t(.profile.edit.errors.backendUnreachable)
     }
 
     private static func displayName(for user: AuthUser?) -> String {
         let trimmedName = user?.name.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmedName.isEmpty ? "Worth It User" : trimmedName
+        return trimmedName.isEmpty ? I18n(localeIdentifier: "en").t(.profile.view.fallback.user) : trimmedName
     }
 }
 

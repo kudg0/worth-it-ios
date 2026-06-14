@@ -8,6 +8,7 @@ struct ProfileView: View {
     let onEditProfile: () -> Void
     let onLogout: () -> Void
 
+    @Environment(\.i18n) private var i18n
     @State private var settings = UserSettings(distanceUnit: "km", currency: "EUR", locale: "en-CY")
     @State private var settingsOptions: UserSettingsOptions?
     @State private var activeSelect: ProfileSettingsSelect?
@@ -19,35 +20,35 @@ struct ProfileView: View {
             identityHeader
 
             VStack(alignment: .leading, spacing: WorthItSpacing.xxxl) {
-                ProfileSection(title: i18n.t("Identity")) {
-                    ProfileRow(title: i18n.t("Name"), value: displayName, systemIcon: "person")
-                    ProfileRow(title: i18n.t("Email"), value: email, systemIcon: "envelope")
+                ProfileSection(title: i18n.t(.profile.view.sections.identity)) {
+                    ProfileRow(title: i18n.t(.profile.view.rows.name), value: displayName, systemIcon: "person")
+                    ProfileRow(title: i18n.t(.profile.view.rows.email), value: email, systemIcon: "envelope")
                 }
 
-                ProfileSection(title: i18n.t("Localization")) {
+                ProfileSection(title: i18n.t(.profile.view.sections.localization)) {
                     ProfileSelectableRow(
-                        title: i18n.t("Region"),
+                        title: i18n.t(.profile.view.rows.region),
                         value: regionTitle,
                         systemIcon: "globe.europe.africa"
                     ) {
                         openSelect(.region)
                     }
-                    ProfileSelectableRow(title: i18n.t("Currency"), value: settings.currency, systemIcon: "banknote") {
+                    ProfileSelectableRow(title: i18n.t(.profile.view.rows.currency), value: settings.currency, systemIcon: "banknote") {
                         openSelect(.currency)
                     }
-                    ProfileSelectableRow(title: i18n.t("Distance"), value: distanceTitle, systemIcon: "ruler") {
+                    ProfileSelectableRow(title: i18n.t(.profile.view.rows.distance), value: distanceTitle, systemIcon: "ruler") {
                         openSelect(.distance)
                     }
                 }
 
                 if let settingsError {
-                    WITipInfo(title: i18n.t("Settings not saved"), bodyText: settingsError, size: .small, tone: .info)
+                    WITipInfo(title: i18n.t(.profile.view.errors.settingsNotSaved), bodyText: settingsError, size: .small, tone: .info)
                 }
 
-                ProfileSection(title: i18n.t("Security")) {
+                ProfileSection(title: i18n.t(.profile.view.sections.security)) {
                     ProfileRow(
-                        title: i18n.t("Sign-in Method"),
-                        value: "Email connected",
+                        title: i18n.t(.profile.view.rows.signInMethod),
+                        value: i18n.t(.profile.view.values.emailConnected),
                         systemIcon: "shield.checkered",
                         valueColor: WorthItColor.primaryContainer,
                         isSelectable: true
@@ -71,10 +72,10 @@ struct ProfileView: View {
         )) {
             if let activeSelect, let settingsOptions {
                 ProfileSettingsSelectSheet(
-                    title: activeSelect.title,
+                    title: i18n.t(activeSelect.titleKey),
                     options: activeSelect.options(from: settingsOptions),
                     selectedId: activeSelect.selectedId(from: settings),
-                    infoText: activeSelect.infoText,
+                    infoText: i18n.t(activeSelect.infoKey),
                     onSave: { selectedId in
                         try await save(activeSelect.patch(selectedId))
                     }
@@ -87,7 +88,7 @@ struct ProfileView: View {
 
     private var topBar: some View {
         HStack {
-            Text("Worth It")
+            Text(i18n.t(.brand.name))
                 .font(.system(size: 24, weight: .black))
                 .foregroundStyle(Color(hex: 0xD8E2FF))
                 .lineLimit(1)
@@ -118,7 +119,7 @@ struct ProfileView: View {
                     Image(systemName: "pencil")
                         .font(.system(size: 14, weight: .semibold))
 
-                    Text("Edit Profile")
+                    Text(i18n.t(.profile.view.actions.edit))
                         .font(.system(size: 14, weight: .semibold))
                 }
                 .foregroundStyle(Color(hex: 0xD8E2FF))
@@ -142,7 +143,7 @@ struct ProfileView: View {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
                     .font(.system(size: 14, weight: .semibold))
 
-                Text("Sign Out")
+                Text(i18n.t(.profile.view.actions.signOut))
                     .font(.system(size: 14, weight: .medium))
             }
             .foregroundStyle(Color(hex: 0xFFB4AB))
@@ -157,7 +158,7 @@ struct ProfileView: View {
         }
         .buttonStyle(.plain)
         .padding(.top, WorthItSpacing.s)
-        .accessibilityLabel("Sign out")
+        .accessibilityLabel(i18n.t(.profile.view.accessibility.signOut))
     }
 
     private var avatar: some View {
@@ -175,11 +176,11 @@ struct ProfileView: View {
 
     private var displayName: String {
         let trimmedName = user?.name.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmedName.isEmpty ? "Worth It User" : trimmedName
+        return trimmedName.isEmpty ? i18n.t(.profile.view.fallback.user) : trimmedName
     }
 
     private var email: String {
-        user?.email ?? "Not connected"
+        user?.email ?? i18n.t(.profile.view.fallback.notConnected)
     }
 
     private var regionTitle: String {
@@ -208,13 +209,13 @@ struct ProfileView: View {
             settingsOptions = try await loadedOptions
             settingsError = nil
         } catch {
-            settingsError = "Could not load profile preferences."
+            settingsError = i18n.t(.profile.view.errors.loadPreferences)
         }
     }
 
     private func openSelect(_ select: ProfileSettingsSelect) {
         guard settingsOptions != nil else {
-            settingsError = "Could not load available preference options."
+            settingsError = i18n.t(.profile.view.errors.loadPreferenceOptions)
             return
         }
 
@@ -226,7 +227,7 @@ struct ProfileView: View {
             settings = try await onUpdateSettings(patch)
             settingsError = nil
         } catch {
-            settingsError = "Could not update this preference. Check connection and try again."
+            settingsError = i18n.t(.profile.view.errors.updatePreference)
             throw error
         }
     }
@@ -245,22 +246,22 @@ private enum ProfileSettingsSelect: Identifiable {
         }
     }
 
-    var title: String {
+    var titleKey: I18nKey {
         switch self {
-        case .region: "Region"
-        case .currency: "Currency"
-        case .distance: "Distance"
+        case .region: .profile.preferences.region.title
+        case .currency: .profile.preferences.currency.title
+        case .distance: .profile.preferences.distance.title
         }
     }
 
-    var infoText: String {
+    var infoKey: I18nKey {
         switch self {
         case .region:
-            "This changes the default region for new scenarios. Existing scenarios keep their own saved settings and analytics stay based on the scenario configuration."
+            .profile.preferences.region.info
         case .currency:
-            "This changes the default currency for new scenarios. Existing scenarios keep their own currency, so past ownership analytics are not converted here."
+            .profile.preferences.currency.info
         case .distance:
-            "This changes your default distance unit for new scenarios. Existing scenarios keep their own distance settings and continue rendering from their scenario configuration."
+            .profile.preferences.distance.info
         }
     }
 
@@ -448,6 +449,7 @@ private struct ProfileSettingsSelectSheet: View {
     let infoText: String
     let onSave: (String) async throws -> Void
 
+    @Environment(\.i18n) private var i18n
     @Environment(\.dismiss) private var dismiss
     @State private var draftId: String
     @State private var searchText = ""
@@ -495,12 +497,12 @@ private struct ProfileSettingsSelectSheet: View {
                             }
 
                             if filteredSections.isEmpty {
-                                WITipInfo(title: i18n.t("No results"), bodyText: i18n.t("Try another search."), size: .small, tone: .info)
+                                WITipInfo(title: i18n.t(.profile.preferences.empty.title), bodyText: i18n.t(.profile.preferences.empty.body), size: .small, tone: .info)
                                     .padding(.top, WorthItSpacing.m)
                             }
 
                             if let errorText {
-                                WITipInfo(title: i18n.t("Not saved"), bodyText: errorText, size: .small, tone: .info)
+                                WITipInfo(title: i18n.t(.profile.preferences.errors.notSaved), bodyText: errorText, size: .small, tone: .info)
                                     .padding(.top, WorthItSpacing.m)
                             }
                         }
@@ -582,7 +584,7 @@ private struct ProfileSettingsSelectSheet: View {
 
             ZStack(alignment: .leading) {
                 if searchText.isEmpty {
-                    Text("Search")
+                    Text(i18n.t(.profile.preferences.search.placeholder))
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(WorthItColor.textTertiary.opacity(0.72))
                 }
@@ -637,12 +639,12 @@ private struct ProfileSettingsSelectSheet: View {
             .frame(height: 28)
             .allowsHitTesting(false)
 
-            WITipInfo(title: i18n.t("Default setting"), bodyText: infoText, size: .small, tone: .info)
+            WITipInfo(title: i18n.t(.profile.preferences.defaultSetting.title), bodyText: infoText, size: .small, tone: .info)
                 .padding(.horizontal, WorthItSpacing.xxl)
                 .padding(.bottom, WorthItSpacing.m)
                 .background(WorthItColor.pageBackground)
 
-            WIButton(title: isSaving ? "SAVING..." : "SAVE", height: 56) {
+            WIButton(title: isSaving ? i18n.t(.profile.preferences.actions.saving) : i18n.t(.profile.preferences.actions.save), height: 56) {
                 save()
             }
             .opacity(isSaving ? 0.62 : 1)
@@ -720,7 +722,7 @@ private struct ProfileSettingsSelectSheet: View {
                 try await onSave(draftId)
                 dismiss()
             } catch {
-                errorText = "Could not save this setting."
+                errorText = i18n.t(.profile.preferences.errors.saveFailed)
             }
 
             isSaving = false

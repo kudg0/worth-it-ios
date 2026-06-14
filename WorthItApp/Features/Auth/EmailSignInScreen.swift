@@ -5,6 +5,7 @@ struct EmailSignInScreen: View {
     let onAppleSignIn: () -> Void
     let onAuthenticated: (AuthSession) -> Void
 
+    @Environment(\.i18n) private var i18n
     @Environment(\.dismiss) private var dismiss
     @State private var email = ""
     @State private var password = ""
@@ -28,7 +29,7 @@ struct EmailSignInScreen: View {
                 errorLabel
                 Spacer(minLength: 0)
                 registrationLink
-                AuthFooterNote(text: "Use the account tied to your ownership scenarios.")
+                AuthFooterNote(text: i18n.t(.auth.email.footer))
             }
             .padding(.horizontal, WorthItSpacing.xl)
             .padding(.top, WorthItSpacing.m)
@@ -62,11 +63,11 @@ struct EmailSignInScreen: View {
 
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            Text("Sign in with email.")
+            Text(i18n.t(.auth.email.title))
                 .font(WorthItTypography.headline)
                 .foregroundStyle(WorthItColor.textPrimary)
 
-            Text("Open your scenarios, metrics, and history from this account.")
+            Text(i18n.t(.auth.email.subtitle))
                 .font(WorthItTypography.bodySmall)
                 .foregroundStyle(WorthItColor.textSecondary)
                 .lineSpacing(4)
@@ -77,15 +78,15 @@ struct EmailSignInScreen: View {
     private var formFields: some View {
         VStack(spacing: WorthItSpacing.l) {
             AuthTextField(
-                label: i18n.t("Email"),
-                placeholder: i18n.t("you@example.com"),
+                label: i18n.t(.auth.fields.email.label),
+                placeholder: i18n.t(.auth.fields.email.placeholder),
                 text: $email,
                 keyboardType: .emailAddress,
                 textContentType: .username
             )
             AuthTextField(
-                label: i18n.t("Password"),
-                placeholder: i18n.t("Password"),
+                label: i18n.t(.auth.fields.password.label),
+                placeholder: i18n.t(.auth.fields.password.placeholder),
                 text: $password,
                 isSecure: true,
                 textContentType: .password,
@@ -95,7 +96,7 @@ struct EmailSignInScreen: View {
     }
 
     private var appleButton: some View {
-        AuthActionButton(title: i18n.t("Continue with Apple"), systemName: "apple.logo", style: .apple) {
+        AuthActionButton(title: i18n.t(.auth.actions.continueWithApple), systemName: "apple.logo", style: .apple) {
             onAppleSignIn()
         }
         .padding(.top, WorthItSpacing.s)
@@ -107,7 +108,7 @@ struct EmailSignInScreen: View {
                 .fill(WorthItColor.outlineInput)
                 .frame(height: 1)
 
-            Text("or use email")
+            Text(i18n.t(.auth.email.divider.orUseEmail))
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(WorthItColor.textTertiary)
                 .lineLimit(1)
@@ -119,7 +120,7 @@ struct EmailSignInScreen: View {
     }
 
     private var submitButton: some View {
-        AuthActionButton(title: isSubmitting ? "Signing in..." : "Sign in", systemName: "arrow.right", style: .primary) {
+        AuthActionButton(title: isSubmitting ? i18n.t(.auth.email.actions.signingIn) : i18n.t(.auth.email.actions.signIn), systemName: "arrow.right", style: .primary) {
             Task { await submit() }
         }
         .disabled(isSubmitting)
@@ -127,7 +128,7 @@ struct EmailSignInScreen: View {
 
     private var registrationLink: some View {
         NavigationLink(value: AuthRoute.registration) {
-            Text("No account yet? Create account")
+            Text(i18n.t(.auth.email.links.createAccount))
                 .font(.system(size: 14, weight: .bold))
                 .foregroundStyle(WorthItColor.textSecondary)
                 .frame(maxWidth: .infinity)
@@ -150,7 +151,7 @@ struct EmailSignInScreen: View {
         errorMessage = nil
 
         guard !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, !password.isEmpty else {
-            errorMessage = "Email and password are required."
+            errorMessage = i18n.t(.auth.email.errors.required)
             return
         }
 
@@ -170,10 +171,10 @@ struct EmailSignInScreen: View {
 
     private func authErrorText(_ error: Error) -> String {
         if case APIError.requestFailed(let statusCode, _) = error, statusCode == 401 || statusCode == 403 {
-            return "Email or password is incorrect."
+            return i18n.t(.auth.email.errors.invalidCredentials)
         }
 
-        return "Could not sign in. Check connection and try again."
+        return i18n.t(.auth.email.errors.signInFailed)
     }
 }
 

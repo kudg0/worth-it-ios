@@ -5,6 +5,7 @@ struct RegistrationScreen: View {
     let onAppleSignIn: () -> Void
     let onAuthenticated: (AuthSession) -> Void
 
+    @Environment(\.i18n) private var i18n
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var email = ""
@@ -31,7 +32,7 @@ struct RegistrationScreen: View {
                     createButton
                     errorLabel
                     signInLink
-                    AuthFooterNote(text: "By creating an account, you keep ownership data private and account-bound.")
+                    AuthFooterNote(text: i18n.t(.auth.registration.footer))
                 }
                 .padding(.horizontal, WorthItSpacing.xl)
                 .padding(.top, WorthItSpacing.m)
@@ -66,11 +67,11 @@ struct RegistrationScreen: View {
 
     private var titleBlock: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            Text("Create your account.")
+            Text(i18n.t(.auth.registration.title))
                 .font(WorthItTypography.headline)
                 .foregroundStyle(WorthItColor.textPrimary)
 
-            Text("Keep scenarios, metrics, and history connected across devices.")
+            Text(i18n.t(.auth.registration.subtitle))
                 .font(WorthItTypography.bodySmall)
                 .foregroundStyle(WorthItColor.textSecondary)
                 .lineSpacing(4)
@@ -79,7 +80,7 @@ struct RegistrationScreen: View {
     }
 
     private var appleButton: some View {
-        AuthActionButton(title: i18n.t("Continue with Apple"), systemName: "apple.logo", style: .apple) {
+        AuthActionButton(title: i18n.t(.auth.actions.continueWithApple), systemName: "apple.logo", style: .apple) {
             onAppleSignIn()
         }
         .padding(.top, WorthItSpacing.s)
@@ -91,7 +92,7 @@ struct RegistrationScreen: View {
                 .fill(WorthItColor.outlineInput)
                 .frame(height: 1)
 
-            Text("or use email")
+            Text(i18n.t(.auth.email.divider.orUseEmail))
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(WorthItColor.textTertiary)
                 .lineLimit(1)
@@ -105,21 +106,21 @@ struct RegistrationScreen: View {
     private var formFields: some View {
         VStack(spacing: WorthItSpacing.l) {
             AuthTextField(
-                label: i18n.t("Name"),
-                placeholder: i18n.t("Your name"),
+                label: i18n.t(.auth.fields.name.label),
+                placeholder: i18n.t(.auth.fields.name.placeholder),
                 text: $name,
                 textContentType: .name
             )
             AuthTextField(
-                label: i18n.t("Email"),
-                placeholder: i18n.t("you@example.com"),
+                label: i18n.t(.auth.fields.email.label),
+                placeholder: i18n.t(.auth.fields.email.placeholder),
                 text: $email,
                 keyboardType: .emailAddress,
                 textContentType: .emailAddress
             )
             AuthTextField(
-                label: i18n.t("Password"),
-                placeholder: i18n.t("Create password"),
+                label: i18n.t(.auth.fields.password.label),
+                placeholder: i18n.t(.auth.fields.password.createPlaceholder),
                 text: $password,
                 isSecure: true,
                 textContentType: .newPassword,
@@ -130,7 +131,7 @@ struct RegistrationScreen: View {
 
     private var createButton: some View {
         AuthActionButton(
-            title: isSubmitting ? "Creating account..." : "Create account",
+            title: isSubmitting ? i18n.t(.auth.registration.actions.creating) : i18n.t(.auth.registration.actions.create),
             systemName: "person.badge.plus",
             style: .primary
         ) {
@@ -152,7 +153,7 @@ struct RegistrationScreen: View {
 
     private var signInLink: some View {
         NavigationLink(value: AuthRoute.emailSignIn) {
-            Text("Already have an account? Sign in")
+            Text(i18n.t(.auth.registration.links.signIn))
                 .font(.system(size: 14, weight: .bold))
                 .foregroundStyle(WorthItColor.textSecondary)
                 .frame(maxWidth: .infinity)
@@ -168,12 +169,12 @@ struct RegistrationScreen: View {
         let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !trimmedName.isEmpty, !trimmedEmail.isEmpty, !password.isEmpty else {
-            errorMessage = "Name, email, and password are required."
+            errorMessage = i18n.t(.auth.registration.errors.required)
             return
         }
 
         guard password.count >= 8 else {
-            errorMessage = "Password must be at least 8 characters."
+            errorMessage = i18n.t(.auth.registration.errors.passwordTooShort)
             return
         }
 
@@ -199,17 +200,17 @@ struct RegistrationScreen: View {
 
             if [400, 409, 422].contains(statusCode),
                authError.matches("already") || authError.matches("USER_ALREADY_EXISTS") {
-                return "Account already exists. Sign in instead."
+                return i18n.t(.auth.registration.errors.accountExists)
             }
 
             if let message = authError.message, !message.isEmpty {
                 return message
             }
 
-            return "Could not create account. Check details and try again. (\(statusCode))"
+            return "\(i18n.t(.auth.registration.errors.createFailedWithStatus)) (\(statusCode))"
         }
 
-        return "Could not create account. Check connection and try again."
+        return i18n.t(.auth.registration.errors.createFailedNetwork)
     }
 }
 
@@ -233,6 +234,8 @@ private struct AuthErrorBody: Decodable {
 }
 
 private struct RegionSelector: View {
+    @Environment(\.i18n) private var i18n
+
     @Binding var selection: String
 
     private let regions = Locale.Region.isoRegions
@@ -242,9 +245,9 @@ private struct RegionSelector: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.s) {
-            WISelectField(label: i18n.t("Region"), options: regions, selection: $selection)
+            WISelectField(label: i18n.t(.profile.view.rows.region), options: regions, selection: $selection)
 
-            Text("Sets default currency and distance units. You can change it later.")
+            Text(i18n.t(.auth.registration.region.helpText))
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(WorthItColor.textTertiary)
                 .fixedSize(horizontal: false, vertical: true)

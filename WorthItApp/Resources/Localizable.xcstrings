@@ -168,6 +168,1170 @@
           }
         }
       }
+    },
+    "auth.actions.continueWithApple": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with Apple"
+          }
+        }
+      }
+    },
+    "auth.entry.hero.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Know what ownership really costs."
+          }
+        }
+      }
+    },
+    "auth.entry.hero.subtitle": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compare private ownership scenarios against real-world alternatives with precision."
+          }
+        }
+      }
+    },
+    "auth.entry.actions.signInWithEmail": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in with Email"
+          }
+        }
+      }
+    },
+    "auth.entry.actions.createAccount": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create account"
+          }
+        }
+      }
+    },
+    "auth.entry.footer": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your scenarios stay tied to your account."
+          }
+        }
+      }
+    },
+    "auth.entry.metrics.costPerKm.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cost / km"
+          }
+        }
+      }
+    },
+    "auth.entry.metrics.alternatives.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alternatives"
+          }
+        }
+      }
+    },
+    "auth.entry.metrics.alternatives.value": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "4 options"
+          }
+        }
+      }
+    },
+    "auth.entry.metrics.totalCost.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Total Cost"
+          }
+        }
+      }
+    },
+    "auth.entry.metrics.totalCost.value": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tracked"
+          }
+        }
+      }
+    },
+    "auth.email.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in with email."
+          }
+        }
+      }
+    },
+    "auth.email.subtitle": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open your scenarios, metrics, and history from this account."
+          }
+        }
+      }
+    },
+    "auth.email.divider.orUseEmail": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "or use email"
+          }
+        }
+      }
+    },
+    "auth.email.actions.signIn": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in"
+          }
+        }
+      }
+    },
+    "auth.email.actions.signingIn": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing in..."
+          }
+        }
+      }
+    },
+    "auth.email.links.createAccount": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No account yet? Create account"
+          }
+        }
+      }
+    },
+    "auth.email.footer": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use the account tied to your ownership scenarios."
+          }
+        }
+      }
+    },
+    "auth.email.errors.required": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email and password are required."
+          }
+        }
+      }
+    },
+    "auth.email.errors.invalidCredentials": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email or password is incorrect."
+          }
+        }
+      }
+    },
+    "auth.email.errors.signInFailed": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not sign in. Check connection and try again."
+          }
+        }
+      }
+    },
+    "auth.registration.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create your account."
+          }
+        }
+      }
+    },
+    "auth.registration.subtitle": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep scenarios, metrics, and history connected across devices."
+          }
+        }
+      }
+    },
+    "auth.registration.actions.create": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create account"
+          }
+        }
+      }
+    },
+    "auth.registration.actions.creating": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creating account..."
+          }
+        }
+      }
+    },
+    "auth.registration.links.signIn": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Already have an account? Sign in"
+          }
+        }
+      }
+    },
+    "auth.registration.footer": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By creating an account, you keep ownership data private and account-bound."
+          }
+        }
+      }
+    },
+    "auth.registration.region.helpText": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sets default currency and distance units. You can change it later."
+          }
+        }
+      }
+    },
+    "auth.registration.errors.required": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name, email, and password are required."
+          }
+        }
+      }
+    },
+    "auth.registration.errors.passwordTooShort": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password must be at least 8 characters."
+          }
+        }
+      }
+    },
+    "auth.registration.errors.accountExists": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account already exists. Sign in instead."
+          }
+        }
+      }
+    },
+    "auth.registration.errors.createFailedWithStatus": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not create account. Check details and try again."
+          }
+        }
+      }
+    },
+    "auth.registration.errors.createFailedNetwork": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not create account. Check connection and try again."
+          }
+        }
+      }
+    },
+    "auth.fields.name.label": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        }
+      }
+    },
+    "auth.fields.name.placeholder": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your name"
+          }
+        }
+      }
+    },
+    "auth.fields.email.label": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email"
+          }
+        }
+      }
+    },
+    "auth.fields.email.placeholder": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "you@example.com"
+          }
+        }
+      }
+    },
+    "auth.fields.password.label": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password"
+          }
+        }
+      }
+    },
+    "auth.fields.password.placeholder": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password"
+          }
+        }
+      }
+    },
+    "auth.fields.password.createPlaceholder": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create password"
+          }
+        }
+      }
+    },
+    "profile.view.sections.identity": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Identity"
+          }
+        }
+      }
+    },
+    "profile.view.sections.localization": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Localization"
+          }
+        }
+      }
+    },
+    "profile.view.sections.security": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Security"
+          }
+        }
+      }
+    },
+    "profile.view.rows.name": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        }
+      }
+    },
+    "profile.view.rows.email": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email"
+          }
+        }
+      }
+    },
+    "profile.view.rows.region": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Region"
+          }
+        }
+      }
+    },
+    "profile.view.rows.currency": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currency"
+          }
+        }
+      }
+    },
+    "profile.view.rows.distance": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Distance"
+          }
+        }
+      }
+    },
+    "profile.view.rows.signInMethod": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in Method"
+          }
+        }
+      }
+    },
+    "profile.view.values.emailConnected": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email connected"
+          }
+        }
+      }
+    },
+    "profile.view.actions.edit": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Profile"
+          }
+        }
+      }
+    },
+    "profile.view.actions.signOut": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign Out"
+          }
+        }
+      }
+    },
+    "profile.view.accessibility.signOut": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign out"
+          }
+        }
+      }
+    },
+    "profile.view.fallback.user": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Worth It User"
+          }
+        }
+      }
+    },
+    "profile.view.fallback.notConnected": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not connected"
+          }
+        }
+      }
+    },
+    "profile.view.errors.settingsNotSaved": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings not saved"
+          }
+        }
+      }
+    },
+    "profile.view.errors.loadPreferences": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load profile preferences."
+          }
+        }
+      }
+    },
+    "profile.view.errors.loadPreferenceOptions": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not load available preference options."
+          }
+        }
+      }
+    },
+    "profile.view.errors.updatePreference": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not update this preference. Check connection and try again."
+          }
+        }
+      }
+    },
+    "profile.edit.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Profile"
+          }
+        }
+      }
+    },
+    "profile.edit.accessibility.back": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "profile.edit.accessibility.changePhoto": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change profile photo"
+          }
+        }
+      }
+    },
+    "profile.edit.fields.fullName.label": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FULL NAME"
+          }
+        }
+      }
+    },
+    "profile.edit.fields.email.label": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "EMAIL ADDRESS"
+          }
+        }
+      }
+    },
+    "profile.edit.sections.securityLinkedAccounts": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SECURITY & LINKED ACCOUNTS"
+          }
+        }
+      }
+    },
+    "profile.edit.rows.accountStatus": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account Status"
+          }
+        }
+      }
+    },
+    "profile.edit.rows.linkedIdentity": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linked Identity"
+          }
+        }
+      }
+    },
+    "profile.edit.values.verified": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verified"
+          }
+        }
+      }
+    },
+    "profile.edit.values.appleId": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ID"
+          }
+        }
+      }
+    },
+    "profile.edit.values.email": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email"
+          }
+        }
+      }
+    },
+    "profile.edit.actions.saveChanges": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SAVE CHANGES"
+          }
+        }
+      }
+    },
+    "profile.edit.actions.discard": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DISCARD"
+          }
+        }
+      }
+    },
+    "profile.edit.errors.profileNotSaved": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile not saved"
+          }
+        }
+      }
+    },
+    "profile.edit.errors.nameEmpty": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name cannot be empty."
+          }
+        }
+      }
+    },
+    "profile.edit.errors.invalidEmail": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a valid email address."
+          }
+        }
+      }
+    },
+    "profile.edit.errors.emailInUse": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This email is already used by another account."
+          }
+        }
+      }
+    },
+    "profile.edit.errors.backendRejected": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backend rejected the profile update."
+          }
+        }
+      }
+    },
+    "profile.edit.errors.backendUnreachable": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not reach backend. Check connection and try again."
+          }
+        }
+      }
+    },
+    "profile.preferences.region.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Region"
+          }
+        }
+      }
+    },
+    "profile.preferences.currency.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Currency"
+          }
+        }
+      }
+    },
+    "profile.preferences.distance.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Distance"
+          }
+        }
+      }
+    },
+    "profile.preferences.region.info": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This changes the default region for new scenarios. Existing scenarios keep their own saved settings and analytics stay based on the scenario configuration."
+          }
+        }
+      }
+    },
+    "profile.preferences.currency.info": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This changes the default currency for new scenarios. Existing scenarios keep their own currency, so past ownership analytics are not converted here."
+          }
+        }
+      }
+    },
+    "profile.preferences.distance.info": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This changes your default distance unit for new scenarios. Existing scenarios keep their own distance settings and continue rendering from their scenario configuration."
+          }
+        }
+      }
+    },
+    "profile.preferences.search.placeholder": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
+          }
+        }
+      }
+    },
+    "profile.preferences.empty.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No results"
+          }
+        }
+      }
+    },
+    "profile.preferences.empty.body": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try another search."
+          }
+        }
+      }
+    },
+    "profile.preferences.errors.notSaved": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not saved"
+          }
+        }
+      }
+    },
+    "profile.preferences.errors.saveFailed": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not save this setting."
+          }
+        }
+      }
+    },
+    "profile.preferences.defaultSetting.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Default setting"
+          }
+        }
+      }
+    },
+    "profile.preferences.actions.save": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SAVE"
+          }
+        }
+      }
+    },
+    "profile.preferences.actions.saving": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SAVING..."
+          }
+        }
+      }
+    },
+    "auth.apple.errors.providerNotEnabled": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Sign In is not enabled on the backend yet."
+          }
+        }
+      }
+    },
+    "auth.apple.errors.signInFailed": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not sign in with Apple. Check setup and try again."
+          }
+        }
+      }
+    },
+    "auth.alerts.authorization.title": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authorization"
+          }
+        }
+      }
+    },
+    "auth.alerts.ok": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "profile.edit.errors.backendRejectedWithStatus": {
+      "comment": "Auth/Profile localization string.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Backend rejected the profile update. Status"
+          }
+        }
+      }
     }
   },
   "version": "1.1"

@@ -3,6 +3,7 @@ import SwiftUI
 struct AuthFlowView: View {
     let authRepository: AuthRepository
     @ObservedObject var authSessionStore: AuthSessionStore
+    @Environment(\.i18n) private var i18n
     @StateObject private var appleSignIn = AppleSignInProvider()
     @State private var authNotice: String?
 
@@ -45,11 +46,11 @@ struct AuthFlowView: View {
                 authNotice = message
             }
         }
-        .alert("Authorization", isPresented: Binding(
+        .alert(i18n.t(.auth.alerts.authorization.title), isPresented: Binding(
             get: { authNotice != nil },
             set: { if !$0 { authNotice = nil } }
         )) {
-            Button("OK", role: .cancel) {}
+            Button(i18n.t(.auth.alerts.ok), role: .cancel) {}
         } message: {
             Text(authNotice ?? "")
         }
@@ -73,10 +74,10 @@ struct AuthFlowView: View {
     private func appleAuthErrorText(_ error: Error) -> String {
         if case APIError.requestFailed(_, let body) = error,
            body.contains("PROVIDER_NOT_FOUND") {
-            return "Apple Sign In is not enabled on the backend yet."
+            return i18n.t(.auth.apple.errors.providerNotEnabled)
         }
 
-        return "Could not sign in with Apple. Check setup and try again."
+        return i18n.t(.auth.apple.errors.signInFailed)
     }
 }
 

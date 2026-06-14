@@ -12,10 +12,163 @@ struct I18nKey: Hashable {
 }
 
 extension I18nKey {
+    static let auth = AuthKeys()
     static let brand = BrandKeys()
     static let common = CommonKeys()
+    static let profile = ProfileKeys()
     static let scenarios = ScenariosKeys()
     static let tabs = TabsKeys()
+}
+
+struct AuthKeys {
+    let actions = ActionsKeys()
+    let alerts = AlertsKeys()
+    let apple = AppleKeys()
+    let email = EmailKeys()
+    let entry = EntryKeys()
+    let fields = FieldsKeys()
+    let registration = RegistrationKeys()
+
+    struct ActionsKeys {
+        let continueWithApple = I18nKey("auth.actions.continueWithApple")
+    }
+
+    struct AlertsKeys {
+        let authorization = AuthorizationKeys()
+        let ok = I18nKey("auth.alerts.ok")
+
+        struct AuthorizationKeys {
+            let title = I18nKey("auth.alerts.authorization.title")
+        }
+    }
+
+    struct AppleKeys {
+        let errors = ErrorsKeys()
+
+        struct ErrorsKeys {
+            let providerNotEnabled = I18nKey("auth.apple.errors.providerNotEnabled")
+            let signInFailed = I18nKey("auth.apple.errors.signInFailed")
+        }
+    }
+
+    struct EmailKeys {
+        let actions = ActionsKeys()
+        let divider = DividerKeys()
+        let errors = ErrorsKeys()
+        let footer = I18nKey("auth.email.footer")
+        let links = LinksKeys()
+        let subtitle = I18nKey("auth.email.subtitle")
+        let title = I18nKey("auth.email.title")
+
+        struct ActionsKeys {
+            let signIn = I18nKey("auth.email.actions.signIn")
+            let signingIn = I18nKey("auth.email.actions.signingIn")
+        }
+
+        struct DividerKeys {
+            let orUseEmail = I18nKey("auth.email.divider.orUseEmail")
+        }
+
+        struct ErrorsKeys {
+            let invalidCredentials = I18nKey("auth.email.errors.invalidCredentials")
+            let required = I18nKey("auth.email.errors.required")
+            let signInFailed = I18nKey("auth.email.errors.signInFailed")
+        }
+
+        struct LinksKeys {
+            let createAccount = I18nKey("auth.email.links.createAccount")
+        }
+    }
+
+    struct EntryKeys {
+        let actions = ActionsKeys()
+        let footer = I18nKey("auth.entry.footer")
+        let hero = HeroKeys()
+        let metrics = MetricsKeys()
+
+        struct ActionsKeys {
+            let createAccount = I18nKey("auth.entry.actions.createAccount")
+            let signInWithEmail = I18nKey("auth.entry.actions.signInWithEmail")
+        }
+
+        struct HeroKeys {
+            let subtitle = I18nKey("auth.entry.hero.subtitle")
+            let title = I18nKey("auth.entry.hero.title")
+        }
+
+        struct MetricsKeys {
+            let alternatives = AlternativesKeys()
+            let costPerKm = CostPerKmKeys()
+            let totalCost = TotalCostKeys()
+
+            struct AlternativesKeys {
+                let title = I18nKey("auth.entry.metrics.alternatives.title")
+                let value = I18nKey("auth.entry.metrics.alternatives.value")
+            }
+
+            struct CostPerKmKeys {
+                let title = I18nKey("auth.entry.metrics.costPerKm.title")
+            }
+
+            struct TotalCostKeys {
+                let title = I18nKey("auth.entry.metrics.totalCost.title")
+                let value = I18nKey("auth.entry.metrics.totalCost.value")
+            }
+        }
+    }
+
+    struct FieldsKeys {
+        let email = EmailKeys()
+        let name = NameKeys()
+        let password = PasswordKeys()
+
+        struct EmailKeys {
+            let label = I18nKey("auth.fields.email.label")
+            let placeholder = I18nKey("auth.fields.email.placeholder")
+        }
+
+        struct NameKeys {
+            let label = I18nKey("auth.fields.name.label")
+            let placeholder = I18nKey("auth.fields.name.placeholder")
+        }
+
+        struct PasswordKeys {
+            let createPlaceholder = I18nKey("auth.fields.password.createPlaceholder")
+            let label = I18nKey("auth.fields.password.label")
+            let placeholder = I18nKey("auth.fields.password.placeholder")
+        }
+    }
+
+    struct RegistrationKeys {
+        let actions = ActionsKeys()
+        let errors = ErrorsKeys()
+        let footer = I18nKey("auth.registration.footer")
+        let links = LinksKeys()
+        let region = RegionKeys()
+        let subtitle = I18nKey("auth.registration.subtitle")
+        let title = I18nKey("auth.registration.title")
+
+        struct ActionsKeys {
+            let create = I18nKey("auth.registration.actions.create")
+            let creating = I18nKey("auth.registration.actions.creating")
+        }
+
+        struct ErrorsKeys {
+            let accountExists = I18nKey("auth.registration.errors.accountExists")
+            let createFailedNetwork = I18nKey("auth.registration.errors.createFailedNetwork")
+            let createFailedWithStatus = I18nKey("auth.registration.errors.createFailedWithStatus")
+            let passwordTooShort = I18nKey("auth.registration.errors.passwordTooShort")
+            let required = I18nKey("auth.registration.errors.required")
+        }
+
+        struct LinksKeys {
+            let signIn = I18nKey("auth.registration.links.signIn")
+        }
+
+        struct RegionKeys {
+            let helpText = I18nKey("auth.registration.region.helpText")
+        }
+    }
 }
 
 struct BrandKeys {
@@ -27,6 +180,170 @@ struct CommonKeys {
 
     struct ActionsKeys {
         let retry = I18nKey("common.actions.retry")
+    }
+}
+
+struct ProfileKeys {
+    let edit = EditKeys()
+    let preferences = PreferencesKeys()
+    let view = ViewKeys()
+
+    struct EditKeys {
+        let accessibility = AccessibilityKeys()
+        let actions = ActionsKeys()
+        let errors = ErrorsKeys()
+        let fields = FieldsKeys()
+        let rows = RowsKeys()
+        let sections = SectionsKeys()
+        let title = I18nKey("profile.edit.title")
+        let values = ValuesKeys()
+
+        struct AccessibilityKeys {
+            let back = I18nKey("profile.edit.accessibility.back")
+            let changePhoto = I18nKey("profile.edit.accessibility.changePhoto")
+        }
+
+        struct ActionsKeys {
+            let discard = I18nKey("profile.edit.actions.discard")
+            let saveChanges = I18nKey("profile.edit.actions.saveChanges")
+        }
+
+        struct ErrorsKeys {
+            let backendRejected = I18nKey("profile.edit.errors.backendRejected")
+            let backendRejectedWithStatus = I18nKey("profile.edit.errors.backendRejectedWithStatus")
+            let backendUnreachable = I18nKey("profile.edit.errors.backendUnreachable")
+            let emailInUse = I18nKey("profile.edit.errors.emailInUse")
+            let invalidEmail = I18nKey("profile.edit.errors.invalidEmail")
+            let nameEmpty = I18nKey("profile.edit.errors.nameEmpty")
+            let profileNotSaved = I18nKey("profile.edit.errors.profileNotSaved")
+        }
+
+        struct FieldsKeys {
+            let email = EmailKeys()
+            let fullName = FullNameKeys()
+
+            struct EmailKeys {
+                let label = I18nKey("profile.edit.fields.email.label")
+            }
+
+            struct FullNameKeys {
+                let label = I18nKey("profile.edit.fields.fullName.label")
+            }
+        }
+
+        struct RowsKeys {
+            let accountStatus = I18nKey("profile.edit.rows.accountStatus")
+            let linkedIdentity = I18nKey("profile.edit.rows.linkedIdentity")
+        }
+
+        struct SectionsKeys {
+            let securityLinkedAccounts = I18nKey("profile.edit.sections.securityLinkedAccounts")
+        }
+
+        struct ValuesKeys {
+            let appleId = I18nKey("profile.edit.values.appleId")
+            let email = I18nKey("profile.edit.values.email")
+            let verified = I18nKey("profile.edit.values.verified")
+        }
+    }
+
+    struct PreferencesKeys {
+        let actions = ActionsKeys()
+        let currency = CurrencyKeys()
+        let defaultSetting = DefaultSettingKeys()
+        let distance = DistanceKeys()
+        let empty = EmptyKeys()
+        let errors = ErrorsKeys()
+        let region = RegionKeys()
+        let search = SearchKeys()
+
+        struct ActionsKeys {
+            let save = I18nKey("profile.preferences.actions.save")
+            let saving = I18nKey("profile.preferences.actions.saving")
+        }
+
+        struct CurrencyKeys {
+            let info = I18nKey("profile.preferences.currency.info")
+            let title = I18nKey("profile.preferences.currency.title")
+        }
+
+        struct DefaultSettingKeys {
+            let title = I18nKey("profile.preferences.defaultSetting.title")
+        }
+
+        struct DistanceKeys {
+            let info = I18nKey("profile.preferences.distance.info")
+            let title = I18nKey("profile.preferences.distance.title")
+        }
+
+        struct EmptyKeys {
+            let body = I18nKey("profile.preferences.empty.body")
+            let title = I18nKey("profile.preferences.empty.title")
+        }
+
+        struct ErrorsKeys {
+            let notSaved = I18nKey("profile.preferences.errors.notSaved")
+            let saveFailed = I18nKey("profile.preferences.errors.saveFailed")
+        }
+
+        struct RegionKeys {
+            let info = I18nKey("profile.preferences.region.info")
+            let title = I18nKey("profile.preferences.region.title")
+        }
+
+        struct SearchKeys {
+            let placeholder = I18nKey("profile.preferences.search.placeholder")
+        }
+    }
+
+    struct ViewKeys {
+        let accessibility = AccessibilityKeys()
+        let actions = ActionsKeys()
+        let errors = ErrorsKeys()
+        let fallback = FallbackKeys()
+        let rows = RowsKeys()
+        let sections = SectionsKeys()
+        let values = ValuesKeys()
+
+        struct AccessibilityKeys {
+            let signOut = I18nKey("profile.view.accessibility.signOut")
+        }
+
+        struct ActionsKeys {
+            let edit = I18nKey("profile.view.actions.edit")
+            let signOut = I18nKey("profile.view.actions.signOut")
+        }
+
+        struct ErrorsKeys {
+            let loadPreferenceOptions = I18nKey("profile.view.errors.loadPreferenceOptions")
+            let loadPreferences = I18nKey("profile.view.errors.loadPreferences")
+            let settingsNotSaved = I18nKey("profile.view.errors.settingsNotSaved")
+            let updatePreference = I18nKey("profile.view.errors.updatePreference")
+        }
+
+        struct FallbackKeys {
+            let notConnected = I18nKey("profile.view.fallback.notConnected")
+            let user = I18nKey("profile.view.fallback.user")
+        }
+
+        struct RowsKeys {
+            let currency = I18nKey("profile.view.rows.currency")
+            let distance = I18nKey("profile.view.rows.distance")
+            let email = I18nKey("profile.view.rows.email")
+            let name = I18nKey("profile.view.rows.name")
+            let region = I18nKey("profile.view.rows.region")
+            let signInMethod = I18nKey("profile.view.rows.signInMethod")
+        }
+
+        struct SectionsKeys {
+            let identity = I18nKey("profile.view.sections.identity")
+            let localization = I18nKey("profile.view.sections.localization")
+            let security = I18nKey("profile.view.sections.security")
+        }
+
+        struct ValuesKeys {
+            let emailConnected = I18nKey("profile.view.values.emailConnected")
+        }
     }
 }
 

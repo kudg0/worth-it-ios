@@ -5,6 +5,8 @@ struct AuthEntryScreen: View {
     let onEmailSignIn: () -> Void
     let onCreateAccount: () -> Void
 
+    @Environment(\.i18n) private var i18n
+
     var body: some View {
         ZStack {
             WorthItColor.surfaceLowest.ignoresSafeArea()
@@ -35,13 +37,13 @@ struct AuthEntryScreen: View {
 
     private var heroCopy: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            Text("Know what ownership really costs.")
+            Text(i18n.t(.auth.entry.hero.title))
                 .font(.system(size: 38, weight: .bold))
                 .foregroundStyle(WorthItColor.textPrimary)
                 .lineSpacing(2)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("Compare private ownership scenarios against real-world alternatives with precision.")
+            Text(i18n.t(.auth.entry.hero.subtitle))
                 .font(WorthItTypography.bodySmall)
                 .foregroundStyle(WorthItColor.textSecondary)
                 .lineSpacing(4)
@@ -53,7 +55,7 @@ struct AuthEntryScreen: View {
     private var actionStack: some View {
         VStack(spacing: WorthItSpacing.m) {
             if AuthCapabilities.isAppleSignInEnabled {
-                AuthActionButton(title: i18n.t("Continue with Apple"), systemName: "apple.logo", style: .apple) {
+                AuthActionButton(title: i18n.t(.auth.actions.continueWithApple), systemName: "apple.logo", style: .apple) {
                     onAppleSignIn()
                 }
             }
@@ -63,7 +65,7 @@ struct AuthEntryScreen: View {
                     Image(systemName: "envelope.fill")
                         .font(.system(size: 17, weight: .semibold))
 
-                    Text("Sign in with Email")
+                    Text(i18n.t(.auth.entry.actions.signInWithEmail))
                         .font(.system(size: 16, weight: .bold))
                 }
                 .foregroundStyle(WorthItColor.textPrimary)
@@ -78,7 +80,7 @@ struct AuthEntryScreen: View {
             .simultaneousGesture(TapGesture().onEnded(onEmailSignIn))
 
             NavigationLink(value: AuthRoute.registration) {
-                Text("Create account")
+                Text(i18n.t(.auth.entry.actions.createAccount))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(WorthItColor.primaryContainer)
                     .frame(maxWidth: .infinity)
@@ -86,13 +88,15 @@ struct AuthEntryScreen: View {
             }
             .simultaneousGesture(TapGesture().onEnded(onCreateAccount))
 
-            AuthFooterNote(text: "Your scenarios stay tied to your account.")
+            AuthFooterNote(text: i18n.t(.auth.entry.footer))
                 .padding(.top, WorthItSpacing.xs)
         }
     }
 }
 
 private struct CockpitCluster: View {
+    @Environment(\.i18n) private var i18n
+
     var body: some View {
         ZStack {
             Circle()
@@ -112,13 +116,13 @@ private struct CockpitCluster: View {
             }
 
             VStack(spacing: WorthItSpacing.m) {
-                MetricPreviewChip(title: i18n.t("Cost / km"), value: "€0.41", alignment: .leading)
+                MetricPreviewChip(title: i18n.t(.auth.entry.metrics.costPerKm.title), value: "€0.41", alignment: .leading)
                     .offset(x: -52)
 
-                MetricPreviewChip(title: i18n.t("Alternatives"), value: "4 options", alignment: .center)
+                MetricPreviewChip(title: i18n.t(.auth.entry.metrics.alternatives.title), value: i18n.t(.auth.entry.metrics.alternatives.value), alignment: .center)
                     .offset(x: 42)
 
-                MetricPreviewChip(title: i18n.t("Total Cost"), value: "Tracked", alignment: .trailing)
+                MetricPreviewChip(title: i18n.t(.auth.entry.metrics.totalCost.title), value: i18n.t(.auth.entry.metrics.totalCost.value), alignment: .trailing)
                     .offset(x: -18)
             }
         }
