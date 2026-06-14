@@ -113,42 +113,42 @@ extension ScenarioOverviewView {
         [
             BreakEvenDetailScreen.CalculationRow(
                 id: "car",
-                title: "Your car",
+                title: i18n.t("Your car"),
                 value: snapshot.map { "\(currencySymbol)\(formatDouble($0.carTotal, fractionDigits: 0))" } ?? "-",
                 accentColor: WorthItColor.textPrimary,
                 showsDot: false
             ),
             BreakEvenDetailScreen.CalculationRow(
                 id: "alternative",
-                title: "Alternative",
+                title: i18n.t("Alternative"),
                 value: snapshot.map { "\(currencySymbol)\(formatDouble($0.alternativeTotal, fractionDigits: 0))" } ?? "-",
                 accentColor: WorthItColor.primaryContainer,
                 showsDot: true
             ),
             BreakEvenDetailScreen.CalculationRow(
                 id: "difference",
-                title: "Difference",
+                title: i18n.t("Difference"),
                 value: savingsHeroValue(for: snapshot),
                 accentColor: savingsColor(for: snapshot),
                 showsDot: false
             ),
             BreakEvenDetailScreen.CalculationRow(
                 id: "distance",
-                title: "Distance",
+                title: i18n.t("Distance"),
                 value: row.map { "\(formatDouble($0.currentDistanceKm, fractionDigits: 0)) \(mileageDisplayUnit)" } ?? "-",
                 accentColor: WorthItColor.textPrimary,
                 showsDot: false
             ),
             BreakEvenDetailScreen.CalculationRow(
                 id: "car-rate",
-                title: "Car \(currencySymbol)/\(mileageDisplayUnit)",
+                title: i18n.t("Car \(currencySymbol)/\(mileageDisplayUnit)"),
                 value: snapshot.map { "\(currencySymbol)\(formatDouble($0.carRate, fractionDigits: 2))" } ?? "-",
                 accentColor: WorthItColor.textPrimary,
                 showsDot: false
             ),
             BreakEvenDetailScreen.CalculationRow(
                 id: "alternative-rate",
-                title: "Alternative \(currencySymbol)/\(mileageDisplayUnit)",
+                title: i18n.t("Alternative \(currencySymbol)/\(mileageDisplayUnit)"),
                 value: snapshot.map(alternativeRateDisplay) ?? "-",
                 accentColor: WorthItColor.textPrimary,
                 showsDot: false

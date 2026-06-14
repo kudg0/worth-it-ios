@@ -18,12 +18,12 @@ struct ScheduleServiceTriggerSection: View {
 
     var body: some View {
         VStack(spacing: WorthItSpacing.xl) {
-            ScheduleServiceDivider(title: "Triggered by")
+            ScheduleServiceDivider(title: i18n.t("Triggered by"))
 
             WISegmentedControl(
                 items: [
-                    (title: "Date", value: ScenarioOverviewView.ScheduleTrigger.date),
-                    (title: "Mileage", value: ScenarioOverviewView.ScheduleTrigger.mileage),
+                    (title: i18n.t("Date"), value: ScenarioOverviewView.ScheduleTrigger.date),
+                    (title: i18n.t("Mileage"), value: ScenarioOverviewView.ScheduleTrigger.mileage),
                 ],
                 selection: model.trigger
             )
@@ -35,7 +35,7 @@ struct ScheduleServiceTriggerSection: View {
             }
 
             if model.trigger.wrappedValue == .date {
-                WIDateField(label: "Service date", placeholder: "MM/DD/YY", date: model.serviceDate, allowedRange: model.minimumServiceDate...Date.distantFuture)
+                WIDateField(label: i18n.t("Service date"), placeholder: i18n.t("MM/DD/YY"), date: model.serviceDate, allowedRange: model.minimumServiceDate...Date.distantFuture)
                 optionalMileageBlock
             } else {
                 mileageInputBlock
@@ -46,8 +46,8 @@ struct ScheduleServiceTriggerSection: View {
 
     private var optionalMileageBlock: some View {
         ScheduleServiceOptionalTriggerBlock(
-            title: "Add mileage trigger",
-            subtitle: "Use odometer too, so the reminder fires by date or mileage, whichever comes first.",
+            title: i18n.t("Add mileage trigger"),
+            subtitle: i18n.t("Use odometer too, so the reminder fires by date or mileage, whichever comes first."),
             isEnabled: model.isOptionalMileageEnabled
         ) {
             mileageInputBlock
@@ -56,11 +56,11 @@ struct ScheduleServiceTriggerSection: View {
 
     private var optionalDateBlock: some View {
         ScheduleServiceOptionalTriggerBlock(
-            title: "Add date trigger",
-            subtitle: "Use a date too, so the reminder fires by mileage or date, whichever comes first.",
+            title: i18n.t("Add date trigger"),
+            subtitle: i18n.t("Use a date too, so the reminder fires by mileage or date, whichever comes first."),
             isEnabled: model.isOptionalDateEnabled
         ) {
-            WIDateField(label: "Service date", placeholder: "MM/DD/YY", date: model.serviceDate, allowedRange: model.minimumServiceDate...Date.distantFuture)
+            WIDateField(label: i18n.t("Service date"), placeholder: i18n.t("MM/DD/YY"), date: model.serviceDate, allowedRange: model.minimumServiceDate...Date.distantFuture)
         }
     }
 
@@ -86,7 +86,7 @@ struct ScheduleServiceTriggerSection: View {
 
             WITextField(
                 label: model.mileageFieldLabel,
-                placeholder: "0",
+                placeholder: i18n.t("0"),
                 text: model.serviceMileage,
                 trailingText: model.mileageUnit,
                 keyboardType: .numberPad

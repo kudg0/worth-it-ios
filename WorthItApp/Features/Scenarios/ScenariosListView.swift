@@ -6,6 +6,8 @@ struct ScenariosListView: View {
         case profile
     }
 
+    @Environment(\.i18n) private var i18n
+
     let repository: ScenarioRepository
     let refreshToken: Int
     let profileUser: AuthUser?
@@ -117,13 +119,13 @@ struct ScenariosListView: View {
     private var stickyHeader: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xl) {
             ZStack {
-                Text("Worth It")
+                Text(i18n.t(.brand.name))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(WorthItColor.textPrimary)
 
                 HStack {
                     Spacer()
-                    WIIconButton(systemName: "plus", accessibilityLabel: "Create scenario", style: .plain) {
+                    WIIconButton(systemName: "plus", accessibilityLabel: i18n.t(.scenarios.actions.create.accessibilityLabel), style: .plain) {
                         onCreateScenario()
                     }
                 }
@@ -158,10 +160,10 @@ struct ScenariosListView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.s) {
-            Text("Scenarios")
+            Text(i18n.t(.scenarios.title))
                 .font(WorthItTypography.headline)
                 .foregroundStyle(WorthItColor.textPrimary)
-            Text("Track ownership decisions and open a scenario overview.")
+            Text(i18n.t(.scenarios.subtitle))
                 .font(WorthItTypography.bodySmall)
                 .foregroundStyle(WorthItColor.textSecondary)
         }
@@ -174,12 +176,12 @@ struct ScenariosListView: View {
             } label: {
                 WIScenarioCard(
                     mode: .create,
-                    title: "Create New Scenario"
+                    title: i18n.t(.scenarios.cards.create.title)
                 )
             }
             .buttonStyle(.plain)
 
-            WIButton(title: "Create Scenario", iconSystemName: "plus") {
+            WIButton(title: i18n.t(.scenarios.actions.create.title), iconSystemName: "plus") {
                 onCreateScenario()
             }
         }
@@ -193,9 +195,9 @@ struct ScenariosListView: View {
                 } label: {
                     WIScenarioCard(
                         title: scenario.name,
-                        subtitle: "Car Ownership",
-                        metric1: WIScenarioMetric(label: "Purchase", value: scenario.formattedPurchasePrice),
-                        metric2: WIScenarioMetric(label: "Odometer", value: scenario.formattedOdometer)
+                        subtitle: i18n.t(.scenarios.card.type.carOwnership),
+                        metric1: WIScenarioMetric(label: i18n.t(.scenarios.metrics.purchase), value: scenario.formattedPurchasePrice),
+                        metric2: WIScenarioMetric(label: i18n.t(.scenarios.metrics.odometer), value: scenario.formattedOdometer)
                     )
                 }
                 .buttonStyle(.plain)
@@ -206,7 +208,7 @@ struct ScenariosListView: View {
             } label: {
                 WIScenarioCard(
                     mode: .create,
-                    title: "Create New Scenario"
+                    title: i18n.t(.scenarios.cards.create.title)
                 )
             }
             .buttonStyle(.plain)
@@ -250,8 +252,8 @@ struct ScenariosListView: View {
             .allowsHitTesting(false)
 
             HStack {
-                bottomNavItem(tab: .scenarios, systemName: "list.bullet.rectangle.fill", accessibilityLabel: "Scenarios")
-                bottomNavItem(tab: .profile, systemName: "person.fill", accessibilityLabel: "Profile")
+                bottomNavItem(tab: .scenarios, systemName: "list.bullet.rectangle.fill", accessibilityLabel: i18n.t(.tabs.scenarios))
+                bottomNavItem(tab: .profile, systemName: "person.fill", accessibilityLabel: i18n.t(.tabs.profile))
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, WorthItSpacing.xxl)
@@ -299,21 +301,46 @@ struct ScenariosListView: View {
 }
 
 private struct ErrorStateView: View {
+    @Environment(\.i18n) private var i18n
+
     let message: String
     let retry: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            Text("Could not load scenarios")
-                .font(WorthItTypography.cardTitle)
-                .foregroundStyle(WorthItColor.textPrimary)
-            Text(message)
-                .font(WorthItTypography.caption)
-                .foregroundStyle(WorthItColor.textSecondary)
-            PrimaryButton(title: "Retry", action: retry)
+        VStack(alignment: .leading, spacing: WorthItSpacing.xl) {
+            HStack(alignment: .top, spacing: WorthItSpacing.m) {
+                ZStack {
+                    Circle()
+                        .fill(WorthItColor.surfaceContainerHigh)
+                        .frame(width: 52, height: 52)
+
+                    Image(systemName: "wifi.slash")
+                        .font(.system(size: 22, weight: .semibold))
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(WorthItColor.primaryContainer)
+                }
+
+                VStack(alignment: .leading, spacing: WorthItSpacing.s) {
+                    Text(i18n.t(.scenarios.offline.title))
+                        .font(WorthItTypography.cardTitle)
+                        .foregroundStyle(WorthItColor.textPrimary)
+
+                    Text(i18n.t(.scenarios.offline.body))
+                        .font(WorthItTypography.bodySmall)
+                        .foregroundStyle(WorthItColor.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            WIButton(title: i18n.t(.common.actions.retry), iconSystemName: "arrow.clockwise", action: retry)
         }
         .padding(WorthItSpacing.xl)
-        .background(WorthItColor.surfaceContainer, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(WorthItColor.surfaceContainer, in: RoundedRectangle(cornerRadius: WorthItRadius.xxl))
+        .overlay {
+            RoundedRectangle(cornerRadius: WorthItRadius.xxl)
+                .stroke(WorthItColor.outlineSubtle, lineWidth: 1)
+        }
     }
 }
 

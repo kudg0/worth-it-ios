@@ -69,10 +69,10 @@ struct LogExpenseRecurringSection: View {
             }
 
             HStack(alignment: .top, spacing: WorthItSpacing.m) {
-                WIDateField(label: "Start Date", placeholder: "Today", date: startDate)
+                WIDateField(label: i18n.t("Start Date"), placeholder: i18n.t("Today"), date: startDate)
                     .frame(maxWidth: .infinity)
 
-                WIDateField(label: "End Date", placeholder: "Optional", date: endDate)
+                WIDateField(label: i18n.t("End Date"), placeholder: i18n.t("Optional"), date: endDate)
                     .frame(maxWidth: .infinity)
             }
         }

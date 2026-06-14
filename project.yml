@@ -18,6 +18,11 @@ targets:
     deploymentTarget: "18.0"
     sources:
       - path: WorthItApp
+    preBuildScripts:
+      - name: Generate i18n keys
+        script: |
+          python3 "$SRCROOT/Scripts/generate_i18n_keys.py"
+        basedOnDependencyAnalysis: false
     dependencies:
       - package: WorthItPackage
         product: WorthItAPI

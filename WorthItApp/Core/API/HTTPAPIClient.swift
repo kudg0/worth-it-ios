@@ -64,6 +64,24 @@ struct HTTPAPIClient: Sendable {
         try await sendEmpty(request)
     }
 
+    func upload(data: Data, to url: URL, headers: [String: String]) async throws {
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        headers.forEach { key, value in
+            request.setValue(value, forHTTPHeaderField: key)
+        }
+
+        let (responseData, response) = try await session.upload(for: request, from: data)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let body = String(data: responseData, encoding: .utf8) ?? ""
+            throw APIError.requestFailed(statusCode: httpResponse.statusCode, body: body)
+        }
+    }
+
     private func send<Response: Decodable>(_ request: URLRequest) async throws -> Response {
         let (data, response) = try await session.data(for: authorized(request))
         guard let httpResponse = response as? HTTPURLResponse else {

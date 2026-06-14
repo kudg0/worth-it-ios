@@ -53,7 +53,7 @@ struct AuthEntryScreen: View {
     private var actionStack: some View {
         VStack(spacing: WorthItSpacing.m) {
             if AuthCapabilities.isAppleSignInEnabled {
-                AuthActionButton(title: "Continue with Apple", systemName: "apple.logo", style: .apple) {
+                AuthActionButton(title: i18n.t("Continue with Apple"), systemName: "apple.logo", style: .apple) {
                     onAppleSignIn()
                 }
             }
@@ -112,13 +112,13 @@ private struct CockpitCluster: View {
             }
 
             VStack(spacing: WorthItSpacing.m) {
-                MetricPreviewChip(title: "Cost / km", value: "€0.41", alignment: .leading)
+                MetricPreviewChip(title: i18n.t("Cost / km"), value: "€0.41", alignment: .leading)
                     .offset(x: -52)
 
-                MetricPreviewChip(title: "Alternatives", value: "4 options", alignment: .center)
+                MetricPreviewChip(title: i18n.t("Alternatives"), value: "4 options", alignment: .center)
                     .offset(x: 42)
 
-                MetricPreviewChip(title: "Total Cost", value: "Tracked", alignment: .trailing)
+                MetricPreviewChip(title: i18n.t("Total Cost"), value: "Tracked", alignment: .trailing)
                     .offset(x: -18)
             }
         }

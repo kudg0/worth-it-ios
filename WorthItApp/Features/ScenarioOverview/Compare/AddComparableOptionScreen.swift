@@ -55,10 +55,10 @@ struct AddComparableOptionScreen: View {
 
     private var identityFields: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxl) {
-            WITextField(label: "Comparable Name", placeholder: "Local Taxi Service", text: name)
+            WITextField(label: i18n.t("Comparable Name"), placeholder: i18n.t("Local Taxi Service"), text: name)
 
             WISelectField(
-                label: "Pricing Model",
+                label: i18n.t("Pricing Model"),
                 options: editablePricingOptions.map(\.title),
                 selection: pricingSelection
             )
@@ -66,13 +66,13 @@ struct AddComparableOptionScreen: View {
     }
 
     private var costParametersSection: some View {
-        ComparableEditorIsland(title: "Cost Parameters", systemName: "sum") {
+        ComparableEditorIsland(title: i18n.t("Cost Parameters"), systemName: "sum") {
             VStack(spacing: WorthItSpacing.xxl) {
                 switch pricingModel.wrappedValue {
                 case .perDistance:
                     WITextField(
-                        label: "Cost per KM",
-                        placeholder: "0.00",
+                        label: i18n.t("Cost per KM"),
+                        placeholder: i18n.t("0.00"),
                         text: pricePerKm,
                         leadingText: currencySymbol,
                         trailingText: "/ km",
@@ -81,8 +81,8 @@ struct AddComparableOptionScreen: View {
                 case .mixed:
                     VStack(spacing: WorthItSpacing.xxl) {
                         WITextField(
-                            label: "Cost per KM",
-                            placeholder: "0.00",
+                            label: i18n.t("Cost per KM"),
+                            placeholder: i18n.t("0.00"),
                             text: pricePerKm,
                             leadingText: currencySymbol,
                             trailingText: "/ km",
@@ -90,8 +90,8 @@ struct AddComparableOptionScreen: View {
                         )
 
                         WITextField(
-                            label: "Cost per Minute",
-                            placeholder: "0.00",
+                            label: i18n.t("Cost per Minute"),
+                            placeholder: i18n.t("0.00"),
                             text: pricePerMinute,
                             leadingText: currencySymbol,
                             trailingText: "/ min",
@@ -134,8 +134,8 @@ struct AddComparableOptionScreen: View {
                     }
                 case .perPeriod:
                     WITextField(
-                        label: "Cost per Month",
-                        placeholder: "0.00",
+                        label: i18n.t("Cost per Month"),
+                        placeholder: i18n.t("0.00"),
                         text: pricePerMonth,
                         leadingText: currencySymbol,
                         trailingText: "/ mo",
@@ -143,8 +143,8 @@ struct AddComparableOptionScreen: View {
                     )
                 case .manualEquivalent, .perTime:
                     WITextField(
-                        label: "Total Equivalent Cost",
-                        placeholder: "0.00",
+                        label: i18n.t("Total Equivalent Cost"),
+                        placeholder: i18n.t("0.00"),
                         text: manualTotal,
                         leadingText: currencySymbol,
                         keyboardType: .decimalPad
@@ -154,7 +154,7 @@ struct AddComparableOptionScreen: View {
                 if pricingModel.wrappedValue == .distanceCurve {
                     distanceCurveBreakdown
                 } else {
-                    WITextField(label: "Note", placeholder: "City taxi, car share, rental...", text: note)
+                    WITextField(label: i18n.t("Note"), placeholder: i18n.t("City taxi, car share, rental..."), text: note)
                 }
             }
         }
@@ -232,7 +232,7 @@ struct AddComparableOptionScreen: View {
     }
 
     private var inheritedCostsSection: some View {
-        ComparableEditorIsland(title: "Also Applies", systemName: "plus.circle") {
+        ComparableEditorIsland(title: i18n.t("Also Applies"), systemName: "plus.circle") {
             VStack(alignment: .leading, spacing: WorthItSpacing.l) {
                 Text("Choose ownership cost categories that would still happen for this option, like fuel or wash for a rental car.")
                     .font(WorthItTypography.caption)
@@ -292,8 +292,8 @@ struct AddComparableOptionScreen: View {
     ) -> some View {
         HStack(alignment: .bottom, spacing: WorthItSpacing.m) {
             WITextField(
-                label: "Distance",
-                placeholder: "12",
+                label: i18n.t("Distance"),
+                placeholder: i18n.t("12"),
                 text: Binding(
                     get: { point.wrappedValue.distanceKm },
                     set: { point.wrappedValue.distanceKm = $0 }
@@ -304,8 +304,8 @@ struct AddComparableOptionScreen: View {
             .frame(width: 112)
 
             WITextField(
-                label: "Trip price",
-                placeholder: "0.00",
+                label: i18n.t("Trip price"),
+                placeholder: i18n.t("0.00"),
                 text: Binding(
                     get: { point.wrappedValue.totalPrice },
                     set: { point.wrappedValue.totalPrice = $0 }

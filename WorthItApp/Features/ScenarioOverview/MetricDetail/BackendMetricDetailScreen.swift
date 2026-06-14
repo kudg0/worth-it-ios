@@ -52,7 +52,7 @@ enum BackendMetricDetailSections {
         let summaries: [ScenarioAnalyticsMetricPayload.Detail.Summary]
 
         var body: some View {
-            WIIsland(title: "Backend Breakdown", systemIcon: "sum") {
+            WIIsland(title: i18n.t("Backend Breakdown"), systemIcon: "sum") {
                 VStack(spacing: WorthItSpacing.l) {
                     ForEach(summaries) { item in
                         HStack(alignment: .firstTextBaseline) {
@@ -138,7 +138,7 @@ enum BackendMetricDetailSections {
 
 struct BackendMetricDetailLoadingView: View {
     var body: some View {
-        WIIsland(title: "Loading Metric", systemIcon: "arrow.triangle.2.circlepath") {
+        WIIsland(title: i18n.t("Loading Metric"), systemIcon: "arrow.triangle.2.circlepath") {
             HStack(spacing: WorthItSpacing.l) {
                 ProgressView()
                 Text("Fetching backend analytics")
@@ -154,7 +154,7 @@ struct BackendMetricDetailErrorView: View {
     let onRetry: () -> Void
 
     var body: some View {
-        WIIsland(title: "Backend Metric", systemIcon: "exclamationmark.triangle") {
+        WIIsland(title: i18n.t("Backend Metric"), systemIcon: "exclamationmark.triangle") {
             VStack(alignment: .leading, spacing: WorthItSpacing.l) {
                 Text(message)
                     .font(WorthItTypography.caption)

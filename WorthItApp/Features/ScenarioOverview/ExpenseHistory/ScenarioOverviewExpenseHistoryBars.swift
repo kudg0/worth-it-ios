@@ -19,7 +19,7 @@ extension ScenarioOverviewView {
         return expenseHistoryBars.last ?? ExpenseHistoryBar(
             monthStart: currentMonthStart,
             selectionId: expenseHistoryMonthIdentifier(for: currentMonthStart),
-            label: "Now",
+            label: i18n.t("Now"),
             total: 0,
             previousTotal: nil,
             count: 0,

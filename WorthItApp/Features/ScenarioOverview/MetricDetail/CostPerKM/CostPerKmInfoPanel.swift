@@ -14,14 +14,14 @@ struct CostPerKmInfoPanel: View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
             if model.usesEffectiveOwnership {
                 infoRow(
-                    title: "Vehicle value included",
+                    title: i18n.t("Vehicle value included"),
                     body: "Effective cost uses depreciation and accrued interest. Loan principal is excluded so vehicle value is not counted twice.",
                     systemName: "car.fill",
                     color: WorthItColor.primaryContainer
                 )
             } else {
                 infoRow(
-                    title: "Month-only cost",
+                    title: i18n.t("Month-only cost"),
                     body: "This metric uses logged costs and tracked distance inside the selected month only.",
                     systemName: "calendar",
                     color: Color(hex: 0x2DD4BF)
@@ -29,7 +29,7 @@ struct CostPerKmInfoPanel: View {
             }
 
             infoRow(
-                title: "Savings comparison",
+                title: i18n.t("Savings comparison"),
                 body: "Savings compares your actual ownership and running costs against a selected alternative for the same tracked distance.",
                 systemName: "function",
                 color: WorthItColor.accentGold

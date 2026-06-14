@@ -7,8 +7,8 @@ struct ScheduledServiceActionOverlay: View {
 
     var body: some View {
         ScenarioBottomActionSheet(onDismiss: onDismiss) {
-            actionButton(title: "Edit", systemName: "pencil", action: onEdit)
-            actionButton(title: "Complete with expense", systemName: "checkmark.circle", action: onCompleteWithExpense)
+            actionButton(title: i18n.t("Edit"), systemName: "pencil", action: onEdit)
+            actionButton(title: i18n.t("Complete with expense"), systemName: "checkmark.circle", action: onCompleteWithExpense)
         }
     }
 

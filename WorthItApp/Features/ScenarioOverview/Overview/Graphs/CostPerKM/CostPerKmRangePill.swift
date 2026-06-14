@@ -6,9 +6,9 @@ struct CostPerKmRangePill: View {
 
     var body: some View {
         HStack(spacing: WorthItSpacing.xs) {
-            segment(title: "Day", value: .day)
-            segment(title: "Week", value: .week)
-            segment(title: "Month", value: .month)
+            segment(title: i18n.t("Day"), value: .day)
+            segment(title: i18n.t("Week"), value: .week)
+            segment(title: i18n.t("Month"), value: .month)
         }
         .padding(WorthItSpacing.xs)
         .background(WorthItColor.surfaceLowest, in: Capsule())

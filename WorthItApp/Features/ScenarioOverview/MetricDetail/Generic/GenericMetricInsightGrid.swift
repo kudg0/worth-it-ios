@@ -23,14 +23,14 @@ struct GenericMetricInsightGrid: View {
                 spacing: WorthItSpacing.l
             ) {
                 smallInsight(
-                    title: "Volatility Score",
+                    title: i18n.t("Volatility Score"),
                     value: model.volatilityValue,
                     body: "Stable enough for planning, but improves as more real entries are logged.",
                     systemName: "chart.xyaxis.line"
                 )
 
                 smallInsight(
-                    title: "Action required",
+                    title: i18n.t("Action required"),
                     value: model.actionValue,
                     body: model.missingDataText,
                     systemName: "exclamationmark.triangle.fill",

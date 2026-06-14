@@ -16,6 +16,7 @@ struct ExpenseDetailScreen: View {
     let onMoveWeek: (Int) -> Void
     let onSelectWeekDay: (Date) -> Void
     let onOpenActions: () -> Void
+    let onOpenResourceAction: (ScenarioResourceAction) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxl) {
@@ -34,6 +35,14 @@ struct ExpenseDetailScreen: View {
             if let note = normalizedNote {
                 noteCard(note)
             }
+            ScenarioResourceMetadataCard(
+                attachments: event.attachments ?? [],
+                links: event.links ?? [],
+                locations: event.locations ?? [],
+                onOpenAttachment: { onOpenResourceAction(.attachment($0)) },
+                onOpenLink: { onOpenResourceAction(.link($0)) },
+                onOpenLocation: { onOpenResourceAction(.location($0)) }
+            )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -90,11 +99,11 @@ struct ExpenseDetailScreen: View {
 
     private var costContext: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
-            sectionHeader(title: "Cost Context", systemName: "chart.line.uptrend.xyaxis")
+            sectionHeader(title: i18n.t("Cost Context"), systemName: "chart.line.uptrend.xyaxis")
 
             HStack(spacing: WorthItSpacing.m) {
-                metricTile(title: "Logged", value: amountText, subtitle: "Included in \(monthText)", progress: 1)
-                metricTile(title: "Category", value: categoryTitle, subtitle: kindText, progress: event.kind == "recurring" ? 0.66 : 0.34)
+                metricTile(title: i18n.t("Logged"), value: amountText, subtitle: i18n.t("Included in \(monthText)"), progress: 1)
+                metricTile(title: i18n.t("Category"), value: categoryTitle, subtitle: kindText, progress: event.kind == "recurring" ? 0.66 : 0.34)
             }
         }
         .padding(WorthItSpacing.xxl)
@@ -104,11 +113,11 @@ struct ExpenseDetailScreen: View {
 
     private var detailContext: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
-            sectionHeader(title: "Expense Details", systemName: "receipt")
-            detailRow(title: "Scenario", value: scenarioName)
-            detailRow(title: "Date", value: dateText)
-            detailRow(title: "Time", value: timeText)
-            detailRow(title: "Currency", value: event.currency)
+            sectionHeader(title: i18n.t("Expense Details"), systemName: "receipt")
+            detailRow(title: i18n.t("Scenario"), value: scenarioName)
+            detailRow(title: i18n.t("Date"), value: dateText)
+            detailRow(title: i18n.t("Time"), value: timeText)
+            detailRow(title: i18n.t("Currency"), value: event.currency)
         }
         .padding(WorthItSpacing.xxl)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -117,7 +126,7 @@ struct ExpenseDetailScreen: View {
 
     private var serviceContext: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
-            sectionHeader(title: "Linked Service", systemName: "calendar.badge.clock")
+            sectionHeader(title: i18n.t("Linked Service"), systemName: "calendar.badge.clock")
 
             HStack(spacing: WorthItSpacing.m) {
                 Image(systemName: linkedServiceTitle == nil ? "link.badge.plus" : "checkmark.circle")
@@ -146,9 +155,9 @@ struct ExpenseDetailScreen: View {
 
     private var odometerContext: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
-            sectionHeader(title: "Odometer Context", systemName: "gauge.with.dots.needle.33percent")
-            detailRow(title: "Mileage", value: "No odometer linked")
-            detailRow(title: "Source", value: "Expense entry has no mileage field")
+            sectionHeader(title: i18n.t("Odometer Context"), systemName: "gauge.with.dots.needle.33percent")
+            detailRow(title: i18n.t("Mileage"), value: "No odometer linked")
+            detailRow(title: i18n.t("Source"), value: "Expense entry has no mileage field")
         }
         .padding(WorthItSpacing.xxl)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -201,7 +210,7 @@ struct ExpenseDetailScreen: View {
 
     private func noteCard(_ note: String) -> some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            sectionHeader(title: "Notes", systemName: "note.text")
+            sectionHeader(title: i18n.t("Notes"), systemName: "note.text")
 
             Text(note)
                 .font(.system(size: 14, weight: .regular))

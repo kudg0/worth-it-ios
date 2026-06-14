@@ -77,15 +77,15 @@ struct EmailSignInScreen: View {
     private var formFields: some View {
         VStack(spacing: WorthItSpacing.l) {
             AuthTextField(
-                label: "Email",
-                placeholder: "you@example.com",
+                label: i18n.t("Email"),
+                placeholder: i18n.t("you@example.com"),
                 text: $email,
                 keyboardType: .emailAddress,
                 textContentType: .username
             )
             AuthTextField(
-                label: "Password",
-                placeholder: "Password",
+                label: i18n.t("Password"),
+                placeholder: i18n.t("Password"),
                 text: $password,
                 isSecure: true,
                 textContentType: .password,
@@ -95,7 +95,7 @@ struct EmailSignInScreen: View {
     }
 
     private var appleButton: some View {
-        AuthActionButton(title: "Continue with Apple", systemName: "apple.logo", style: .apple) {
+        AuthActionButton(title: i18n.t("Continue with Apple"), systemName: "apple.logo", style: .apple) {
             onAppleSignIn()
         }
         .padding(.top, WorthItSpacing.s)

@@ -10,6 +10,7 @@ struct ScheduledServiceDetailScreen: View {
     let onEdit: (UUID) -> Void
     let onCompleteWithExpense: (UUID) -> Void
     let onOpenActions: (UUID) -> Void
+    let onOpenResourceAction: (ScenarioResourceAction) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxl) {
@@ -18,6 +19,14 @@ struct ScheduledServiceDetailScreen: View {
             if let note = item.note {
                 noteCard(note)
             }
+            ScenarioResourceMetadataCard(
+                attachments: service?.attachments ?? [],
+                links: service?.links ?? [],
+                locations: service?.locations ?? [],
+                onOpenAttachment: { onOpenResourceAction(.attachment($0)) },
+                onOpenLink: { onOpenResourceAction(.link($0)) },
+                onOpenLocation: { onOpenResourceAction(.location($0)) }
+            )
             serviceDetailsCard
             actionButtons
         }
@@ -52,7 +61,7 @@ struct ScheduledServiceDetailScreen: View {
             HStack(spacing: WorthItSpacing.s) {
                 statusPill
                 if item.isEstimatedDate {
-                    detailPill(title: "Estimated", systemName: "sparkles")
+                    detailPill(title: i18n.t("Estimated"), systemName: "sparkles")
                 }
             }
         }
@@ -95,17 +104,17 @@ struct ScheduledServiceDetailScreen: View {
 
     private var nextTriggerCard: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
-            sectionHeader(title: "Next Trigger", systemName: "calendar.badge.clock")
+            sectionHeader(title: i18n.t("Next Trigger"), systemName: "calendar.badge.clock")
 
             HStack(spacing: WorthItSpacing.m) {
                 triggerMetric(
-                    title: "Date",
+                    title: i18n.t("Date"),
                     value: dateCounterValue,
                     subtitle: dateValue,
                     progress: dateProgress
                 )
                 triggerMetric(
-                    title: "Mileage",
+                    title: i18n.t("Mileage"),
                     value: mileageCounterValue,
                     subtitle: mileageValue,
                     progress: mileageProgress
@@ -165,7 +174,7 @@ struct ScheduledServiceDetailScreen: View {
 
     private func noteCard(_ note: String) -> some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            sectionHeader(title: "Notes", systemName: "note.text")
+            sectionHeader(title: i18n.t("Notes"), systemName: "note.text")
 
             Text(note)
                 .font(.system(size: 14, weight: .regular))
@@ -180,11 +189,11 @@ struct ScheduledServiceDetailScreen: View {
 
     private var serviceDetailsCard: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
-            sectionHeader(title: "Schedule Basis", systemName: "point.3.connected.trianglepath.dotted")
+            sectionHeader(title: i18n.t("Schedule Basis"), systemName: "point.3.connected.trianglepath.dotted")
 
-            detailRow(title: "Created", value: createdValue)
-            detailRow(title: "Baseline", value: baselineValue)
-            detailRow(title: "Repeats", value: repeatValue)
+            detailRow(title: i18n.t("Created"), value: createdValue)
+            detailRow(title: i18n.t("Baseline"), value: baselineValue)
+            detailRow(title: i18n.t("Repeats"), value: repeatValue)
         }
         .padding(WorthItSpacing.xxl)
         .frame(maxWidth: .infinity, alignment: .leading)

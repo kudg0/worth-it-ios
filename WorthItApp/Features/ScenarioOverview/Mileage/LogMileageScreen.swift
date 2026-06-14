@@ -38,8 +38,8 @@ struct LogMileageScreen: View {
     private var modePicker: some View {
         WISegmentedControl(
             items: [
-                (title: "Update Odometer", value: ScenarioOverviewView.MileageMode.odometer),
-                (title: "Add Trip", value: ScenarioOverviewView.MileageMode.trip),
+                (title: i18n.t("Update Odometer"), value: ScenarioOverviewView.MileageMode.odometer),
+                (title: i18n.t("Add Trip"), value: ScenarioOverviewView.MileageMode.trip),
             ],
             selection: mode
         )
@@ -53,15 +53,15 @@ struct LogMileageScreen: View {
     private var odometerForm: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxxl) {
             LogMileageHeroInput(
-                label: "Current Odometer (\(mileageUnit))",
-                placeholder: "0",
+                label: i18n.t("Current Odometer (\(mileageUnit))"),
+                placeholder: i18n.t("0"),
                 value: value,
                 sanitizeValue: sanitizeValue
             )
 
             HStack(spacing: WorthItSpacing.l) {
-                LogMileageStatTile(title: "Previous", value: previousOdometerText, color: WorthItColor.textPrimary)
-                LogMileageStatTile(title: "Delta", value: odometerDeltaText, color: WorthItColor.accentGold)
+                LogMileageStatTile(title: i18n.t("Previous"), value: previousOdometerText, color: WorthItColor.textPrimary)
+                LogMileageStatTile(title: i18n.t("Delta"), value: odometerDeltaText, color: WorthItColor.accentGold)
             }
 
             formFields
@@ -71,18 +71,18 @@ struct LogMileageScreen: View {
     private var tripForm: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxxl) {
             LogMileageHeroInput(
-                label: "Trip Distance (\(mileageUnit))",
-                placeholder: "0",
+                label: i18n.t("Trip Distance (\(mileageUnit))"),
+                placeholder: i18n.t("0"),
                 value: value,
                 sanitizeValue: sanitizeValue
             )
             formFields
 
-            LogMileageResultRow(title: "Resulting Odometer", value: resultingOdometerText, systemName: "doc.text")
+            LogMileageResultRow(title: i18n.t("Resulting Odometer"), value: resultingOdometerText, systemName: "doc.text")
 
             WITipInfo(
-                title: "Usage Analytics",
-                bodyText: "This trip improves your usage analytics and cost-per-\(mileageUnit) accuracy."
+                title: i18n.t("Usage Analytics"),
+                bodyText: i18n.t("This trip improves your usage analytics and cost-per-\(mileageUnit) accuracy.")
             )
         }
     }
@@ -90,8 +90,8 @@ struct LogMileageScreen: View {
     private var formFields: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxl) {
             HStack(spacing: WorthItSpacing.l) {
-                LogMileagePickerField(label: "Date", value: dateText, systemName: "calendar", action: onOpenDatePicker)
-                LogMileagePickerField(label: "Time (optional)", value: timeText, systemName: "clock", action: onOpenTimePicker)
+                LogMileagePickerField(label: i18n.t("Date"), value: dateText, systemName: "calendar", action: onOpenDatePicker)
+                LogMileagePickerField(label: i18n.t("Time (optional)"), value: timeText, systemName: "clock", action: onOpenTimePicker)
             }
 
             LogMileageNotesField(notes: notes)

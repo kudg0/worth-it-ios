@@ -151,7 +151,7 @@ struct CostPerKmEfficiencyCard: View {
 
     private var legend: some View {
         EfficiencyLegendFlowLayout(spacing: WorthItSpacing.m, rowSpacing: WorthItSpacing.xs) {
-            legendItem(title: "Your car", color: WorthItColor.primaryContainer)
+            legendItem(title: i18n.t("Your car"), color: WorthItColor.primaryContainer)
 
             ForEach(model.comparisonSeries) { series in
                 comparisonLegendItem(series)

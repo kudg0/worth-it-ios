@@ -79,7 +79,7 @@ struct RegistrationScreen: View {
     }
 
     private var appleButton: some View {
-        AuthActionButton(title: "Continue with Apple", systemName: "apple.logo", style: .apple) {
+        AuthActionButton(title: i18n.t("Continue with Apple"), systemName: "apple.logo", style: .apple) {
             onAppleSignIn()
         }
         .padding(.top, WorthItSpacing.s)
@@ -105,21 +105,21 @@ struct RegistrationScreen: View {
     private var formFields: some View {
         VStack(spacing: WorthItSpacing.l) {
             AuthTextField(
-                label: "Name",
-                placeholder: "Your name",
+                label: i18n.t("Name"),
+                placeholder: i18n.t("Your name"),
                 text: $name,
                 textContentType: .name
             )
             AuthTextField(
-                label: "Email",
-                placeholder: "you@example.com",
+                label: i18n.t("Email"),
+                placeholder: i18n.t("you@example.com"),
                 text: $email,
                 keyboardType: .emailAddress,
                 textContentType: .emailAddress
             )
             AuthTextField(
-                label: "Password",
-                placeholder: "Create password",
+                label: i18n.t("Password"),
+                placeholder: i18n.t("Create password"),
                 text: $password,
                 isSecure: true,
                 textContentType: .newPassword,
@@ -242,7 +242,7 @@ private struct RegionSelector: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.s) {
-            WISelectField(label: "Region", options: regions, selection: $selection)
+            WISelectField(label: i18n.t("Region"), options: regions, selection: $selection)
 
             Text("Sets default currency and distance units. You can change it later.")
                 .font(.system(size: 11, weight: .semibold))

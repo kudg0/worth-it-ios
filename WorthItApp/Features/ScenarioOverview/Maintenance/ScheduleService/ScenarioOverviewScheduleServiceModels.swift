@@ -29,7 +29,8 @@ extension ScenarioOverviewView {
                     }
                 }
             ),
-            details: $serviceDetails
+            details: $serviceDetails,
+            resources: resourceManagementModel(for: editingScheduledService)
         )
     }
 }

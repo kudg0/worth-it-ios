@@ -38,7 +38,7 @@ struct LogExpenseCategorySection: View {
             Spacer()
 
             WISelectControl(
-                title: "Category",
+                title: i18n.t("Category"),
                 options: ScenarioOverviewView.ExpenseCategory.allCases.map {
                     WISelectSheetOption(id: $0.rawValue, title: $0.title, systemName: $0.systemName)
                 },

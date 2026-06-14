@@ -128,6 +128,24 @@ struct ScenarioRepository: Sendable {
         try await client.delete("/cost-events/\(apiId(costEventId))")
     }
 
+    func createCostEventAttachmentUploadIntent(
+        costEventId: UUID,
+        request: CreateAttachmentUploadIntentRequest
+    ) async throws -> AttachmentUploadIntentResponse {
+        try await client.post("/cost-events/\(apiId(costEventId))/attachments/upload-intents", body: request)
+    }
+
+    func createCostEventLink(costEventId: UUID, request: CreateResourceLinkRequest) async throws -> ResourceLink {
+        try await client.post("/cost-events/\(apiId(costEventId))/links", body: request)
+    }
+
+    func createCostEventLocation(
+        costEventId: UUID,
+        request: CreateResourceLocationRequest
+    ) async throws -> ResourceLocation {
+        try await client.post("/cost-events/\(apiId(costEventId))/locations", body: request)
+    }
+
     func createScheduledService(
         scenarioId: UUID,
         request: CreateScheduledServiceRequest
@@ -155,6 +173,66 @@ struct ScenarioRepository: Sendable {
 
     func listScheduledServiceDueStates(scenarioId: UUID) async throws -> ScheduledServicesDueResponse {
         try await client.get("/scenarios/\(apiId(scenarioId))/scheduled-services/due")
+    }
+
+    func createScheduledServiceAttachmentUploadIntent(
+        scheduledServiceId: UUID,
+        request: CreateAttachmentUploadIntentRequest
+    ) async throws -> AttachmentUploadIntentResponse {
+        try await client.post(
+            "/scheduled-services/\(apiId(scheduledServiceId))/attachments/upload-intents",
+            body: request
+        )
+    }
+
+    func createScheduledServiceLink(
+        scheduledServiceId: UUID,
+        request: CreateResourceLinkRequest
+    ) async throws -> ResourceLink {
+        try await client.post("/scheduled-services/\(apiId(scheduledServiceId))/links", body: request)
+    }
+
+    func createScheduledServiceLocation(
+        scheduledServiceId: UUID,
+        request: CreateResourceLocationRequest
+    ) async throws -> ResourceLocation {
+        try await client.post("/scheduled-services/\(apiId(scheduledServiceId))/locations", body: request)
+    }
+
+    func updateAttachment(attachmentId: UUID, request: UpdateAttachmentRequest) async throws -> ResourceAttachment {
+        try await client.patch("/attachments/\(apiId(attachmentId))", body: request)
+    }
+
+    func getAttachmentDownloadURL(attachmentId: UUID) async throws -> AttachmentDownloadURLResponse {
+        try await client.get("/attachments/\(apiId(attachmentId))/download-url")
+    }
+
+    func uploadAttachmentData(_ data: Data, intent: AttachmentUploadIntentResponse) async throws {
+        guard intent.uploadUrl.scheme != "local" else { return }
+        try await client.upload(data: data, to: intent.uploadUrl, headers: intent.uploadHeaders)
+    }
+
+    func deleteAttachment(attachmentId: UUID) async throws {
+        try await client.delete("/attachments/\(apiId(attachmentId))")
+    }
+
+    func updateResourceLink(linkId: UUID, request: UpdateResourceLinkRequest) async throws -> ResourceLink {
+        try await client.patch("/links/\(apiId(linkId))", body: request)
+    }
+
+    func deleteResourceLink(linkId: UUID) async throws {
+        try await client.delete("/links/\(apiId(linkId))")
+    }
+
+    func updateResourceLocation(
+        locationId: UUID,
+        request: UpdateResourceLocationRequest
+    ) async throws -> ResourceLocation {
+        try await client.patch("/locations/\(apiId(locationId))", body: request)
+    }
+
+    func deleteResourceLocation(locationId: UUID) async throws {
+        try await client.delete("/locations/\(apiId(locationId))")
     }
 
     func createSmokeScenario() async throws -> ScenarioListItem {

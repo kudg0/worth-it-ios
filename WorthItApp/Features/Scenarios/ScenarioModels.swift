@@ -465,8 +465,107 @@ struct CostEvent: Decodable, Identifiable, Hashable {
     let kind: String
     let isSharedCost: Bool
     let note: String?
+    let attachments: [ResourceAttachment]?
+    let links: [ResourceLink]?
+    let locations: [ResourceLocation]?
     let createdAt: Date
     let updatedAt: Date
+}
+
+struct ResourceAttachment: Decodable, Identifiable, Hashable {
+    let id: UUID
+    let scenarioId: UUID
+    let ownerType: String
+    let costEventId: UUID?
+    let scheduledServiceId: UUID?
+    let storageProvider: String
+    let storageBucket: String
+    let storageKey: String
+    let originalFileName: String
+    let contentType: String
+    let byteSize: Int
+    let checksumSha256: String?
+    let status: String
+    let createdAt: Date
+    let updatedAt: Date
+}
+
+struct ResourceLink: Decodable, Identifiable, Hashable {
+    let id: UUID
+    let scenarioId: UUID
+    let ownerType: String
+    let costEventId: UUID?
+    let scheduledServiceId: UUID?
+    let label: String?
+    let url: URL
+    let createdAt: Date
+    let updatedAt: Date
+}
+
+struct ResourceLocation: Decodable, Identifiable, Hashable {
+    let id: UUID
+    let scenarioId: UUID
+    let ownerType: String
+    let costEventId: UUID?
+    let scheduledServiceId: UUID?
+    let label: String?
+    let address: String?
+    let latitude: String?
+    let longitude: String?
+    let providerPlaceId: String?
+    let createdAt: Date
+    let updatedAt: Date
+}
+
+struct CreateAttachmentUploadIntentRequest: Encodable {
+    let fileName: String
+    let contentType: String
+    let byteSize: Int
+    let checksumSha256: String?
+}
+
+struct AttachmentUploadIntentResponse: Decodable, Hashable {
+    let attachment: ResourceAttachment
+    let uploadUrl: URL
+    let uploadHeaders: [String: String]
+    let expiresInSeconds: Int
+}
+
+struct AttachmentDownloadURLResponse: Decodable, Hashable {
+    let attachment: ResourceAttachment
+    let downloadUrl: URL
+    let expiresInSeconds: Int
+}
+
+struct UpdateAttachmentRequest: Encodable {
+    let originalFileName: String?
+    let status: String?
+}
+
+struct CreateResourceLinkRequest: Encodable {
+    let label: String?
+    let url: URL
+}
+
+struct UpdateResourceLinkRequest: Encodable {
+    let label: String?
+    let url: URL?
+}
+
+struct CreateResourceLocationRequest: Encodable {
+    let label: String?
+    let address: String?
+    let latitude: Double?
+    let longitude: Double?
+    let providerPlaceId: String?
+}
+
+struct UpdateResourceLocationRequest: Encodable {
+    let label: String?
+    let address: String?
+    let latitude: Double?
+    let longitude: Double?
+    let providerPlaceId: String?
 }
 
 struct UsageEvent: Decodable, Identifiable, Hashable {
@@ -550,6 +649,9 @@ struct ScheduledService: Decodable, Identifiable, Hashable {
     let lastCompletedOdometerKm: String?
     let completedExpenseId: UUID?
     let note: String?
+    let attachments: [ResourceAttachment]?
+    let links: [ResourceLink]?
+    let locations: [ResourceLocation]?
     let createdAt: Date
     let updatedAt: Date
 }

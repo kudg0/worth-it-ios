@@ -19,10 +19,10 @@ struct MaintenanceSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxl) {
-            ScenarioSectionTitle(title: "Maintenance")
+            ScenarioSectionTitle(title: i18n.t("Maintenance"))
 
             if let error = model.error {
-                WITipInfo(title: "Service schedule unavailable", bodyText: error, size: .medium, tone: .info)
+                WITipInfo(title: i18n.t("Service schedule unavailable"), bodyText: error, size: .medium, tone: .info)
             } else {
                 scheduledServicesSection
                 completedServicesSection
@@ -33,13 +33,13 @@ struct MaintenanceSection: View {
     private var scheduledServicesSection: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
             MaintenanceSectionHeader(
-                title: "Scheduled Services",
+                title: i18n.t("Scheduled Services"),
                 showsViewAll: !model.upcomingItems.isEmpty,
                 action: model.onOpenScheduledServices
             )
 
             if model.upcomingItems.isEmpty {
-                ScenarioWideAction(title: "Scheduled Services", subtitle: "Upcoming service reminders will live here.", systemName: "calendar.badge.clock")
+                ScenarioWideAction(title: i18n.t("Scheduled Services"), subtitle: i18n.t("Upcoming service reminders will live here."), systemName: "calendar.badge.clock")
             } else {
                 VStack(spacing: WorthItSpacing.m) {
                     ForEach(Array(model.upcomingItems.prefix(5))) { item in
@@ -60,10 +60,10 @@ struct MaintenanceSection: View {
 
     private var completedServicesSection: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            MaintenanceSectionHeader(title: "Completed Work")
+            MaintenanceSectionHeader(title: i18n.t("Completed Work"))
 
             if model.completedServices.isEmpty {
-                ScenarioWideAction(title: "Completed Work", subtitle: "Finished services can be linked back to expenses.", systemName: "checkmark.seal.fill")
+                ScenarioWideAction(title: i18n.t("Completed Work"), subtitle: i18n.t("Finished services can be linked back to expenses."), systemName: "checkmark.seal.fill")
             } else {
                 VStack(spacing: WorthItSpacing.m) {
                     ForEach(model.completedServices) { service in

@@ -20,8 +20,8 @@ extension ScenarioOverviewView {
                 }
         } else {
             WITipInfo(
-                title: "Trip unavailable",
-                bodyText: "This trip is no longer available in mileage history."
+                title: i18n.t("Trip unavailable"),
+                bodyText: i18n.t("This trip is no longer available in mileage history.")
             )
         }
     }

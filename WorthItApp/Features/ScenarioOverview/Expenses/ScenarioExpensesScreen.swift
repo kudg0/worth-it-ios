@@ -15,7 +15,7 @@ struct ScenarioExpensesScreen: View {
     var body: some View {
         VStack(spacing: WorthItSpacing.xxxxl) {
             if let costEventsError = model.costEventsError {
-                WITipInfo(title: "Maintenance unavailable", bodyText: costEventsError, size: .medium, tone: .info)
+                WITipInfo(title: i18n.t("Maintenance unavailable"), bodyText: costEventsError, size: .medium, tone: .info)
             } else if model.isEmpty {
                 ExpensesEmptyState()
             } else {

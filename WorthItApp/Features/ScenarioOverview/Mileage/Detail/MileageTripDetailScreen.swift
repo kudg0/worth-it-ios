@@ -115,7 +115,7 @@ struct MileageTripDetailScreen: View {
     @ViewBuilder
     private var comparisonCard: some View {
         if !model.comparableCosts.isEmpty {
-            WIIsland(title: "Efficiency Comparison", systemIcon: "arrow.left.arrow.right") {
+            WIIsland(title: i18n.t("Efficiency Comparison"), systemIcon: "arrow.left.arrow.right") {
                 VStack(spacing: WorthItSpacing.m) {
                     ForEach(model.comparableCosts) { item in
                         comparableRow(item)
@@ -175,7 +175,7 @@ struct MileageTripDetailScreen: View {
     }
 
     private var calculationCard: some View {
-        WIIsland(title: "Calculation Basis", systemIcon: "sum") {
+        WIIsland(title: i18n.t("Calculation Basis"), systemIcon: "sum") {
             VStack(alignment: .leading, spacing: WorthItSpacing.l) {
                 formula
 
@@ -225,7 +225,7 @@ struct MileageTripDetailScreen: View {
     }
 
     private var ledgerButton: some View {
-        WIButton(title: "View in Monthly Ledger", iconSystemName: "list.bullet.rectangle", style: .secondary, height: 56, action: model.onOpenLedger)
+        WIButton(title: i18n.t("View in Monthly Ledger"), iconSystemName: "list.bullet.rectangle", style: .secondary, height: 56, action: model.onOpenLedger)
             .shadow(color: WorthItColor.primaryContainer.opacity(0.16), radius: 18)
             .padding(.horizontal, WorthItSpacing.xxxl)
             .padding(.bottom, WorthItSpacing.xxxxl)
@@ -248,7 +248,7 @@ private struct ComparableCostDetailSheet: View {
                     header
                     calculation
                     source
-                    WIButton(title: "Open in Compare", iconSystemName: "arrow.left.arrow.right", height: 56, action: onOpenCompare)
+                    WIButton(title: i18n.t("Open in Compare"), iconSystemName: "arrow.left.arrow.right", height: 56, action: onOpenCompare)
                         .shadow(color: WorthItColor.primaryContainer.opacity(0.18), radius: 18)
                 }
                 .padding(.horizontal, WorthItSpacing.xxl)
@@ -322,7 +322,7 @@ private struct ComparableCostDetailSheet: View {
                     calculationRow(label: index == 0 ? "Base" : "Inherited", value: line, badge: "\(index + 1)")
                 }
 
-                calculationRow(label: "Comparable total", value: "Final estimated alternative cost", badge: "Σ", trailing: item.costText)
+                calculationRow(label: i18n.t("Comparable total"), value: "Final estimated alternative cost", badge: "Σ", trailing: item.costText)
             }
         }
         .padding(WorthItSpacing.xl)
@@ -368,8 +368,8 @@ private struct ComparableCostDetailSheet: View {
 
     private var source: some View {
         HStack(spacing: WorthItSpacing.m) {
-            sourceTile(label: "Source", value: dataSource)
-            sourceTile(label: "Confidence", value: confidenceLevel)
+            sourceTile(label: i18n.t("Source"), value: dataSource)
+            sourceTile(label: i18n.t("Confidence"), value: confidenceLevel)
         }
     }
 

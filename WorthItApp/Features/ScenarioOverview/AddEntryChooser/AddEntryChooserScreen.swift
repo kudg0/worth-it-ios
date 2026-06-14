@@ -8,15 +8,15 @@ struct AddEntryChooserScreen: View {
         VStack(spacing: 0) {
             VStack(spacing: WorthItSpacing.l) {
                 entryOptionCard(
-                    title: "Log Expense",
-                    subtitle: "Record a completed cost: fuel, repairs, insurance, parts, wash, taxes, or one-off maintenance.",
+                    title: i18n.t("Log Expense"),
+                    subtitle: i18n.t("Record a completed cost: fuel, repairs, insurance, parts, wash, taxes, or one-off maintenance."),
                     systemName: "receipt",
                     kind: .expense
                 )
 
                 entryOptionCard(
-                    title: "Schedule Service",
-                    subtitle: "Plan upcoming service by date, mileage, or both, then track when it gets close.",
+                    title: i18n.t("Schedule Service"),
+                    subtitle: i18n.t("Plan upcoming service by date, mileage, or both, then track when it gets close."),
                     systemName: "wrench.fill",
                     kind: .service
                 )
@@ -24,7 +24,7 @@ struct AddEntryChooserScreen: View {
 
             Spacer(minLength: 0)
 
-            WIButton(title: "Continue", action: onContinue)
+            WIButton(title: i18n.t("Continue"), action: onContinue)
         }
         .frame(minHeight: 684, alignment: .top)
     }

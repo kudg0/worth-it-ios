@@ -41,8 +41,8 @@ struct ExpensesEmptyState: View {
                 ],
                 spacing: WorthItSpacing.l
             ) {
-                ExpenseEducationCard(title: "Fuel Costs", subtitle: "Track efficiency and\nrange over time.", systemName: "fuelpump")
-                ExpenseEducationCard(title: "Service", subtitle: "Keep your car in peak\ncondition.", systemName: "wrench.fill")
+                ExpenseEducationCard(title: i18n.t("Fuel Costs"), subtitle: i18n.t("Track efficiency and\nrange over time."), systemName: "fuelpump")
+                ExpenseEducationCard(title: i18n.t("Service"), subtitle: i18n.t("Keep your car in peak\ncondition."), systemName: "wrench.fill")
             }
         }
     }

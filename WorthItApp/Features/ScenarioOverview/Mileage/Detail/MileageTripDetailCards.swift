@@ -4,7 +4,7 @@ struct MileageTripDetailSourceCard: View {
     let model: MileageTripDetailScreen.Model
 
     var body: some View {
-        WIIsland(title: "Confidence Level", systemIcon: "circle.fill") {
+        WIIsland(title: i18n.t("Confidence Level"), systemIcon: "circle.fill") {
             VStack(alignment: .leading, spacing: WorthItSpacing.xl) {
                 HStack(spacing: WorthItSpacing.m) {
                     Circle()
@@ -55,10 +55,10 @@ struct MileageTripDetailMetadataCard: View {
     let model: MileageTripDetailScreen.Model
 
     var body: some View {
-        WIIsland(title: "Trip Metadata", systemIcon: "list.bullet.rectangle") {
+        WIIsland(title: i18n.t("Trip Metadata"), systemIcon: "list.bullet.rectangle") {
             VStack(spacing: WorthItSpacing.m) {
-                metadataRow(icon: "calendar", value: model.dateTimeText, label: "Date & Time")
-                metadataRow(icon: "point.topleft.down.curvedto.point.bottomright.up", value: model.distanceText, label: "Distance")
+                metadataRow(icon: "calendar", value: model.dateTimeText, label: i18n.t("Date & Time"))
+                metadataRow(icon: "point.topleft.down.curvedto.point.bottomright.up", value: model.distanceText, label: i18n.t("Distance"))
                 notesBlock
             }
         }

@@ -14,16 +14,16 @@ struct ScheduleServiceBasisSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
-            ScheduleServiceDivider(title: "SCHEDULE BASIS")
+            ScheduleServiceDivider(title: i18n.t("SCHEDULE BASIS"))
             basisInfo
 
             if model.isExpanded.wrappedValue {
                 HStack(spacing: WorthItSpacing.l) {
-                    WIDateField(label: "Basis date", placeholder: "MM/DD/YY", date: model.baselineDate)
+                    WIDateField(label: i18n.t("Basis date"), placeholder: i18n.t("MM/DD/YY"), date: model.baselineDate)
 
                     WITextField(
-                        label: "Basis odometer",
-                        placeholder: "0",
+                        label: i18n.t("Basis odometer"),
+                        placeholder: i18n.t("0"),
                         text: model.baselineOdometer,
                         trailingText: model.mileageUnit,
                         keyboardType: .numberPad

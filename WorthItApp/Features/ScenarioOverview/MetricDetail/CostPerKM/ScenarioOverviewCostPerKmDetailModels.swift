@@ -14,7 +14,7 @@ extension ScenarioOverviewView {
             efficiencyComparison: costPerKmDetailEfficiencyModel,
             summary: CostPerKmSummaryGrid.Model(
                 cost: CostPerKmSummaryGrid.Stat(
-                    title: "Total Costs",
+                    title: i18n.t("Total Costs"),
                     value: "\(currencySymbol)\(formatDouble(costPerKmBreakdownCost, fractionDigits: 0))",
                     unit: nil,
                     subtitle: costPerKmBreakdownCostSubtitle,
@@ -24,7 +24,7 @@ extension ScenarioOverviewView {
                     action: openExpensesPage
                 ),
                 distance: CostPerKmSummaryGrid.Stat(
-                    title: "Tracked Dist",
+                    title: i18n.t("Tracked Dist"),
                     value: "\(formatDouble(costPerKmBreakdownDistance, fractionDigits: 0))",
                     unit: mileageDisplayUnit,
                     subtitle: costPerKmMileageBasisLabel,

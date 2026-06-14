@@ -18,7 +18,7 @@ struct RecentExpensesList: View {
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.l) {
             HStack(alignment: .firstTextBaseline) {
-                ScenarioSectionTitle(title: "Recent expenses")
+                ScenarioSectionTitle(title: i18n.t("Recent expenses"))
 
                 Button(action: onOpenHistory) {
                     Text("View all")

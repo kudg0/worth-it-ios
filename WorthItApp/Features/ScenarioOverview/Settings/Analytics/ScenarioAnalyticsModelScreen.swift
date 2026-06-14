@@ -168,7 +168,7 @@ struct ScenarioAnalyticsModelScreen: View {
     }
 
     private var costBasisSection: some View {
-        settingsSection(title: "Cost Per KM Basis", subtitle: "Which ownership data should be used as the car baseline.") {
+        settingsSection(title: i18n.t("Cost Per KM Basis"), subtitle: i18n.t("Which ownership data should be used as the car baseline.")) {
             HStack(spacing: WorthItSpacing.l) {
                 ForEach(ScenarioAnalyticsCostPerKmBasis.allCases) { basis in
                     AnalyticsCostBasisTile(
@@ -185,7 +185,7 @@ struct ScenarioAnalyticsModelScreen: View {
     }
 
     private var trendDifferenceSection: some View {
-        settingsSection(title: "Trend Difference", subtitle: "How trend pills show change against the previous period.") {
+        settingsSection(title: i18n.t("Trend Difference"), subtitle: i18n.t("How trend pills show change against the previous period.")) {
             WISegmentedControl(
                 items: ScenarioAnalyticsDeltaDisplay.allCases.map { ($0.title, $0) },
                 selection: $deltaDisplay
@@ -194,7 +194,7 @@ struct ScenarioAnalyticsModelScreen: View {
     }
 
     private var calculationModelSection: some View {
-        settingsSection(title: "Calculation Model", subtitle: "Controls what affects ownership cost.") {
+        settingsSection(title: i18n.t("Calculation Model"), subtitle: i18n.t("Controls what affects ownership cost.")) {
             HStack(alignment: .center, spacing: WorthItSpacing.l) {
                 Image(systemName: includesResidualValue ? "car.fill" : "car")
                     .font(.system(size: 18, weight: .bold))

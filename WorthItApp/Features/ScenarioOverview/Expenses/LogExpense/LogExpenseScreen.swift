@@ -14,6 +14,7 @@ struct LogExpenseScreen: View {
         let recurringStartDate: Binding<Date?>
         let recurringEndDate: Binding<Date?>
         let serviceLink: LogExpenseServiceLink.Model
+        let resources: ScenarioResourceManagementSectionModel?
         let isEditing: Bool
         let sanitizeAmount: (String) -> String
         let onOpenDatePicker: () -> Void
@@ -34,9 +35,9 @@ struct LogExpenseScreen: View {
             LogExpenseCategorySection(category: model.category)
 
             VStack(spacing: WorthItSpacing.l) {
-                LogExpensePickerField(label: "Transaction Date", value: model.dateText, systemName: "calendar", action: model.onOpenDatePicker)
-                LogExpensePickerField(label: "Time", value: model.timeText, systemName: "clock", action: model.onOpenTimePicker)
-                LogExpenseNotesField(title: "Notes", placeholder: "Add details or receipt info...", text: model.notes)
+                LogExpensePickerField(label: i18n.t("Transaction Date"), value: model.dateText, systemName: "calendar", action: model.onOpenDatePicker)
+                LogExpensePickerField(label: i18n.t("Time"), value: model.timeText, systemName: "clock", action: model.onOpenTimePicker)
+                LogExpenseNotesField(title: i18n.t("Notes"), placeholder: i18n.t("Add details or receipt info..."), text: model.notes)
             }
 
             LogExpenseRecurringSection(
@@ -48,6 +49,10 @@ struct LogExpenseScreen: View {
             )
 
             LogExpenseServiceLink(model: model.serviceLink)
+
+            if let resources = model.resources {
+                ScenarioResourceManagementSection(model: resources)
+            }
 
             if model.isEditing {
                 LogExpenseDeleteButton(action: model.onDelete)

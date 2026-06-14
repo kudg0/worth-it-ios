@@ -87,7 +87,7 @@ struct BreakEvenDetailScreen: View {
             sectionLabel("Compare against")
 
             WISelectControl(
-                title: "Compare against",
+                title: i18n.t("Compare against"),
                 options: selectOptions,
                 selectedId: selectedOptionIdBinding
             ) {
@@ -141,7 +141,7 @@ struct BreakEvenDetailScreen: View {
     }
 
     private var calculation: some View {
-        WIIsland(title: "Calculation", systemIcon: "sum", spacing: WorthItSpacing.l, padding: WorthItSpacing.xl) {
+        WIIsland(title: i18n.t("Calculation"), systemIcon: "sum", spacing: WorthItSpacing.l, padding: WorthItSpacing.xl) {
             VStack(spacing: 0) {
                 ForEach(Array(model.calculationRows.enumerated()), id: \.element.id) { index, row in
                     calculationRow(row)
@@ -187,7 +187,7 @@ struct BreakEvenDetailScreen: View {
     }
 
     private var otherBenchmarks: some View {
-        WIIsland(title: "Other Benchmarks", systemIcon: "arrow.left.arrow.right", spacing: WorthItSpacing.l, padding: WorthItSpacing.xl) {
+        WIIsland(title: i18n.t("Other Benchmarks"), systemIcon: "arrow.left.arrow.right", spacing: WorthItSpacing.l, padding: WorthItSpacing.xl) {
             VStack(spacing: WorthItSpacing.s) {
                 ForEach(model.benchmarkRows) { row in
                     benchmarkBarRow(row)

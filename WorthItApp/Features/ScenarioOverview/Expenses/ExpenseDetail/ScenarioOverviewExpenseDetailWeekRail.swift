@@ -89,7 +89,7 @@ extension ScenarioOverviewView {
             WISelectSheetOption(
                 id: event.id.uuidString,
                 title: expenseDaySelectionTitle(for: event),
-                subtitle: "\(expenseCategoryTitle(for: event.category)) • \(Self.shortDateFormatter.string(from: event.date))",
+                subtitle: i18n.t("\(expenseCategoryTitle(for: event.category)) • \(Self.shortDateFormatter.string(from: event.date))"),
                 systemName: expenseIconName(for: event.category),
                 textBadge: expenseAmountPrecise(event)
             )

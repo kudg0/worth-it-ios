@@ -61,7 +61,7 @@ struct ScheduledServicesScreen: View {
     }
 
     private var calendarIsland: some View {
-        WIIsland(title: "Service Calendar", systemIcon: "calendar") {
+        WIIsland(title: i18n.t("Service Calendar"), systemIcon: "calendar") {
             VStack(spacing: WorthItSpacing.xl) {
                 monthHeader
                 selectedDayReset
@@ -242,8 +242,8 @@ struct ScheduledServicesScreen: View {
 
     private var emptyState: some View {
         ScenarioWideAction(
-            title: "No service on this day",
-            subtitle: "Choose another marked date or show the full schedule.",
+            title: i18n.t("No service on this day"),
+            subtitle: i18n.t("Choose another marked date or show the full schedule."),
             systemName: "calendar"
         ) {
             withAnimation(.easeInOut(duration: 0.18)) {

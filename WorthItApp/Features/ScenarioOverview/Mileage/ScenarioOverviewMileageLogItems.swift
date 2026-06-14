@@ -17,7 +17,7 @@ extension ScenarioOverviewView {
                     MileageLogItem(
                         id: event.id,
                         kind: .odometer,
-                        title: "Odometer Update",
+                        title: i18n.t("Odometer Update"),
                         subtitle: mileageEventSubtitle(event.note, fallback: "Odometer reading"),
                         previousOdometer: previousReading,
                         currentOdometer: currentReading,
@@ -32,7 +32,7 @@ extension ScenarioOverviewView {
                     MileageLogItem(
                         id: event.id,
                         kind: .trip,
-                        title: "Trip Added",
+                        title: i18n.t("Trip Added"),
                         subtitle: mileageEventSubtitle(event.note, fallback: "Trip"),
                         previousOdometer: nil,
                         currentOdometer: nil,

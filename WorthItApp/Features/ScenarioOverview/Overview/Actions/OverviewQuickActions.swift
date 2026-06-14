@@ -10,9 +10,9 @@ struct OverviewQuickActions: View {
             columns: Array(repeating: GridItem(.flexible(), spacing: WorthItSpacing.m), count: 3),
             spacing: WorthItSpacing.m
         ) {
-            OverviewQuickAction(title: "Expense", systemName: "plus", action: onAddExpense)
-            OverviewQuickAction(title: "Usage", systemName: "speedometer", action: onOpenUsage)
-            OverviewQuickAction(title: "Compare", systemName: "arrow.left.arrow.right", action: onOpenCompare)
+            OverviewQuickAction(title: i18n.t("Expense"), systemName: "plus", action: onAddExpense)
+            OverviewQuickAction(title: i18n.t("Usage"), systemName: "speedometer", action: onOpenUsage)
+            OverviewQuickAction(title: i18n.t("Compare"), systemName: "arrow.left.arrow.right", action: onOpenCompare)
         }
     }
 }

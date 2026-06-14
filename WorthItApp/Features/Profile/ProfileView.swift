@@ -19,34 +19,34 @@ struct ProfileView: View {
             identityHeader
 
             VStack(alignment: .leading, spacing: WorthItSpacing.xxxl) {
-                ProfileSection(title: "Identity") {
-                    ProfileRow(title: "Name", value: displayName, systemIcon: "person")
-                    ProfileRow(title: "Email", value: email, systemIcon: "envelope")
+                ProfileSection(title: i18n.t("Identity")) {
+                    ProfileRow(title: i18n.t("Name"), value: displayName, systemIcon: "person")
+                    ProfileRow(title: i18n.t("Email"), value: email, systemIcon: "envelope")
                 }
 
-                ProfileSection(title: "Localization") {
+                ProfileSection(title: i18n.t("Localization")) {
                     ProfileSelectableRow(
-                        title: "Region",
+                        title: i18n.t("Region"),
                         value: regionTitle,
                         systemIcon: "globe.europe.africa"
                     ) {
                         openSelect(.region)
                     }
-                    ProfileSelectableRow(title: "Currency", value: settings.currency, systemIcon: "banknote") {
+                    ProfileSelectableRow(title: i18n.t("Currency"), value: settings.currency, systemIcon: "banknote") {
                         openSelect(.currency)
                     }
-                    ProfileSelectableRow(title: "Distance", value: distanceTitle, systemIcon: "ruler") {
+                    ProfileSelectableRow(title: i18n.t("Distance"), value: distanceTitle, systemIcon: "ruler") {
                         openSelect(.distance)
                     }
                 }
 
                 if let settingsError {
-                    WITipInfo(title: "Settings not saved", bodyText: settingsError, size: .small, tone: .info)
+                    WITipInfo(title: i18n.t("Settings not saved"), bodyText: settingsError, size: .small, tone: .info)
                 }
 
-                ProfileSection(title: "Security") {
+                ProfileSection(title: i18n.t("Security")) {
                     ProfileRow(
-                        title: "Sign-in Method",
+                        title: i18n.t("Sign-in Method"),
                         value: "Email connected",
                         systemIcon: "shield.checkered",
                         valueColor: WorthItColor.primaryContainer,
@@ -495,12 +495,12 @@ private struct ProfileSettingsSelectSheet: View {
                             }
 
                             if filteredSections.isEmpty {
-                                WITipInfo(title: "No results", bodyText: "Try another search.", size: .small, tone: .info)
+                                WITipInfo(title: i18n.t("No results"), bodyText: i18n.t("Try another search."), size: .small, tone: .info)
                                     .padding(.top, WorthItSpacing.m)
                             }
 
                             if let errorText {
-                                WITipInfo(title: "Not saved", bodyText: errorText, size: .small, tone: .info)
+                                WITipInfo(title: i18n.t("Not saved"), bodyText: errorText, size: .small, tone: .info)
                                     .padding(.top, WorthItSpacing.m)
                             }
                         }
@@ -637,7 +637,7 @@ private struct ProfileSettingsSelectSheet: View {
             .frame(height: 28)
             .allowsHitTesting(false)
 
-            WITipInfo(title: "Default setting", bodyText: infoText, size: .small, tone: .info)
+            WITipInfo(title: i18n.t("Default setting"), bodyText: infoText, size: .small, tone: .info)
                 .padding(.horizontal, WorthItSpacing.xxl)
                 .padding(.bottom, WorthItSpacing.m)
                 .background(WorthItColor.pageBackground)

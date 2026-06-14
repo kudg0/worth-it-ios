@@ -99,21 +99,21 @@ struct ScenarioTopBar: View {
         ZStack {
             RadialGradient(
                 colors: [
-                    WorthItColor.primaryContainer.opacity(0.20),
-                    WorthItColor.primaryContainer.opacity(0.07),
+                    WorthItColor.primaryContainer.opacity(0.10),
+                    WorthItColor.primaryContainer.opacity(0.025),
                     .clear
                 ],
                 center: .center,
                 startRadius: 1,
-                endRadius: 26
+                endRadius: 24
             )
-            .frame(width: 54, height: 54)
-            .blur(radius: 2)
+            .frame(width: 48, height: 48)
+            .blur(radius: 3)
 
             Image(systemName: systemName)
                 .font(.system(size: size, weight: weight))
                 .foregroundStyle(WorthItColor.primaryContainer)
-                .shadow(color: WorthItColor.primaryContainer.opacity(0.28), radius: 10)
+                .shadow(color: WorthItColor.primaryContainer.opacity(0.12), radius: 5)
         }
     }
 }

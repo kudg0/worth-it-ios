@@ -61,9 +61,9 @@ struct ScenarioMileageScreen: View {
 
     private var metrics: some View {
         HStack(spacing: WorthItSpacing.l) {
-            metric(title: "Last Update", value: lastUpdateText, color: WorthItColor.textPrimary)
-            metric(title: "This Month", value: thisMonthText, color: WorthItColor.accentGold)
-            metric(title: "Avg / Day", value: averagePerDayText, color: WorthItColor.textPrimary)
+            metric(title: i18n.t("Last Update"), value: lastUpdateText, color: WorthItColor.textPrimary)
+            metric(title: i18n.t("This Month"), value: thisMonthText, color: WorthItColor.accentGold)
+            metric(title: i18n.t("Avg / Day"), value: averagePerDayText, color: WorthItColor.textPrimary)
         }
         .padding(.top, WorthItSpacing.xl)
         .overlay(alignment: .top) {
@@ -110,11 +110,11 @@ struct ScenarioMileageScreen: View {
     @ViewBuilder
     private var activityContent: some View {
         if let usageEventsError {
-            WITipInfo(title: "Mileage unavailable", bodyText: usageEventsError)
+            WITipInfo(title: i18n.t("Mileage unavailable"), bodyText: usageEventsError)
         } else if logItems.isEmpty {
             WITipInfo(
-                title: "No mileage logged",
-                bodyText: "No mileage logged yet. Log odometer updates or trips to make mileage history and cost per distance real."
+                title: i18n.t("No mileage logged"),
+                bodyText: i18n.t("No mileage logged yet. Log odometer updates or trips to make mileage history and cost per distance real.")
             )
         } else if currentMonthItems.isEmpty {
             currentMonthNoMileageState

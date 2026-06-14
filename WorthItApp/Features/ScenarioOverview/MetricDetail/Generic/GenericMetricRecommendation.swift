@@ -35,7 +35,7 @@ struct GenericMetricRecommendation: View {
                 .lineSpacing(5)
                 .fixedSize(horizontal: false, vertical: true)
 
-            WIButton(title: "Generate Full Appraisal", iconSystemName: "doc.text", action: model.onGenerateFullAppraisal)
+            WIButton(title: i18n.t("Generate Full Appraisal"), iconSystemName: "doc.text", action: model.onGenerateFullAppraisal)
                 .padding(.top, WorthItSpacing.s)
         }
         .padding(WorthItSpacing.xxl)

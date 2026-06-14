@@ -120,8 +120,8 @@ extension ScenarioOverviewView {
         return [
             ExpenseMonthGroup.SyntheticItem(
                 id: "loan-interest-\(expenseHistoryMonthIdentifier(for: monthStart))",
-                title: "Loan interest accrued",
-                subtitle: "Financing cost • \(expenseHistoryMonthLabel(for: monthStart))",
+                title: i18n.t("Loan interest accrued"),
+                subtitle: i18n.t("Financing cost • \(expenseHistoryMonthLabel(for: monthStart))"),
                 value: loanInterest,
                 valueText: "\(currencySymbol)\(formatDouble(loanInterest, fractionDigits: 2))",
                 detail: "Loan interest",

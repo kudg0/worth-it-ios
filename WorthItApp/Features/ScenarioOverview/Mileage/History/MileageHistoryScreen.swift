@@ -18,11 +18,11 @@ struct MileageHistoryScreen: View {
             MileageHistoryHero(model: model.hero)
 
             if let usageEventsError = model.hero.usageEventsError {
-                WITipInfo(title: "Mileage unavailable", bodyText: usageEventsError)
+                WITipInfo(title: i18n.t("Mileage unavailable"), bodyText: usageEventsError)
             } else if model.groups.isEmpty {
                 WITipInfo(
-                    title: "No mileage found",
-                    bodyText: "No mileage entries have been logged yet."
+                    title: i18n.t("No mileage found"),
+                    bodyText: i18n.t("No mileage entries have been logged yet.")
                 )
             } else {
                 MileageHistoryList(model: listModel)

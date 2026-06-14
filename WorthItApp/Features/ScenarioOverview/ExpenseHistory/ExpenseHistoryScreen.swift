@@ -27,8 +27,8 @@ struct ExpenseHistoryScreen: View {
 
             if model.groups.isEmpty {
                 WITipInfo(
-                    title: "No expenses found",
-                    bodyText: "There are no matching expenses for this filter yet.",
+                    title: i18n.t("No expenses found"),
+                    bodyText: i18n.t("There are no matching expenses for this filter yet."),
                     size: .medium,
                     tone: .info
                 )

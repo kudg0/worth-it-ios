@@ -37,7 +37,7 @@ struct OverviewMetricHero: View {
     private var emptyMetric: ScenarioOverviewView.MetricSlide {
         ScenarioOverviewView.MetricSlide(
             id: .monthlyCost,
-            title: "Summary",
+            title: i18n.t("Summary"),
             value: "-",
             subtitle: nil,
             footer: "ADD USAGE OR COST DATA",

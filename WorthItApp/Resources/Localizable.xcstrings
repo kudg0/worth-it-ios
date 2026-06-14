@@ -1,0 +1,174 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "brand.name": {
+      "comment": "App brand name.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Worth It"
+          }
+        }
+      }
+    },
+    "scenarios.title": {
+      "comment": "Scenarios list screen title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenarios"
+          }
+        }
+      }
+    },
+    "scenarios.subtitle": {
+      "comment": "Scenarios list screen subtitle.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Track ownership decisions and open a scenario overview."
+          }
+        }
+      }
+    },
+    "scenarios.cards.create.title": {
+      "comment": "Create scenario card title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create New Scenario"
+          }
+        }
+      }
+    },
+    "scenarios.card.type.carOwnership": {
+      "comment": "Scenario type label for a car ownership scenario.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Car Ownership"
+          }
+        }
+      }
+    },
+    "scenarios.metrics.purchase": {
+      "comment": "Scenario purchase price metric label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Purchase"
+          }
+        }
+      }
+    },
+    "scenarios.metrics.odometer": {
+      "comment": "Scenario odometer metric label.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odometer"
+          }
+        }
+      }
+    },
+    "scenarios.offline.title": {
+      "comment": "Offline state title on the scenarios screen.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Worth It is temporarily offline"
+          }
+        }
+      }
+    },
+    "scenarios.offline.body": {
+      "comment": "Offline state body on the scenarios screen.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We could not reach Worth It servers right now. Check your connection or try again in a moment."
+          }
+        }
+      }
+    },
+    "common.actions.retry": {
+      "comment": "Generic retry action.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        }
+      }
+    },
+    "tabs.scenarios": {
+      "comment": "Bottom tab accessibility label for scenarios.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenarios"
+          }
+        }
+      }
+    },
+    "tabs.profile": {
+      "comment": "Bottom tab accessibility label for profile.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile"
+          }
+        }
+      }
+    },
+    "scenarios.actions.create.title": {
+      "comment": "Create scenario button title.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create Scenario"
+          }
+        }
+      }
+    },
+    "scenarios.actions.create.accessibilityLabel": {
+      "comment": "Accessibility label for the create scenario icon button.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create scenario"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.1"
+}

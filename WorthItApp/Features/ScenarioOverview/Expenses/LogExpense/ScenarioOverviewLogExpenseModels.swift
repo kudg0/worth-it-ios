@@ -15,6 +15,7 @@ extension ScenarioOverviewView {
             recurringStartDate: $recurringStartDate,
             recurringEndDate: $recurringEndDate,
             serviceLink: logExpenseServiceLinkModel,
+            resources: resourceManagementModel(for: editingCostEvent),
             isEditing: editingCostEvent != nil,
             sanitizeAmount: sanitizedDecimalInput,
             onOpenDatePicker: { activeLogExpensePicker = .date },

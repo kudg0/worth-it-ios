@@ -19,9 +19,15 @@ struct RootView: View {
                 )
             }
         }
+        .environment(\.i18n, I18n(localeIdentifier: localeIdentifier))
+        .environment(\.locale, Locale(identifier: localeIdentifier))
         .onReceive(NotificationCenter.default.publisher(for: .apiUnauthorized)) { _ in
             handleUnauthorized()
         }
+    }
+
+    private var localeIdentifier: String {
+        "en"
     }
 
     private var appShell: some View {

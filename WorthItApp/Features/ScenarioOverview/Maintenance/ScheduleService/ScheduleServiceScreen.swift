@@ -7,6 +7,7 @@ struct ScheduleServiceScreen: View {
         let basis: ScheduleServiceBasisSection.Model
         let trigger: ScheduleServiceTriggerSection.Model
         let details: Binding<String>
+        let resources: ScenarioResourceManagementSectionModel?
     }
 
     let model: Model
@@ -16,7 +17,7 @@ struct ScheduleServiceScreen: View {
             header
 
             WISelectField(
-                label: "Service type",
+                label: i18n.t("Service type"),
                 options: model.serviceTypeOptions,
                 selection: model.selectedServiceType
             )
@@ -25,14 +26,18 @@ struct ScheduleServiceScreen: View {
             ScheduleServiceTriggerSection(model: model.trigger)
 
             LogExpenseNotesField(
-                title: "Details",
-                placeholder: "Add specific instructions, part numbers, or preferred mechanic...",
+                title: i18n.t("Details"),
+                placeholder: i18n.t("Add specific instructions, part numbers, or preferred mechanic..."),
                 text: model.details
             )
 
+            if let resources = model.resources {
+                ScenarioResourceManagementSection(model: resources)
+            }
+
             WITipInfo(
-                title: "Smart Insight",
-                bodyText: "Based on your driving history, your brake pads usually require attention around this time of year. Consider an inspection to be safe.",
+                title: i18n.t("Smart Insight"),
+                bodyText: i18n.t("Based on your driving history, your brake pads usually require attention around this time of year. Consider an inspection to be safe."),
                 size: .medium,
                 tone: .primary
             )

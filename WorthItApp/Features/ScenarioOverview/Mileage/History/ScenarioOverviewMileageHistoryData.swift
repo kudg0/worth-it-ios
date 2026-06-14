@@ -46,7 +46,7 @@ extension ScenarioOverviewView {
         return mileageHistoryBars.last ?? MileageHistoryBar(
             monthStart: currentMonthStart,
             selectionId: expenseHistoryMonthIdentifier(for: currentMonthStart),
-            label: "Now",
+            label: i18n.t("Now"),
             total: 0,
             previousTotal: nil,
             count: 0,

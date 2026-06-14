@@ -117,6 +117,66 @@ enum ScenarioOverviewTab: Hashable {
     case settings
 }
 
+enum ScenarioResourceOwner: Identifiable, Hashable {
+    case costEvent(UUID)
+    case scheduledService(UUID)
+
+    var id: String {
+        switch self {
+        case .costEvent(let id): "costEvent-\(id.uuidString)"
+        case .scheduledService(let id): "scheduledService-\(id.uuidString)"
+        }
+    }
+}
+
+enum ScenarioResourceUploadSource: Identifiable, Hashable {
+    case owner(ScenarioResourceOwner)
+
+    var id: String {
+        switch self {
+        case .owner(let owner): owner.id
+        }
+    }
+}
+
+enum ScenarioResourceLinkEditor: Identifiable, Hashable {
+    case create(ScenarioResourceOwner)
+    case edit(ResourceLink)
+
+    var id: String {
+        switch self {
+        case .create(let owner): "create-link-\(owner.id)"
+        case .edit(let link): "edit-link-\(link.id.uuidString)"
+        }
+    }
+}
+
+enum ScenarioResourceLocationEditor: Identifiable, Hashable {
+    case create(ScenarioResourceOwner)
+    case edit(ResourceLocation)
+
+    var id: String {
+        switch self {
+        case .create(let owner): "create-location-\(owner.id)"
+        case .edit(let location): "edit-location-\(location.id.uuidString)"
+        }
+    }
+}
+
+enum ScenarioResourceAction: Identifiable, Hashable {
+    case attachment(ResourceAttachment)
+    case link(ResourceLink)
+    case location(ResourceLocation)
+
+    var id: String {
+        switch self {
+        case .attachment(let attachment): "attachment-\(attachment.id.uuidString)"
+        case .link(let link): "link-\(link.id.uuidString)"
+        case .location(let location): "location-\(location.id.uuidString)"
+        }
+    }
+}
+
 enum ScenarioOverviewEntryKind: Hashable {
     case expense
     case service

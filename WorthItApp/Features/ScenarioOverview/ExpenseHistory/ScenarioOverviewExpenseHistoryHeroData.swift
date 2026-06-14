@@ -48,11 +48,11 @@ extension ScenarioOverviewView {
 
     var currentMonthTrend: MetricTrend {
         guard currentMonthExpenseCount > 0 else {
-            return MetricTrend(label: "NO DATA AVAILABLE FOR THIS MONTH", iconName: "info.circle.fill", color: WorthItColor.textTertiary)
+            return MetricTrend(label: i18n.t("NO DATA AVAILABLE FOR THIS MONTH"), iconName: "info.circle.fill", color: WorthItColor.textTertiary)
         }
 
         guard previousMonthExpenseCount > 0 else {
-            return MetricTrend(label: "NO PREVIOUS MONTH DATA", iconName: "minus", color: WorthItColor.textTertiary)
+            return MetricTrend(label: i18n.t("NO PREVIOUS MONTH DATA"), iconName: "minus", color: WorthItColor.textTertiary)
         }
 
         let current = currentMonthExpenseTotal
@@ -62,7 +62,7 @@ extension ScenarioOverviewView {
         let sign = delta >= 0 ? "+" : "-"
 
         return MetricTrend(
-            label: "\(sign)\(currencySymbol)\(formatDecimal(abs(delta), fractionDigits: 0)) VS \(previousMonthName.uppercased())",
+            label: i18n.t("\(sign)\(currencySymbol)\(formatDecimal(abs(delta), fractionDigits: 0)) VS \(previousMonthName.uppercased())"),
             iconName: trend.iconName,
             color: trend.color
         )

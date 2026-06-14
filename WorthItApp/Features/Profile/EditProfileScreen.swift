@@ -37,7 +37,7 @@ struct EditProfileScreen: View {
                     identityCard
                     securitySection
                     if let errorText {
-                        WITipInfo(title: "Profile not saved", bodyText: errorText, size: .small, tone: .info)
+                        WITipInfo(title: i18n.t("Profile not saved"), bodyText: errorText, size: .small, tone: .info)
                     }
                     actionStack
                 }
@@ -95,13 +95,13 @@ struct EditProfileScreen: View {
 
             VStack(spacing: WorthItSpacing.xl) {
                 AccountProfileField(
-                    label: "FULL NAME",
+                    label: i18n.t("FULL NAME"),
                     text: $fullName,
                     systemName: "person"
                 )
 
                 AccountProfileField(
-                    label: "EMAIL ADDRESS",
+                    label: i18n.t("EMAIL ADDRESS"),
                     text: $email,
                     systemName: "envelope",
                     keyboardType: .emailAddress
@@ -171,7 +171,7 @@ struct EditProfileScreen: View {
 
             VStack(spacing: 0) {
                 AccountInfoRow(
-                    title: "Account Status",
+                    title: i18n.t("Account Status"),
                     value: "Verified",
                     systemName: "shield.checkered",
                     valueColor: WorthItColor.accentGold
@@ -182,7 +182,7 @@ struct EditProfileScreen: View {
                     .padding(.leading, 72)
 
                 AccountInfoRow(
-                    title: "Linked Identity",
+                    title: i18n.t("Linked Identity"),
                     value: linkedIdentity,
                     systemName: "link"
                 )
@@ -198,13 +198,13 @@ struct EditProfileScreen: View {
 
     private var actionStack: some View {
         VStack(spacing: WorthItSpacing.m) {
-            WIButton(title: "SAVE CHANGES", height: 56) {
+            WIButton(title: i18n.t("SAVE CHANGES"), height: 56) {
                 save()
             }
             .opacity(isSaving ? 0.62 : 1)
             .allowsHitTesting(!isSaving)
 
-            WIButton(title: "DISCARD", style: .outline, height: 56, action: onDiscard)
+            WIButton(title: i18n.t("DISCARD"), style: .outline, height: 56, action: onDiscard)
         }
         .padding(.top, WorthItSpacing.xxxl)
     }

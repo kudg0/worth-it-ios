@@ -19,14 +19,14 @@ struct ScenarioActionsOverlay: View {
             )
 
             actionButton(
-                title: "Edit Scenario",
+                title: i18n.t("Edit Scenario"),
                 systemName: "pencil",
                 isDisabled: isDeleting,
                 action: onEditScenario
             )
 
             actionButton(
-                title: "Delete Scenario",
+                title: i18n.t("Delete Scenario"),
                 systemName: "trash",
                 foregroundColor: WorthItColor.danger,
                 iconForegroundColor: WorthItColor.danger,

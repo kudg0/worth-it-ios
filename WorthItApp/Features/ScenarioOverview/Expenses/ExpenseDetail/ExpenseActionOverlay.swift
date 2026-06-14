@@ -6,7 +6,7 @@ struct ExpenseActionOverlay: View {
 
     var body: some View {
         ScenarioBottomActionSheet(onDismiss: onDismiss) {
-            actionButton(title: "Edit", systemName: "pencil", action: onEdit)
+            actionButton(title: i18n.t("Edit"), systemName: "pencil", action: onEdit)
         }
     }
 

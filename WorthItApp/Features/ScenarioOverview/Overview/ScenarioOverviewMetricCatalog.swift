@@ -61,7 +61,7 @@ extension ScenarioOverviewView {
             let trend = monthlyCostTrend
             return MetricSlide(
                 id: metric,
-                title: "Monthly Cost",
+                title: i18n.t("Monthly Cost"),
                 value: monthlySpend,
                 subtitle: nil,
                 footer: trend.label,
@@ -75,7 +75,7 @@ extension ScenarioOverviewView {
             let trend = costPerKmTrend
             return MetricSlide(
                 id: metric,
-                title: "Cost per KM",
+                title: i18n.t("Cost per KM"),
                 value: costPerKm,
                 subtitle: nil,
                 footer: trend.label,
@@ -90,7 +90,7 @@ extension ScenarioOverviewView {
             guard totalLoggedExpensesValue > 0 else { return nil }
             return MetricSlide(
                 id: metric,
-                title: "Total Expenses",
+                title: i18n.t("Total Expenses"),
                 value: totalLoggedExpensesDisplay,
                 subtitle: totalExpenseEntriesSubtitle,
                 footer: "OPEN HISTORY",
@@ -104,7 +104,7 @@ extension ScenarioOverviewView {
             let trend = totalOwnershipTrend
             return MetricSlide(
                 id: metric,
-                title: "Total Ownership",
+                title: i18n.t("Total Ownership"),
                 value: totalOwnershipDisplay,
                 subtitle: nil,
                 footer: trend.label,
@@ -118,9 +118,9 @@ extension ScenarioOverviewView {
             let snapshot = alternativeSavingsSnapshot(for: selected)
             return MetricSlide(
                 id: metric,
-                title: "Savings",
+                title: i18n.t("Savings"),
                 value: savingsHeroValue(for: snapshot),
-                subtitle: "vs \(selected.alternativeName)",
+                subtitle: i18n.t("vs \(selected.alternativeName)"),
                 footer: savingsStatusPill(for: snapshot),
                 footerIcon: snapshot?.isSaving == false ? "arrow.down.right" : "arrow.up.right",
                 footerColor: savingsColor(for: snapshot),
@@ -131,7 +131,7 @@ extension ScenarioOverviewView {
             guard projectedGain > 0 else { return nil }
             return MetricSlide(
                 id: metric,
-                title: "Projected Gain",
+                title: i18n.t("Projected Gain"),
                 value: "\(currencySymbol)\(formatDecimal(projectedGain, fractionDigits: 0))",
                 subtitle: nil,
                 footer: "RESALE ABOVE KNOWN COSTS",
@@ -144,7 +144,7 @@ extension ScenarioOverviewView {
             guard expectedResaleValue > 0 else { return nil }
             return MetricSlide(
                 id: metric,
-                title: "Expected Resale",
+                title: i18n.t("Expected Resale"),
                 value: expectedResaleDisplay,
                 subtitle: nil,
                 footer: expectedResaleValue >= purchasePrice ? "ABOVE PURCHASE PRICE" : nil,
@@ -157,7 +157,7 @@ extension ScenarioOverviewView {
             guard loanInterestTotal > 0 else { return nil }
             return MetricSlide(
                 id: metric,
-                title: "Loan Interest",
+                title: i18n.t("Loan Interest"),
                 value: "\(currencySymbol)\(formatDecimal(loanInterestTotal, fractionDigits: 0))",
                 subtitle: loanPaymentSubtitle,
                 footer: "OVER LOAN TERM",

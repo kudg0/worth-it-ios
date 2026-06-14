@@ -4,6 +4,6 @@ struct APIEnvironment: Sendable {
     let baseURL: URL
 
     static let development = APIEnvironment(
-        baseURL: URL(string: "http://localhost:3000")!
+        baseURL: URL(string: "http://127.0.0.1:3000")!
     )
 }

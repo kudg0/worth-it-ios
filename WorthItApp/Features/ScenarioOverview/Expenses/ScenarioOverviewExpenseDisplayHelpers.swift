@@ -20,8 +20,8 @@ extension ScenarioOverviewView {
 
         let loanItem = RecentExpenseItem(
             id: "loan-interest-\(expenseHistoryMonthIdentifier(for: currentMonthStart))",
-            title: "Loan interest accrued",
-            subtitle: "Financing cost • \(expenseHistoryMonthLabel(for: currentMonthStart))",
+            title: i18n.t("Loan interest accrued"),
+            subtitle: i18n.t("Financing cost • \(expenseHistoryMonthLabel(for: currentMonthStart))"),
             value: "\(currencySymbol)\(formatDouble(loanInterest, fractionDigits: 0))",
             detail: "Loan interest",
             systemIcon: "building.columns.fill",

@@ -163,15 +163,15 @@ struct CreateScenarioFlowView: View {
 
             VStack(spacing: WorthItSpacing.l) {
                 WIOptionCard(
-                    title: "Car Ownership",
-                    subtitle: "Analyze purchase costs, maintenance, and resale value.",
+                    title: i18n.t("Car Ownership"),
+                    subtitle: i18n.t("Analyze purchase costs, maintenance, and resale value."),
                     systemIcon: "car.fill",
                     state: .selected
                 )
 
                 WIOptionCard(
-                    title: "Other Assets",
-                    subtitle: "Real estate and high-value collectibles tracking.",
+                    title: i18n.t("Other Assets"),
+                    subtitle: i18n.t("Real estate and high-value collectibles tracking."),
                     systemIcon: "square.grid.2x2.fill",
                     state: .disabled,
                     badge: "COMING SOON"
@@ -180,7 +180,7 @@ struct CreateScenarioFlowView: View {
 
             WITipInfo(
                 title: "",
-                bodyText: "For cars, you’ll add vehicle details, acquisition type, and alternatives next.",
+                bodyText: i18n.t("For cars, you’ll add vehicle details, acquisition type, and alternatives next."),
                 size: .medium,
                 tone: .info
             )
@@ -209,10 +209,10 @@ struct CreateScenarioFlowView: View {
     }
 
     private var assetSnapshot: some View {
-        WIIsland(title: "Asset Snapshot", systemIcon: "car.fill") {
+        WIIsland(title: i18n.t("Asset Snapshot"), systemIcon: "car.fill") {
             VStack(spacing: WorthItSpacing.xxl) {
                 WITextField(
-                    label: "Vehicle Name",
+                    label: i18n.t("Vehicle Name"),
                     placeholder: acquisitionType == .cash ? "e.g. Porsche 911" : "e.g. BMW i4 M50",
                     text: $vehicleName,
                     errorText: displayedError(for: .vehicleName)
@@ -221,16 +221,16 @@ struct CreateScenarioFlowView: View {
 
                 HStack(alignment: .top, spacing: WorthItSpacing.l) {
                     WIDateField(
-                        label: "Purchase Date",
-                        placeholder: "MM/DD/YY",
+                        label: i18n.t("Purchase Date"),
+                        placeholder: i18n.t("MM/DD/YY"),
                         date: $purchaseDate,
                         errorText: displayedError(for: .purchaseDate)
                     )
                     .onChange(of: purchaseDate) { _, _ in clearError(.purchaseDate) }
 
                     WITextField(
-                        label: "Initial Odometer",
-                        placeholder: "0",
+                        label: i18n.t("Initial Odometer"),
+                        placeholder: i18n.t("0"),
                         text: $odometer,
                         trailingText: "km",
                         keyboardType: .numberPad,
@@ -241,8 +241,8 @@ struct CreateScenarioFlowView: View {
 
                 HStack(alignment: .top, spacing: WorthItSpacing.l) {
                     WITextField(
-                        label: "Expected Resale Value",
-                        placeholder: "0",
+                        label: i18n.t("Expected Resale Value"),
+                        placeholder: i18n.t("0"),
                         text: $resaleValue,
                         leadingText: currencySymbol,
                         keyboardType: .decimalPad,
@@ -251,7 +251,7 @@ struct CreateScenarioFlowView: View {
                     .frame(maxWidth: .infinity)
                     .onChange(of: resaleValue) { _, _ in clearError(.resaleValue) }
 
-                    WISelectField(label: "Currency", options: currencies, selection: $currency)
+                    WISelectField(label: i18n.t("Currency"), options: currencies, selection: $currency)
                         .frame(width: 112)
                 }
             }
@@ -260,7 +260,7 @@ struct CreateScenarioFlowView: View {
 
     private var acquisitionDetails: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxl) {
-            sectionHeader(title: "Acquisition Details", systemIcon: "building.columns.fill")
+            sectionHeader(title: i18n.t("Acquisition Details"), systemIcon: "building.columns.fill")
 
             WISegmentedControl(
                 items: [("Cash", AcquisitionType.cash), ("Loan", AcquisitionType.loan)],
@@ -270,8 +270,8 @@ struct CreateScenarioFlowView: View {
             VStack(spacing: WorthItSpacing.xxl) {
                 HStack(alignment: .top, spacing: WorthItSpacing.l) {
                     WITextField(
-                        label: "Vehicle Price",
-                        placeholder: "0",
+                        label: i18n.t("Vehicle Price"),
+                        placeholder: i18n.t("0"),
                         text: $vehiclePrice,
                         leadingText: currencySymbol,
                         keyboardType: .decimalPad,
@@ -280,7 +280,7 @@ struct CreateScenarioFlowView: View {
                     .frame(maxWidth: .infinity)
                     .onChange(of: vehiclePrice) { _, _ in clearError(.vehiclePrice) }
 
-                    WISelectField(label: "Currency", options: currencies, selection: $currency)
+                    WISelectField(label: i18n.t("Currency"), options: currencies, selection: $currency)
                         .frame(width: 112)
                 }
 
@@ -290,7 +290,7 @@ struct CreateScenarioFlowView: View {
                 } else {
                     WITipInfo(
                         title: "",
-                        bodyText: "Cash acquisition avoids interest drag, but we still factor in capital depreciation to show your real ownership cost.",
+                        bodyText: i18n.t("Cash acquisition avoids interest drag, but we still factor in capital depreciation to show your real ownership cost."),
                         size: .small,
                         tone: .info
                     )
@@ -303,8 +303,8 @@ struct CreateScenarioFlowView: View {
         VStack(spacing: WorthItSpacing.xxl) {
             HStack(alignment: .top, spacing: WorthItSpacing.l) {
                 WITextField(
-                    label: "Loan Amount",
-                    placeholder: "0",
+                    label: i18n.t("Loan Amount"),
+                    placeholder: i18n.t("0"),
                     text: $loanAmount,
                     leadingText: currencySymbol,
                     keyboardType: .decimalPad,
@@ -312,13 +312,13 @@ struct CreateScenarioFlowView: View {
                 )
                 .onChange(of: loanAmount) { _, _ in clearError(.loanAmount) }
 
-                calculatedMetricField(label: "Monthly Payment", value: formattedMoney(calculatedMonthlyPayment))
+                calculatedMetricField(label: i18n.t("Monthly Payment"), value: formattedMoney(calculatedMonthlyPayment))
             }
 
             HStack(alignment: .top, spacing: WorthItSpacing.l) {
                 WITextField(
-                    label: "Loan Term (mo)",
-                    placeholder: "48",
+                    label: i18n.t("Loan Term (mo)"),
+                    placeholder: i18n.t("48"),
                     text: $loanTerm,
                     keyboardType: .numberPad,
                     errorText: displayedError(for: .loanTerm)
@@ -326,8 +326,8 @@ struct CreateScenarioFlowView: View {
                 .onChange(of: loanTerm) { _, _ in clearError(.loanTerm) }
 
                 WITextField(
-                    label: "Interest Rate",
-                    placeholder: "4.5",
+                    label: i18n.t("Interest Rate"),
+                    placeholder: i18n.t("4.5"),
                     text: $interestRate,
                     trailingText: "%",
                     keyboardType: .decimalPad,
@@ -474,11 +474,11 @@ struct CreateScenarioFlowView: View {
             .allowsHitTesting(false)
 
             VStack(spacing: WorthItSpacing.l) {
-                WIButton(title: "Open Overview", height: 52) {
+                WIButton(title: i18n.t("Open Overview"), height: 52) {
                     openCreatedScenarioOverview()
                 }
 
-                WIButton(title: "Go to Comparison", style: .secondary, height: 56) {
+                WIButton(title: i18n.t("Go to Comparison"), style: .secondary, height: 56) {
                     openCreatedScenarioOverview()
                 }
             }
@@ -537,11 +537,11 @@ struct CreateScenarioFlowView: View {
 
     private var successSummaryCard: some View {
         VStack(spacing: 0) {
-            summaryRow(label: "Asset Name", value: vehicleName.trimmingCharacters(in: .whitespacesAndNewlines))
+            summaryRow(label: i18n.t("Asset Name"), value: vehicleName.trimmingCharacters(in: .whitespacesAndNewlines))
             divider
-            summaryRow(label: "Type", value: "Ownership Scenario", valueColor: Color(hex: 0x60A5FA))
+            summaryRow(label: i18n.t("Type"), value: "Ownership Scenario", valueColor: Color(hex: 0x60A5FA))
             divider
-            summaryRow(label: "Path", value: acquisitionPathLabel, systemIcon: acquisitionType == .loan ? "building.columns.fill" : "banknote.fill")
+            summaryRow(label: i18n.t("Path"), value: acquisitionPathLabel, systemIcon: acquisitionType == .loan ? "building.columns.fill" : "banknote.fill")
         }
         .padding(25)
         .background(WorthItColor.surfaceContainer.opacity(0.60), in: RoundedRectangle(cornerRadius: WorthItRadius.l))

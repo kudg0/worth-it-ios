@@ -73,9 +73,9 @@ struct ScenarioSettingsScreen: View {
                 }
 
                 VStack(spacing: WorthItSpacing.s) {
-                    compactInfoRow(title: "Vehicle", value: vehicleSummary)
-                    compactInfoRow(title: "Acquisition", value: acquisitionSummary)
-                    compactInfoRow(title: "Current value", value: resaleSummary)
+                    compactInfoRow(title: i18n.t("Vehicle"), value: vehicleSummary)
+                    compactInfoRow(title: i18n.t("Acquisition"), value: acquisitionSummary)
+                    compactInfoRow(title: i18n.t("Current value"), value: resaleSummary)
                 }
             }
             .padding(WorthItSpacing.xxl)
@@ -94,8 +94,8 @@ struct ScenarioSettingsScreen: View {
             settingsRow(
                 SettingsItem(
                     id: "analytics",
-                    title: "Analytics Model",
-                    subtitle: "Cost per km inputs and calculation switches",
+                    title: i18n.t("Analytics Model"),
+                    subtitle: i18n.t("Cost per km inputs and calculation switches"),
                     status: analyticsSummary,
                     systemIcon: "slider.horizontal.3",
                     action: onOpenAnalytics
@@ -105,8 +105,8 @@ struct ScenarioSettingsScreen: View {
             settingsRow(
                 SettingsItem(
                     id: "comparison",
-                    title: "Comparison",
-                    subtitle: "Option pool and efficiency defaults",
+                    title: i18n.t("Comparison"),
+                    subtitle: i18n.t("Option pool and efficiency defaults"),
                     status: comparisonSummary,
                     systemIcon: "arrow.left.arrow.right",
                     action: onOpenComparison
@@ -116,8 +116,8 @@ struct ScenarioSettingsScreen: View {
             settingsRow(
                 SettingsItem(
                     id: "preferences",
-                    title: "Preferences",
-                    subtitle: "Currency, region and distance units",
+                    title: i18n.t("Preferences"),
+                    subtitle: i18n.t("Currency, region and distance units"),
                     status: preferencesSummary,
                     systemIcon: "globe.europe.africa.fill",
                     action: onOpenPreferences
@@ -127,8 +127,8 @@ struct ScenarioSettingsScreen: View {
             settingsRow(
                 SettingsItem(
                     id: "delete",
-                    title: "Delete Scenario",
-                    subtitle: "Remove scenario and related entries",
+                    title: i18n.t("Delete Scenario"),
+                    subtitle: i18n.t("Remove scenario and related entries"),
                     status: "Delete",
                     systemIcon: "trash.fill",
                     accentColor: WorthItColor.danger,

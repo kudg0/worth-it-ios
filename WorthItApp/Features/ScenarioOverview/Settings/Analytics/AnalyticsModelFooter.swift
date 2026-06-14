@@ -35,7 +35,7 @@ struct AnalyticsModelFooter: View {
                 }
                 .padding(.horizontal, WorthItSpacing.xs)
 
-                WIButton(title: "Save Changes", height: 56, action: onSave)
+                WIButton(title: i18n.t("Save Changes"), height: 56, action: onSave)
             }
             .padding(.horizontal, WorthItSpacing.xxl)
             .padding(.bottom, 32)
