@@ -250,24 +250,19 @@ extension ScenarioOverviewView {
     }
 
     func openMetricDetail(_ metric: OverviewMetric) {
-        if metric == .totalExpenses {
-            openExpenseHistory()
-            return
-        }
-
-        if metric == .monthlyCost {
-            openExpenseHistory(monthStart: currentMonthStart)
-            return
-        }
-
         selectedDetailMetric = metric
+        selectedDetailMetricPayload = nil
+        metricDetailError = nil
         selectedMetricTrendDate = nil
+        selectedEfficiencyChartDate = nil
         selectedMetricTrendRange = .oneYear
 
         withAnimation(.easeInOut(duration: 0.20)) {
             scenarioTabPath = [.overview]
             selectedTab = .metricDetail
         }
+
+        Task { await loadSelectedMetricDetail() }
     }
 
     func openExpenseHistory(focusedOn expenseId: UUID? = nil, monthStart: Date? = nil) {

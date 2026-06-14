@@ -13,6 +13,8 @@ struct ScenarioMetricPill: View {
             Text(text)
                 .font(.system(size: 10, weight: .bold))
                 .tracking(0.25)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
         .foregroundStyle(color.opacity(0.85))
         .padding(.horizontal, 13)

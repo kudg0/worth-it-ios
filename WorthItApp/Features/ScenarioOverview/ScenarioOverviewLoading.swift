@@ -7,8 +7,11 @@ extension ScenarioOverviewView {
         usageEventsError = nil
         alternativesError = nil
         scheduledServicesError = nil
+        analyticsError = nil
+        metricDetailError = nil
         previousMonthSummary = nil
 
+        async let analyticsTask = repository.getAnalyticsOverview(scenarioId: activeScenario.id)
         async let summaryTask = repository.getSummary(scenarioId: activeScenario.id)
         async let comparisonTask = repository.getComparison(scenarioId: activeScenario.id)
         async let costEventsTask = repository.listCostEvents(scenarioId: activeScenario.id)
@@ -16,6 +19,13 @@ extension ScenarioOverviewView {
         async let alternativesTask = repository.listAlternatives(scenarioId: activeScenario.id)
         async let scheduledServicesTask = repository.listScheduledServices(scenarioId: activeScenario.id)
         async let scheduledDueTask = repository.listScheduledServiceDueStates(scenarioId: activeScenario.id)
+
+        do {
+            analyticsOverview = try await analyticsTask
+        } catch {
+            analyticsOverview = nil
+            analyticsError = String(describing: error)
+        }
 
         do {
             currentSummary = try await summaryTask
@@ -109,5 +119,22 @@ extension ScenarioOverviewView {
     func selectBreakEvenAlternative(_ id: UUID) {
         selectedBreakEvenAlternativeId = id
         UserDefaults.standard.set(id.uuidString, forKey: selectedBreakEvenStorageKey(for: activeScenario.id))
+    }
+
+    func loadSelectedMetricDetail() async {
+        isLoadingMetricDetail = true
+        metricDetailError = nil
+        selectedDetailMetricPayload = nil
+
+        do {
+            selectedDetailMetricPayload = try await repository.getAnalyticsMetric(
+                scenarioId: activeScenario.id,
+                metricId: selectedDetailMetric
+            )
+        } catch {
+            metricDetailError = String(describing: error)
+        }
+
+        isLoadingMetricDetail = false
     }
 }

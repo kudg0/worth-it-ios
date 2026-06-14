@@ -47,6 +47,39 @@ struct ScenarioRepository: Sendable {
         return try await client.get("/scenarios/\(apiId(scenarioId))/comparison", queryItems: queryItems)
     }
 
+    func getAnalyticsOverview(scenarioId: UUID, asOfDate: Date? = nil) async throws -> ScenarioAnalyticsOverview {
+        var queryItems: [URLQueryItem] = []
+
+        if let asOfDate {
+            queryItems.append(URLQueryItem(name: "asOfDate", value: ISO8601DateFormatter.api.string(from: asOfDate)))
+        }
+
+        if queryItems.isEmpty {
+            return try await client.get("/scenarios/\(apiId(scenarioId))/analytics/overview")
+        }
+
+        return try await client.get("/scenarios/\(apiId(scenarioId))/analytics/overview", queryItems: queryItems)
+    }
+
+    func getAnalyticsMetric(
+        scenarioId: UUID,
+        metricId: ScenarioOverviewMetric,
+        asOfDate: Date? = nil
+    ) async throws -> ScenarioAnalyticsMetricPayload {
+        var queryItems: [URLQueryItem] = []
+
+        if let asOfDate {
+            queryItems.append(URLQueryItem(name: "asOfDate", value: ISO8601DateFormatter.api.string(from: asOfDate)))
+        }
+
+        let path = "/scenarios/\(apiId(scenarioId))/analytics/metrics/\(metricId.rawValue)"
+        if queryItems.isEmpty {
+            return try await client.get(path)
+        }
+
+        return try await client.get(path, queryItems: queryItems)
+    }
+
     func listAlternatives(scenarioId: UUID) async throws -> [AlternativeOption] {
         try await client.get("/scenarios/\(apiId(scenarioId))/alternatives")
     }

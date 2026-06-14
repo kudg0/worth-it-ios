@@ -8,9 +8,11 @@ struct ScenariosListView: View {
 
     let repository: ScenarioRepository
     let refreshToken: Int
+    let profileUser: AuthUser?
     let onCreateScenario: () -> Void
     let onOpenScenario: (ScenarioListItem) -> Void
     let onScenariosLoaded: ([ScenarioListItem]) -> Void
+    let onLogout: () -> Void
     private let stickyHeaderHeight: CGFloat = 154
     private let stickyFadeHeight: CGFloat = 42
 
@@ -29,7 +31,7 @@ struct ScenariosListView: View {
                     content
                 }
                 .padding(WorthItSpacing.xl)
-                .padding(.top, selectedTab == .scenarios ? stickyHeaderHeight : 72)
+                .padding(.top, selectedTab == .scenarios ? stickyHeaderHeight : WorthItSpacing.xl)
                 .padding(.bottom, 132)
             }
 
@@ -60,7 +62,7 @@ struct ScenariosListView: View {
         case .scenarios:
             scenariosContent
         case .profile:
-            ProfileView()
+            ProfileView(user: profileUser, onLogout: onLogout)
         }
     }
 

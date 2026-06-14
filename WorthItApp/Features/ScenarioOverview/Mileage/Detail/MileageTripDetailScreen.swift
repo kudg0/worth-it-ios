@@ -67,12 +67,25 @@ struct MileageTripDetailScreen: View {
 
     private var hero: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxl) {
-            Text(model.title)
-                .font(.system(size: 30, weight: .bold))
-                .foregroundStyle(WorthItColor.textPrimary)
-                .tracking(-0.75)
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: WorthItSpacing.m) {
+                Text(model.title)
+                    .font(.system(size: 30, weight: .bold))
+                    .foregroundStyle(WorthItColor.textPrimary)
+                    .tracking(-0.75)
+                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                HStack(spacing: WorthItSpacing.s) {
+                    Image(systemName: "calendar")
+                        .font(.system(size: 13, weight: .semibold))
+
+                    Text(model.dateTimeText)
+                        .font(.system(size: 14, weight: .medium))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.82)
+                }
+                .foregroundStyle(WorthItColor.textSecondary)
+            }
 
             VStack(alignment: .leading, spacing: WorthItSpacing.s) {
                 Text(model.estimatedCostText)

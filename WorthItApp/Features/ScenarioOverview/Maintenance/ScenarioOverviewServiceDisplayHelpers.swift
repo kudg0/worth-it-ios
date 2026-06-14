@@ -21,10 +21,6 @@ extension ScenarioOverviewView {
             parts.append("in \(formatDouble(max(distanceRemaining, 0), fractionDigits: 0)) \(item.distanceUnit)")
         }
 
-        if let note = item.note {
-            parts.append(note)
-        }
-
         return parts.joined(separator: " • ")
     }
 }

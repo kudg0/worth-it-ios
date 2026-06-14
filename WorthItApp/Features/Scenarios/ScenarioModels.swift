@@ -310,6 +310,150 @@ struct ScenarioComparison: Decodable, Hashable {
     let series: Series?
 }
 
+enum ScenarioAnalyticsMetricId: String, Decodable, Hashable, CaseIterable {
+    case monthlyCost
+    case costPerKm
+    case currentMonthCostPerKm
+    case totalExpenses
+    case totalOwnership
+    case paybackDistance
+    case projectedGain
+    case expectedResale
+    case loanInterest
+    case efficiencyComparison
+
+    var overviewMetric: ScenarioOverviewMetric? {
+        ScenarioOverviewMetric(rawValue: rawValue)
+    }
+}
+
+struct ScenarioAnalyticsOverview: Decodable, Hashable {
+    let scenarioId: UUID
+    let enabledMetricIds: [ScenarioAnalyticsMetricId]
+    let defaultMetricId: ScenarioAnalyticsMetricId
+    let generatedAt: Date
+    let asOfDate: Date
+    let metrics: [ScenarioAnalyticsMetricPayload]
+}
+
+struct ScenarioAnalyticsMetricPayload: Decodable, Hashable {
+    struct Availability: Decodable, Hashable {
+        let isAvailable: Bool
+        let reason: String?
+    }
+
+    struct Card: Decodable, Hashable {
+        let title: String
+        let value: String
+        let numericValue: Double?
+        let unit: String?
+        let subtitle: String?
+        let footer: String?
+        let trend: Trend?
+        let progress: Double?
+        let tone: String?
+    }
+
+    struct Trend: Decodable, Hashable {
+        let label: String
+        let direction: String
+        let delta: Double?
+        let deltaPercent: Double?
+        let lowerIsBetter: Bool
+        let tone: String
+        let comparisonLabel: String?
+    }
+
+    struct Chart: Decodable, Hashable {
+        struct Point: Decodable, Hashable {
+            let date: Date
+            let value: Double
+            let isProjected: Bool?
+        }
+
+        struct Range: Decodable, Hashable {
+            let period: String
+            let points: [Point]
+        }
+
+        struct Series: Decodable, Hashable {
+            let id: String
+            let title: String
+            let role: String
+            let points: [Point]
+        }
+
+        struct SeriesRange: Decodable, Hashable {
+            let period: String
+            let series: [Series]
+        }
+
+        struct Axis: Decodable, Hashable {
+            let max: Double
+            let values: [Double]
+        }
+
+        let chartType: String
+        let ranges: [String: Range]?
+        let seriesRanges: [String: SeriesRange]?
+        let series: [Series]?
+        let yAxis: Axis?
+    }
+
+    struct Detail: Decodable, Hashable {
+        struct Summary: Decodable, Hashable, Identifiable {
+            let id: String
+            let title: String
+            let value: String
+            let numericValue: Double?
+            let unit: String?
+        }
+
+        struct EntityRef: Decodable, Hashable {
+            let type: String
+            let id: String
+        }
+
+        struct Item: Decodable, Hashable, Identifiable {
+            let id: String
+            let title: String
+            let subtitle: String?
+            let value: String?
+            let numericValue: Double?
+            let date: Date?
+            let category: String?
+            let status: String?
+            let entityRef: EntityRef?
+        }
+
+        struct Section: Decodable, Hashable, Identifiable {
+            struct Total: Decodable, Hashable {
+                let value: String
+                let numericValue: Double
+            }
+
+            let id: String
+            let title: String
+            let subtitle: String?
+            let total: Total?
+            let items: [Item]
+        }
+
+        let title: String
+        let summary: [Summary]?
+        let sections: [Section]
+    }
+
+    let metricId: ScenarioAnalyticsMetricId
+    let calculationVersion: String
+    let generatedAt: Date
+    let asOfDate: Date
+    let availability: Availability
+    let card: Card?
+    let chart: Chart?
+    let detail: Detail?
+}
+
 struct CostEvent: Decodable, Identifiable, Hashable {
     let id: UUID
     let scenarioId: UUID

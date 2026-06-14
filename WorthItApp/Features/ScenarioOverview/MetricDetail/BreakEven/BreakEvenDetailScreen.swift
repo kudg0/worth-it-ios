@@ -19,6 +19,8 @@ struct BreakEvenDetailScreen: View {
         let title: String
         let status: String
         let color: Color
+        let magnitude: Double
+        let isSaving: Bool
     }
 
     struct Model {
@@ -188,29 +190,74 @@ struct BreakEvenDetailScreen: View {
         WIIsland(title: "Other Benchmarks", systemIcon: "arrow.left.arrow.right", spacing: WorthItSpacing.l, padding: WorthItSpacing.xl) {
             VStack(spacing: WorthItSpacing.s) {
                 ForEach(model.benchmarkRows) { row in
-                    HStack(spacing: WorthItSpacing.m) {
-                        VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
-                            Text(row.title)
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundStyle(WorthItColor.textPrimary)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.78)
-                        }
-
-                        Spacer(minLength: WorthItSpacing.m)
-
-                        Text(row.status)
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundStyle(row.color)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                    }
-                    .padding(.horizontal, WorthItSpacing.l)
-                    .frame(height: 48)
-                    .background(WorthItColor.surfaceMetric, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
+                    benchmarkBarRow(row)
                 }
             }
         }
+    }
+
+    private var largestBenchmarkMagnitude: Double {
+        max(model.benchmarkRows.map(\.magnitude).max() ?? 0, 1)
+    }
+
+    private func benchmarkBarRow(_ row: BenchmarkRow) -> some View {
+        VStack(alignment: .leading, spacing: WorthItSpacing.s) {
+            HStack(alignment: .firstTextBaseline, spacing: WorthItSpacing.m) {
+                Text(row.title)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(WorthItColor.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+
+                Spacer(minLength: WorthItSpacing.m)
+
+                Text(row.status)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(row.color)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
+            GeometryReader { proxy in
+                let progress = min(max(row.magnitude / largestBenchmarkMagnitude, 0), 1)
+                let halfWidth = proxy.size.width / 2
+                let fillWidth = max(halfWidth * progress, row.magnitude > 0 ? 8 : 0)
+
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(WorthItColor.surfaceContainerHigh.opacity(0.65))
+
+                    Rectangle()
+                        .fill(WorthItColor.textTertiary.opacity(0.45))
+                        .frame(width: 1)
+                        .frame(maxWidth: .infinity)
+
+                    HStack(spacing: 0) {
+                        ZStack(alignment: .trailing) {
+                            if !row.isSaving {
+                                Capsule()
+                                    .fill(row.color.opacity(0.82))
+                                    .frame(width: fillWidth)
+                            }
+                        }
+                        .frame(width: halfWidth, alignment: .trailing)
+
+                        ZStack(alignment: .leading) {
+                            if row.isSaving {
+                                Capsule()
+                                    .fill(row.color.opacity(0.88))
+                                    .frame(width: fillWidth)
+                            }
+                        }
+                        .frame(width: halfWidth, alignment: .leading)
+                    }
+                }
+            }
+            .frame(height: 8)
+        }
+        .padding(.horizontal, WorthItSpacing.l)
+        .padding(.vertical, WorthItSpacing.m)
+        .background(WorthItColor.surfaceMetric, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
     }
 
     private var explanation: some View {

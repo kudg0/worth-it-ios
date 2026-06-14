@@ -15,6 +15,7 @@ struct WITipInfo: View {
     let bodyText: String
     var size: Size = .small
     var tone: Tone = .info
+    var onDismiss: (() -> Void)?
 
     var body: some View {
         Group {
@@ -23,6 +24,11 @@ struct WITipInfo: View {
                 infoBody
             case .primary:
                 primaryBody
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if let onDismiss {
+                dismissButton(action: onDismiss)
             }
         }
     }
@@ -39,7 +45,7 @@ struct WITipInfo: View {
                 .foregroundStyle(size == .medium ? WorthItColor.textPrimary : WorthItColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(size == .medium ? 21 : 17)
+        .padding(tipInsets)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(WorthItColor.neutralContainerSubtle, in: RoundedRectangle(cornerRadius: size == .medium ? WorthItRadius.l : WorthItRadius.m))
         .overlay {
@@ -77,5 +83,24 @@ struct WITipInfo: View {
         .background(WorthItColor.surfaceContainerLow, in: RoundedRectangle(cornerRadius: size == .medium ? WorthItRadius.l : WorthItRadius.m))
         .clipShape(RoundedRectangle(cornerRadius: size == .medium ? WorthItRadius.l : WorthItRadius.m))
         .shadow(color: Color.black.opacity(0.20), radius: 20, y: 4)
+    }
+
+    private var tipInsets: EdgeInsets {
+        let base = size == .medium ? 21.0 : 17.0
+        let trailing = onDismiss == nil ? base : base + 34
+        return EdgeInsets(top: base, leading: base, bottom: base, trailing: trailing)
+    }
+
+    private func dismissButton(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: "xmark")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(WorthItColor.textTertiary)
+                .frame(width: 36, height: 36)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Dismiss")
+        .padding(size == .medium ? WorthItSpacing.m : WorthItSpacing.s)
     }
 }

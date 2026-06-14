@@ -23,11 +23,22 @@ struct ScheduledServiceRow: View {
                     .foregroundStyle(WorthItColor.textPrimary)
                     .lineLimit(1)
 
-                Text(dueSubtitle(item))
-                    .font(.system(size: 11, weight: .regular))
-                    .foregroundStyle(WorthItColor.textSecondary)
-                    .lineLimit(2)
-                    .fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(dueSubtitle(item))
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundStyle(WorthItColor.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.82)
+                        .allowsTightening(true)
+
+                    if let note = item.note {
+                        Text(note)
+                            .font(.system(size: 11, weight: .regular))
+                            .foregroundStyle(WorthItColor.textSecondary)
+                            .lineLimit(1)
+                    }
+                }
+                .fixedSize(horizontal: false, vertical: true)
             }
             .layoutPriority(1)
 

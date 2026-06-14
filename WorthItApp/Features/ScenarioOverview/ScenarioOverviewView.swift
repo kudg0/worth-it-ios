@@ -96,6 +96,8 @@ struct ScenarioOverviewView: View {
     @State var displayedScenario: ScenarioListItem?
     @State var currentSummary: ScenarioSummary?
     @State var currentComparison: ScenarioComparison?
+    @State var analyticsOverview: ScenarioAnalyticsOverview?
+    @State var selectedDetailMetricPayload: ScenarioAnalyticsMetricPayload?
     @State var previousMonthSummary: ScenarioSummary?
     @State var costEvents: [CostEvent] = []
     @State var usageEvents: [UsageEvent] = []
@@ -108,6 +110,9 @@ struct ScenarioOverviewView: View {
     @State var scheduledServices: [ScheduledService] = []
     @State var scheduledServiceDueItems: [ScheduledServiceDueItem] = []
     @State var summaryError: String?
+    @State var analyticsError: String?
+    @State var metricDetailError: String?
+    @State var isLoadingMetricDetail = false
     @State var costEventsError: String?
     @State var usageEventsError: String?
     @State var alternativesError: String?
@@ -945,24 +950,38 @@ struct ScenarioOverviewView: View {
         return monthlyCostValue(from: currentSummary)
     }
 
-    var loanPaymentSubtitle: String? {
+    var loanTermTiming: (remainingMonths: Int, progress: CGFloat)? {
         guard
             activeScenario.acquisitionType == "loan",
             let loanTermMonths = activeScenario.loanTermMonths,
-            loanTermMonths > 0,
-            let loanEndDate = Calendar(identifier: .gregorian).date(
-                byAdding: .month,
-                value: loanTermMonths,
-                to: activeScenario.startDate
-            )
+            loanTermMonths > 0
         else {
             return nil
         }
 
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "MMM yyyy"
-        return "Until \(formatter.string(from: loanEndDate))"
+        let calendar = Calendar(identifier: .gregorian)
+        let loanStart = expenseHistoryMonthStart(for: activeScenario.startDate)
+        let asOfMonth = expenseHistoryMonthStart(for: Date())
+        let elapsedMonths = min(max(calendar.dateComponents([.month], from: loanStart, to: asOfMonth).month ?? 0, 0), loanTermMonths)
+        let remainingMonths = max(loanTermMonths - elapsedMonths, 0)
+
+        return (
+            remainingMonths: remainingMonths,
+            progress: normalizedProgress(Double(elapsedMonths) / Double(loanTermMonths))
+        )
+    }
+
+    var loanPaymentSubtitle: String? {
+        guard let loanTermTiming else { return nil }
+
+        switch loanTermTiming.remainingMonths {
+        case 0:
+            return "Loan complete"
+        case 1:
+            return "1 month to go"
+        default:
+            return "\(loanTermTiming.remainingMonths) months to go"
+        }
     }
 
     var previousMonthlySpendValue: Double? {
@@ -1053,9 +1072,7 @@ struct ScenarioOverviewView: View {
     }
 
     var loanInterestProgress: CGFloat {
-        let principal = decimalValue(activeScenario.loanAmount)
-        guard principal > 0 else { return 0 }
-        return normalizedProgress(doubleValue(loanInterestTotal) / doubleValue(principal))
+        loanTermTiming?.progress ?? 0
     }
 
     var expectedResaleProgress: CGFloat {
@@ -1163,8 +1180,9 @@ struct ScenarioOverviewView: View {
                 .filter { visibleAlternativeIds.contains($0.id) }
                 .enumerated()
                 .compactMap { index, alternative -> ScenarioCompareChartSeries? in
+                    let comparisonResult = currentComparison?.alternatives.first { $0.id == alternative.id }
                     let points = alternative.points.compactMap { point -> ScenarioCompareChartPoint? in
-                        guard let value = compareChartValue(point) else { return nil }
+                        guard let value = compareChartValue(point, result: comparisonResult) else { return nil }
                         return ScenarioCompareChartPoint(date: point.date, value: value)
                     }
                     guard !points.isEmpty else { return nil }
@@ -1182,6 +1200,16 @@ struct ScenarioOverviewView: View {
         return result
     }
 
+    func compareChartValue(_ point: ScenarioComparison.Series.Point, result: ScenarioComparison.AlternativeResult?) -> Double? {
+        if compareMetric == .perKm,
+           result?.pricingMode == .distanceCurve,
+           let averageRate = distanceCurveAverageRate(from: result?.costBreakdown) {
+            return averageRate
+        }
+
+        return compareChartValue(point)
+    }
+
     func compareChartValue(_ point: ScenarioComparison.Series.Point) -> Double? {
         switch compareMetric {
         case .perKm:
@@ -1191,6 +1219,14 @@ struct ScenarioOverviewView: View {
         case .totalCost:
             return point.total
         }
+    }
+
+    func distanceCurveAverageRate(from breakdown: ScenarioComparison.CostBreakdown?) -> Double? {
+        if let rates = breakdown?.inputs.curvePointRates, !rates.isEmpty {
+            return rates.reduce(0, +) / Double(rates.count)
+        }
+
+        return breakdown?.inputs.averageCurvePricePerKm
     }
 
     func averageMonthlyOwnershipCost(asOf date: Date) -> Double? {

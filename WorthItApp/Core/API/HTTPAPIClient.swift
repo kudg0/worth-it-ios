@@ -7,6 +7,7 @@ enum APIError: Error {
 
 struct HTTPAPIClient: Sendable {
     let baseURL: URL
+    var authToken: String?
     var session: URLSession = .shared
 
     func get<Response: Decodable>(_ path: String) async throws -> Response {
@@ -64,13 +65,14 @@ struct HTTPAPIClient: Sendable {
     }
 
     private func send<Response: Decodable>(_ request: URLRequest) async throws -> Response {
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await session.data(for: authorized(request))
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
         }
 
         guard (200..<300).contains(httpResponse.statusCode) else {
             let body = String(data: data, encoding: .utf8) ?? ""
+            await notifyUnauthorizedIfNeeded(statusCode: httpResponse.statusCode)
             throw APIError.requestFailed(statusCode: httpResponse.statusCode, body: body)
         }
 
@@ -78,16 +80,59 @@ struct HTTPAPIClient: Sendable {
     }
 
     private func sendEmpty(_ request: URLRequest) async throws {
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await session.data(for: authorized(request))
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.invalidResponse
         }
 
         guard (200..<300).contains(httpResponse.statusCode) else {
             let body = String(data: data, encoding: .utf8) ?? ""
+            await notifyUnauthorizedIfNeeded(statusCode: httpResponse.statusCode)
             throw APIError.requestFailed(statusCode: httpResponse.statusCode, body: body)
         }
     }
+
+    private func authorized(_ request: URLRequest) -> URLRequest {
+        var request = request
+
+        // Better Auth validates trusted origins even for native clients. URLSession does not
+        // provide an Origin header by default, so we send the API origin explicitly.
+        if request.value(forHTTPHeaderField: "origin") == nil {
+            request.setValue(baseURL.originHeaderValue, forHTTPHeaderField: "origin")
+        }
+
+        guard let authToken, !authToken.isEmpty else { return request }
+
+        request.setValue("Bearer \(authToken)", forHTTPHeaderField: "authorization")
+        return request
+    }
+
+    private func notifyUnauthorizedIfNeeded(statusCode: Int) async {
+        guard statusCode == 401 else { return }
+
+        await MainActor.run {
+            NotificationCenter.default.post(name: .apiUnauthorized, object: nil)
+        }
+    }
+}
+
+private extension URL {
+    var originHeaderValue: String {
+        guard let scheme, let host else {
+            return absoluteString
+        }
+
+        var origin = "\(scheme)://\(host)"
+        if let port {
+            origin += ":\(port)"
+        }
+
+        return origin
+    }
+}
+
+extension Notification.Name {
+    static let apiUnauthorized = Notification.Name("WorthItAPIUnauthorized")
 }
 
 extension JSONDecoder {

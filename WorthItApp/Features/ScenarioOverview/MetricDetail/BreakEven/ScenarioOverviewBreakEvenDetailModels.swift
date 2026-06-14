@@ -42,9 +42,7 @@ extension ScenarioOverviewView {
             selectedOptionId: selected?.alternativeId,
             options: rows.map { BreakEvenDetailScreen.Option(id: $0.alternativeId, title: $0.alternativeName) },
             calculationRows: savingsCalculationRows(for: selected, snapshot: snapshot),
-            benchmarkRows: rows
-                .filter { $0.alternativeId != selected?.alternativeId }
-                .map(savingsBenchmarkRow),
+            benchmarkRows: rows.map(savingsBenchmarkRow),
             explanationTitle: "How this is calculated",
             explanationBody: savingsExplanationBody(for: selected, snapshot: snapshot),
             onSelectOption: selectBreakEvenAlternative
@@ -165,7 +163,9 @@ extension ScenarioOverviewView {
             id: row.alternativeId,
             title: row.alternativeName,
             status: savingsBenchmarkStatus(for: snapshot),
-            color: savingsColor(for: snapshot)
+            color: savingsColor(for: snapshot),
+            magnitude: snapshot.map { abs($0.savings) } ?? 0,
+            isSaving: snapshot?.isSaving ?? false
         )
     }
 

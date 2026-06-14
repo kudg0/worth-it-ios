@@ -3,7 +3,7 @@ import SwiftUI
 struct CostPerKmDetailScreen: View {
     struct Model {
         let hero: CostPerKmDetailHero.Model
-        let trend: CostPerKmTrendPanel.Model
+        let efficiencyComparison: CostPerKmEfficiencyCard.Model
         let summary: CostPerKmSummaryGrid.Model
         let showsEmptyNotice: Bool
         let emptyNoticeUnit: String
@@ -17,7 +17,7 @@ struct CostPerKmDetailScreen: View {
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxxl) {
             CostPerKmDetailHero(model: model.hero)
-            CostPerKmTrendPanel(model: model.trend)
+            CostPerKmEfficiencyCard(model: model.efficiencyComparison) {}
             CostPerKmSummaryGrid(model: model.summary)
 
             if model.showsEmptyNotice {

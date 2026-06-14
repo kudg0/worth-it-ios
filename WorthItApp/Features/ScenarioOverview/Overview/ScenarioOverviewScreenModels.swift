@@ -20,6 +20,10 @@ extension ScenarioOverviewView {
     }
 
     var overviewEfficiencyComparisonSeries: [ScenarioCompareChartSeries] {
+        if let backendSeries = backendOverviewEfficiencyComparisonSeries, !backendSeries.isEmpty {
+            return backendSeries.map(normalizedEfficiencyComparisonSeries)
+        }
+
         let visibleAlternativeIds = Set(alternatives.filter(\.isIncluded).map(\.id))
         let colors = [
             Color(hex: 0x7DD3FC),
@@ -45,7 +49,10 @@ extension ScenarioOverviewView {
                         else { return true }
                         return point.date >= firstDate && point.date <= lastDate
                     }
-                    .prolongatedTo(efficiencyChartPoints.last?.date)
+                    .prolongated(
+                        from: efficiencyChartPoints.first?.date,
+                        to: efficiencyChartPoints.last?.date
+                    )
                     guard points.count >= 2 else { return nil }
 
                     return ScenarioCompareChartSeries(
@@ -56,6 +63,7 @@ extension ScenarioOverviewView {
                         isBenchmark: true
                     )
                 }
+                .map(normalizedEfficiencyComparisonSeries)
 
             if !backendSeries.isEmpty {
                 return backendSeries
@@ -63,6 +71,51 @@ extension ScenarioOverviewView {
         }
 
         return []
+    }
+
+    var backendOverviewEfficiencyComparisonSeries: [ScenarioCompareChartSeries]? {
+        let series = backendEfficiencyMetric?.chart?.seriesRanges?[chartRange.analyticsRangeKey]?.series
+            ?? backendEfficiencyMetric?.chart?.series
+        guard let series else { return nil }
+
+        let colors = [
+            Color(hex: 0x7DD3FC),
+            Color(hex: 0xA7F3D0),
+            Color(hex: 0xC4B5FD)
+        ]
+
+        return series
+            .filter { $0.role == "benchmark" }
+            .enumerated()
+            .map { index, item in
+                ScenarioCompareChartSeries(
+                    id: item.id,
+                    title: item.title,
+                    color: colors[index % colors.count].opacity(0.84),
+                    points: item.points.map {
+                        ScenarioCompareChartPoint(date: $0.date, value: $0.value)
+                    },
+                    isBenchmark: true
+                )
+            }
+    }
+
+    func normalizedEfficiencyComparisonSeries(_ series: ScenarioCompareChartSeries) -> ScenarioCompareChartSeries {
+        guard let id = UUID(uuidString: series.id),
+              let result = currentComparison?.alternatives.first(where: { $0.id == id }),
+              result.pricingMode == .distanceCurve,
+              let averageRate = distanceCurveAverageRate(from: result.costBreakdown)
+        else {
+            return series
+        }
+
+        return ScenarioCompareChartSeries(
+            id: series.id,
+            title: series.title,
+            color: series.color,
+            points: series.points.map { ScenarioCompareChartPoint(date: $0.date, value: averageRate) },
+            isBenchmark: series.isBenchmark
+        )
     }
 
     var overviewEfficiencyYAxisMax: Double {
@@ -77,16 +130,25 @@ extension ScenarioOverviewView {
     }
 }
 
-private extension Array where Element == ScenarioCompareChartPoint {
-    func prolongatedTo(_ endDate: Date?) -> [ScenarioCompareChartPoint] {
+extension Array where Element == ScenarioCompareChartPoint {
+    func prolongated(from startDate: Date?, to endDate: Date?) -> [ScenarioCompareChartPoint] {
         let sortedPoints = sorted { $0.date < $1.date }
-        guard let endDate,
-              let lastPoint = sortedPoints.last,
-              lastPoint.date < endDate
-        else {
-            return sortedPoints
+        guard !sortedPoints.isEmpty else { return [] }
+
+        var points = sortedPoints
+
+        if let startDate,
+           let firstPoint = points.first,
+           firstPoint.date > startDate {
+            points.insert(ScenarioCompareChartPoint(date: startDate, value: firstPoint.value), at: 0)
         }
 
-        return sortedPoints + [ScenarioCompareChartPoint(date: endDate, value: lastPoint.value)]
+        if let endDate,
+           let lastPoint = points.last,
+           lastPoint.date < endDate {
+            points.append(ScenarioCompareChartPoint(date: endDate, value: lastPoint.value))
+        }
+
+        return points
     }
 }

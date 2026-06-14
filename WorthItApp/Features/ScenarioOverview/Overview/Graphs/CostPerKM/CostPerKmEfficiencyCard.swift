@@ -20,6 +20,7 @@ struct CostPerKmEfficiencyCard: View {
 
     let model: Model
     let onOpenDetail: () -> Void
+    @State private var localSelectedDate: Date?
     @State private var hiddenComparisonSeriesIds: Set<String> = []
 
     var body: some View {
@@ -55,13 +56,13 @@ struct CostPerKmEfficiencyCard: View {
             }
 
             Spacer()
-            CostPerKmRangePill(selection: model.chartRange, selectedDate: model.selectedDate)
+            CostPerKmRangePill(selection: model.chartRange, selectedDate: localSelectedDateBinding)
         }
     }
 
     private var readout: some View {
         HStack(spacing: WorthItSpacing.s) {
-            if let point = model.selectedPoint {
+            if let point = selectedPoint {
                 Text(model.valueLabel(point))
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(WorthItColor.textPrimary)
@@ -84,7 +85,7 @@ struct CostPerKmEfficiencyCard: View {
                 LineMark(x: .value("Period", point.date), y: .value("Cost per km", point.value))
                     .foregroundStyle(WorthItColor.primaryContainer)
                     .lineStyle(StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
-                    .interpolationMethod(.catmullRom)
+                    .interpolationMethod(primaryInterpolationMethod)
 
                 PointMark(x: .value("Period", point.date), y: .value("Cost per km", point.value))
                     .foregroundStyle(WorthItColor.primaryContainer)
@@ -121,7 +122,7 @@ struct CostPerKmEfficiencyCard: View {
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
             }
 
-            if let selectedPoint = model.selectedPoint {
+            if let selectedPoint {
                 RuleMark(x: .value("Selected month", selectedPoint.date))
                     .foregroundStyle(WorthItColor.primaryContainer.opacity(0.28))
                     .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
@@ -131,7 +132,7 @@ struct CostPerKmEfficiencyCard: View {
                     .symbolSize(82)
             }
         }
-        .chartXSelection(value: model.selectedDate)
+        .chartXSelection(value: localSelectedDateBinding)
         .chartYScale(domain: chartYDomain)
         .chartXAxis { xAxis }
         .chartYAxis { yAxis }
@@ -215,13 +216,44 @@ struct CostPerKmEfficiencyCard: View {
         model.comparisonSeries.filter { !hiddenComparisonSeriesIds.contains($0.id) }
     }
 
+    private var primaryInterpolationMethod: InterpolationMethod {
+        model.chartRange.wrappedValue == .day ? .linear : .monotone
+    }
+
+    private var selectedPoint: ScenarioOverviewView.MetricTrendPoint? {
+        guard let localSelectedDate else {
+            return model.selectedPoint
+        }
+
+        return nearestPoint(to: localSelectedDate)
+    }
+
+    private var localSelectedDateBinding: Binding<Date?> {
+        Binding {
+            localSelectedDate ?? model.selectedDate.wrappedValue ?? model.selectedPoint?.date
+        } set: { newValue in
+            guard let newValue else {
+                localSelectedDate = nil
+                return
+            }
+
+            localSelectedDate = nearestPoint(to: newValue)?.date
+        }
+    }
+
+    private func nearestPoint(to date: Date) -> ScenarioOverviewView.MetricTrendPoint? {
+        model.points.min { lhs, rhs in
+            abs(lhs.date.timeIntervalSince(date)) < abs(rhs.date.timeIntervalSince(date))
+        }
+    }
+
     private var chartYDomain: ClosedRange<Double> {
         let padding = max(model.yAxisMax * 0.08, 0.04)
         return -padding...(model.yAxisMax + padding)
     }
 
     private func comparisonDeltaLabel(for series: ScenarioCompareChartSeries) -> String? {
-        guard let selectedPoint = model.selectedPoint,
+        guard let selectedPoint,
               let comparisonValue = comparisonValue(in: series, near: selectedPoint.date)
         else {
             return nil
@@ -233,7 +265,7 @@ struct CostPerKmEfficiencyCard: View {
     }
 
     private func comparisonDeltaColor(for series: ScenarioCompareChartSeries) -> Color {
-        guard let selectedPoint = model.selectedPoint,
+        guard let selectedPoint,
               let comparisonValue = comparisonValue(in: series, near: selectedPoint.date)
         else {
             return WorthItColor.textTertiary

@@ -1,17 +1,35 @@
 import SwiftUI
 
 struct RootView: View {
-    let repository: ScenarioRepository
+    let apiBaseURL: URL
+    @ObservedObject var authSessionStore: AuthSessionStore
     @AppStorage("root.lastOpenScenarioId") private var lastOpenScenarioId = ""
     @State private var path: [Route] = []
     @State private var scenarioListRefreshToken = 0
     @State private var didAttemptLastScenarioRestore = false
 
     var body: some View {
+        Group {
+            if authSessionStore.isAuthenticated {
+                appShell
+            } else {
+                AuthFlowView(
+                    authRepository: AuthRepository(baseURL: apiBaseURL),
+                    authSessionStore: authSessionStore
+                )
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .apiUnauthorized)) { _ in
+            handleUnauthorized()
+        }
+    }
+
+    private var appShell: some View {
         NavigationStack(path: $path) {
             ScenariosListView(
                 repository: repository,
                 refreshToken: scenarioListRefreshToken,
+                profileUser: authSessionStore.session?.user,
                 onCreateScenario: {
                     path.append(.createScenario)
                 },
@@ -20,6 +38,9 @@ struct RootView: View {
                 },
                 onScenariosLoaded: { scenarios in
                     restoreLastOpenScenarioIfNeeded(from: scenarios)
+                },
+                onLogout: {
+                    handleLogout()
                 }
             )
             .navigationDestination(for: Route.self) { route in
@@ -70,6 +91,29 @@ struct RootView: View {
         }
         .tint(WorthItColor.primaryContainer)
         .background(WorthItColor.pageBackground)
+    }
+
+    private var repository: ScenarioRepository {
+        ScenarioRepository(
+            client: HTTPAPIClient(
+                baseURL: apiBaseURL,
+                authToken: authSessionStore.session?.token
+            )
+        )
+    }
+
+    @MainActor
+    private func handleUnauthorized() {
+        authSessionStore.clear()
+        path = []
+        didAttemptLastScenarioRestore = false
+    }
+
+    @MainActor
+    private func handleLogout() {
+        authSessionStore.clear()
+        path = []
+        didAttemptLastScenarioRestore = false
     }
 
     private func openScenario(_ scenario: ScenarioListItem, replacingStack: Bool = false) {

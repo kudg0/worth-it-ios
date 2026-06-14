@@ -22,6 +22,10 @@ extension ScenarioOverviewView {
     }
 
     var efficiencyChartPoints: [MetricTrendPoint] {
+        if !backendEfficiencyChartPoints.isEmpty {
+            return backendEfficiencyChartPoints
+        }
+
         let points: [MetricTrendPoint] = switch chartRange {
         case .day:
             projectedEfficiencySnapshotTrendPoints(period: .day, count: 10, projectedCount: 5)
@@ -32,6 +36,27 @@ extension ScenarioOverviewView {
         }
 
         return sortedTrendPoints(points)
+    }
+
+    var backendEfficiencyMetric: ScenarioAnalyticsMetricPayload? {
+        analyticsOverview?.metrics.first { $0.metricId == .efficiencyComparison }
+    }
+
+    var backendEfficiencyChartPoints: [MetricTrendPoint] {
+        if let range = backendEfficiencyMetric?.chart?.ranges?[chartRange.analyticsRangeKey],
+           !range.points.isEmpty {
+            return sortedTrendPoints(range.points.map {
+                MetricTrendPoint(date: $0.date, value: $0.value, isProjected: $0.isProjected ?? false)
+            })
+        }
+
+        guard let primary = backendEfficiencyMetric?.chart?.series?.first(where: { $0.role == "primary" }) else {
+            return []
+        }
+
+        return sortedTrendPoints(primary.points.map {
+            MetricTrendPoint(date: $0.date, value: $0.value, isProjected: $0.isProjected ?? false)
+        })
     }
 
     var monthlyEfficiencyChartPoints: [MetricTrendPoint] {
@@ -223,30 +248,29 @@ extension ScenarioOverviewView {
         let sample = Array(factualPoints.suffix(min(factualPoints.count, 6)))
         guard sample.count >= 2,
               let firstDate = sample.first?.date,
-              let lastValue = sample.last?.value
+              let lastDate = sample.last?.date,
+              let lastValue = sample.last?.value,
+              lastValue > 0
         else {
             return projectedMetricTrendValue(from: factualPoints.map(\.value))
         }
 
-        let xs = sample.map { $0.date.timeIntervalSince(firstDate) }
-        let ys = sample.map(\.value)
-        let xMean = xs.reduce(0, +) / Double(xs.count)
-        let yMean = ys.reduce(0, +) / Double(ys.count)
-        let denominator = xs.reduce(0) { total, x in
-            total + pow(x - xMean, 2)
+        let ratios = zip(sample, sample.dropFirst()).compactMap { previous, current -> Double? in
+            guard previous.value > 0, current.value > 0 else { return nil }
+            return current.value / previous.value
         }
-
-        guard denominator > 0 else {
+        guard !ratios.isEmpty else {
             return lastValue
         }
 
-        let numerator = zip(xs, ys).reduce(0) { total, point in
-            total + (point.0 - xMean) * (point.1 - yMean)
-        }
-        let slope = numerator / denominator
-        let projectedX = projectedDate.timeIntervalSince(firstDate)
+        let averageLogRatio = ratios.map { log($0) }.reduce(0, +) / Double(ratios.count)
+        let rawPeriodRatio = exp(averageLogRatio)
+        let clampedPeriodRatio = min(max(rawPeriodRatio, 0.72), 1.08)
+        let elapsedPeriods = max(Double(sample.count - 1), 1)
+        let averagePeriodLength = max(lastDate.timeIntervalSince(firstDate) / elapsedPeriods, 1)
+        let projectedPeriods = max(projectedDate.timeIntervalSince(lastDate) / averagePeriodLength, 0)
 
-        return max(0, yMean + slope * (projectedX - xMean))
+        return lastValue * pow(clampedPeriodRatio, projectedPeriods)
     }
 
     func efficiencyPeriodPoint(bucketStart: Date, period: Calendar.Component) -> MetricTrendPoint? {

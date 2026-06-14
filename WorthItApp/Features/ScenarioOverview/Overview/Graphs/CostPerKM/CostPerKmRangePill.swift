@@ -12,6 +12,8 @@ struct CostPerKmRangePill: View {
         }
         .padding(WorthItSpacing.xs)
         .background(WorthItColor.surfaceLowest, in: Capsule())
+        .fixedSize(horizontal: true, vertical: false)
+        .layoutPriority(2)
     }
 
     private func segment(title: String, value: ScenarioOverviewView.ChartRange) -> some View {
@@ -24,7 +26,9 @@ struct CostPerKmRangePill: View {
             Text(title)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(selection.wrappedValue == value ? Color(hex: 0x385283) : WorthItColor.textPrimary)
-                .padding(.horizontal, 10)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .padding(.horizontal, WorthItSpacing.s)
                 .frame(height: 20)
                 .background(selection.wrappedValue == value ? WorthItColor.primaryContainer : WorthItColor.surfaceContainer, in: Capsule())
         }

@@ -194,4 +194,5 @@ extension ScenarioOverviewView {
     var costPerKmBreakdownDistanceProgress: CGFloat {
         normalizedProgress(costPerKmBreakdownDistance / max(usageEvents.map { $0.distanceValue }.max() ?? costPerKmBreakdownDistance, 1))
     }
+
 }

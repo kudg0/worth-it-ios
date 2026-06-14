@@ -2,13 +2,14 @@ import SwiftUI
 
 @main
 struct WorthItApp: App {
-    private let scenarioRepository = ScenarioRepository(
-        client: HTTPAPIClient(baseURL: APIEnvironment.development.baseURL)
-    )
+    @StateObject private var authSessionStore = AuthSessionStore()
 
     var body: some Scene {
         WindowGroup {
-            RootView(repository: scenarioRepository)
+            RootView(
+                apiBaseURL: APIEnvironment.development.baseURL,
+                authSessionStore: authSessionStore
+            )
         }
     }
 }

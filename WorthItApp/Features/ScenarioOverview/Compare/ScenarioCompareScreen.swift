@@ -17,6 +17,9 @@ struct ScenarioCompareChartSeries: Identifiable {
 }
 
 struct ScenarioCompareScreen: View {
+    @AppStorage("scenarioCompare.metricExplanationDismissed.perKm") private var isPerKmExplanationDismissed = false
+    @AppStorage("scenarioCompare.metricExplanationDismissed.perMonth") private var isPerMonthExplanationDismissed = false
+
     let selectedMetric: Binding<ScenarioOverviewView.CompareMetric>
     let currency: String
     let summary: ScenarioSummary?
@@ -95,6 +98,19 @@ struct ScenarioCompareScreen: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    @ViewBuilder
+    private var metricExplanation: some View {
+        if shouldShowMetricExplanation {
+            WITipInfo(
+                title: "Metric context",
+                bodyText: metricExplanationText,
+                size: .small,
+                tone: .info,
+                onDismiss: dismissMetricExplanation
+            )
+        }
+    }
+
     private func normalizeSelectedMetric() {
         guard !ScenarioOverviewView.CompareMetric.compareVisibleCases.contains(selectedMetric.wrappedValue) else { return }
         selectedMetric.wrappedValue = .perKm
@@ -112,6 +128,8 @@ struct ScenarioCompareScreen: View {
                     scenarioStartDate: scenarioStartDate,
                     comparisonBaselineValue: comparisonBaselineValue
                 )
+
+                metricExplanation
             }
         }
     }
@@ -211,6 +229,39 @@ struct ScenarioCompareScreen: View {
         return "\(insightScopeText): owning this car is \(amount) \(direction) than \(result.name)."
     }
 
+    private var metricExplanationText: String {
+        switch selectedMetric.wrappedValue {
+        case .perKm:
+            return "Per KM shows distance efficiency: total ownership cost spread across tracked kilometers. It can look strong even when monthly spend is high, because fixed ownership costs are diluted by usage."
+        case .perMonth:
+            return "Per Month shows cumulative average monthly cost through each month. It keeps fixed ownership costs visible, so a car can be efficient per kilometer but still expensive to own each month."
+        case .totalCost:
+            return "Total Cost compares full accumulated ownership cost against alternatives across the same usage history."
+        }
+    }
+
+    private var shouldShowMetricExplanation: Bool {
+        switch selectedMetric.wrappedValue {
+        case .perKm:
+            return !isPerKmExplanationDismissed
+        case .perMonth:
+            return !isPerMonthExplanationDismissed
+        case .totalCost:
+            return true
+        }
+    }
+
+    private func dismissMetricExplanation() {
+        switch selectedMetric.wrappedValue {
+        case .perKm:
+            isPerKmExplanationDismissed = true
+        case .perMonth:
+            isPerMonthExplanationDismissed = true
+        case .totalCost:
+            break
+        }
+    }
+
     private var ownershipMetricText: String {
         switch selectedMetric.wrappedValue {
         case .perKm:
@@ -253,13 +304,16 @@ struct ScenarioCompareScreen: View {
     private func selectedMetricDelta(for result: ScenarioComparison.AlternativeResult) -> Double? {
         switch selectedMetric.wrappedValue {
         case .perKm:
+            let alternativeCostPerKm = result.pricingMode == .distanceCurve
+                ? distanceCurveAverageRate(from: result.costBreakdown)
+                : result.costBreakdown.perKm
             guard let ownershipValue = currentOwnershipChartValue ?? ownershipCostPerKm,
-                  let alternativeCostPerKm = result.costBreakdown.perKm
+                  let alternativeCostPerKm
             else { return nil }
             return alternativeCostPerKm - ownershipValue
         case .perMonth:
-            guard let ownershipValue = currentOwnershipChartValue,
-                  let alternativeCostPerMonth = latestChartValue(for: result.id)
+            guard let ownershipValue = currentOwnershipChartValue ?? ownershipMonthlyCost,
+                  let alternativeCostPerMonth = latestChartValue(for: result.id) ?? result.costBreakdown.perMonth
             else { return nil }
             return alternativeCostPerMonth - ownershipValue
         case .totalCost:
@@ -291,7 +345,7 @@ struct ScenarioCompareScreen: View {
         case .perKm:
             return "Across total tracked distance"
         case .perMonth:
-            return "For selected month usage"
+            return "Average monthly cost"
         case .totalCost:
             return "Across full ownership period"
         }
@@ -299,6 +353,14 @@ struct ScenarioCompareScreen: View {
 
     private func money(_ value: Double) -> String {
         ScenarioCompareFormatter.money(value, currency: currency)
+    }
+
+    private func distanceCurveAverageRate(from breakdown: ScenarioComparison.CostBreakdown) -> Double? {
+        if let rates = breakdown.inputs.curvePointRates, !rates.isEmpty {
+            return rates.reduce(0, +) / Double(rates.count)
+        }
+
+        return breakdown.inputs.averageCurvePricePerKm
     }
 }
 
@@ -407,6 +469,10 @@ private struct ComparableOptionRow: View {
         if let result {
             switch selectedMetric {
             case .perKm:
+                if alternative.pricingMode == .distanceCurve,
+                   let average = distanceCurvePointAverageRate(from: result.costBreakdown) {
+                    return "\(ScenarioCompareFormatter.money(average, currency: currency)) per km"
+                }
                 guard let perKm = result.costBreakdown.perKm else { return pricingDescription }
                 return "\(ScenarioCompareFormatter.money(perKm, currency: currency)) per km"
             case .perMonth:
@@ -437,7 +503,7 @@ private struct ComparableOptionRow: View {
             return "\(total) ÷ \(ScenarioCompareFormatter.number(distance)) km • \(pricingBasisText)"
         case .perMonth:
             if chartMetricValue != nil {
-                return "Selected month usage estimate"
+                return "Average through selected month"
             }
 
             let months = result.costBreakdown.inputs.monthsOwned
@@ -462,11 +528,7 @@ private struct ComparableOptionRow: View {
         case .perDistance:
             return "\(ScenarioCompareFormatter.money(alternative.paramsJson.pricePerKm ?? 0, currency: currency)) per km"
         case .distanceCurve:
-            let rates = (alternative.paramsJson.pricePoints ?? []).compactMap { point -> Double? in
-                guard point.distanceKm > 0 else { return nil }
-                return point.totalPrice / point.distanceKm
-            }
-            let average = rates.isEmpty ? 0 : rates.reduce(0, +) / Double(rates.count)
+            let average = distanceCurvePointAverageRate ?? 0
             return "\(ScenarioCompareFormatter.money(average, currency: currency)) avg per km"
         case .perPeriod:
             return "\(ScenarioCompareFormatter.money(alternative.paramsJson.pricePerMonth ?? 0, currency: currency)) per month"
@@ -498,10 +560,26 @@ private struct ComparableOptionRow: View {
         }
     }
 
+    private var distanceCurvePointRates: [Double] {
+        (alternative.paramsJson.pricePoints ?? []).compactMap { point -> Double? in
+            guard point.distanceKm > 0 else { return nil }
+            return point.totalPrice / point.distanceKm
+        }
+    }
+
+    private var distanceCurvePointAverageRate: Double? {
+        let rates = distanceCurvePointRates
+        guard !rates.isEmpty else { return nil }
+        return rates.reduce(0, +) / Double(rates.count)
+    }
+
     private func selectedMetricDelta(for result: ScenarioComparison.AlternativeResult) -> (value: Double, unitSuffix: String)? {
         switch selectedMetric {
         case .perKm:
-            guard let ownershipCostPerKm, let alternativeCostPerKm = result.costBreakdown.perKm else {
+            let alternativeCostPerKm = alternative.pricingMode == .distanceCurve
+                ? distanceCurvePointAverageRate(from: result.costBreakdown)
+                : result.costBreakdown.perKm
+            guard let ownershipCostPerKm, let alternativeCostPerKm else {
                 return nil
             }
 
@@ -523,14 +601,22 @@ private struct ComparableOptionRow: View {
     }
 
     private func distanceCurveRateFormula(for breakdown: ScenarioComparison.CostBreakdown) -> String {
-        let rates = breakdown.inputs.curvePointRates ?? []
+        let rates = breakdown.inputs.curvePointRates ?? distanceCurvePointRates
         guard !rates.isEmpty else { return "No curve point rates" }
 
         let rateList = rates
             .map { ScenarioCompareFormatter.rate($0) }
             .joined(separator: " + ")
-        let average = ScenarioCompareFormatter.rate(breakdown.inputs.averageCurvePricePerKm ?? breakdown.perKm ?? 0)
+        let average = ScenarioCompareFormatter.rate(rates.reduce(0, +) / Double(rates.count))
         return "Avg of point rates: (\(rateList)) ÷ \(rates.count) = \(average) €/km"
+    }
+
+    private func distanceCurvePointAverageRate(from breakdown: ScenarioComparison.CostBreakdown) -> Double? {
+        if let rates = breakdown.inputs.curvePointRates, !rates.isEmpty {
+            return rates.reduce(0, +) / Double(rates.count)
+        }
+
+        return breakdown.inputs.averageCurvePricePerKm ?? distanceCurvePointAverageRate
     }
 
     private func distanceCurveTotalFormula(total: String, breakdown: ScenarioComparison.CostBreakdown, distance: Double) -> String {

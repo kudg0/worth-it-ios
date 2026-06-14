@@ -5,7 +5,15 @@ enum ScenarioOverviewChartRange: Hashable {
     case week
     case month
 
-    var title: String { "Trend" }
+    var title: String { trendTitle }
+
+    var analyticsRangeKey: String {
+        switch self {
+        case .day: "day"
+        case .week: "week"
+        case .month: "month"
+        }
+    }
 
     var trendTitle: String {
         switch self {

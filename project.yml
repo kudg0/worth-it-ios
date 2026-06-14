@@ -31,6 +31,7 @@ targets:
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""
+        CODE_SIGN_ENTITLEMENTS: WorthItApp/WorthIt.entitlements
         GENERATE_INFOPLIST_FILE: YES
   WorthItTests:
     type: bundle.unit-test
