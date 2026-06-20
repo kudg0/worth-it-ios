@@ -112,6 +112,7 @@
 		98CCD70A8C5A884F7559A8F7 /* ScenarioOverviewView+MetricTrendData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB62D3D218EF2923FAF1CD19 /* ScenarioOverviewView+MetricTrendData.swift */; };
 		996389B3016BD5061D38491A /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E125D40C3F0E2571AAF49D /* FlowLayout.swift */; };
 		9978F7471973D7328C998AD5 /* ScenarioOverviewView+MetricTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D79C03864574D3255BB8F6 /* ScenarioOverviewView+MetricTrend.swift */; };
+		9A7F1E41C2EB8F3009A3EA41 /* BreakEvenTripRowsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BEBA255831F6961288573D /* BreakEvenTripRowsScreen.swift */; };
 		9EA2EA3321EE30FE73FCE22C /* LogExpenseRecurringSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19897B89FFAE8CBA8B4A3A7 /* LogExpenseRecurringSection.swift */; };
 		9F1D88AB9417BA351BD9CAED /* WIOptionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E405D74CC9F1BDE822FDF7DD /* WIOptionCard.swift */; };
 		A07E36B3CC7927003511C3D8 /* OverviewMetricsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D77632A178C0661EFD1BCC /* OverviewMetricsGrid.swift */; };
@@ -221,6 +222,7 @@
 		048C0F9D11EF9022C02DE9A3 /* ScenarioOverviewMetricDetailContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMetricDetailContent.swift; sourceTree = "<group>"; };
 		04A429D27B0D86009D19B8B9 /* ScenarioOverviewView+FinanceMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScenarioOverviewView+FinanceMetrics.swift"; sourceTree = "<group>"; };
 		05259FFFD8C93F53F4A0D513 /* AuthRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRepository.swift; sourceTree = "<group>"; };
+		05BEBA255831F6961288573D /* BreakEvenTripRowsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakEvenTripRowsScreen.swift; sourceTree = "<group>"; };
 		0692C5433CF84A6405D4AD77 /* WorthItTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = WorthItTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A28726DB2C732092328F29F /* ScenarioOverviewMileageHistoryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMileageHistoryData.swift; sourceTree = "<group>"; };
 		0AA637574FFB9C9750B4612F /* ScenarioOverviewMonthHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMonthHelpers.swift; sourceTree = "<group>"; };
@@ -728,6 +730,7 @@
 			isa = PBXGroup;
 			children = (
 				62D36D93F09A17EFC20FE5C6 /* BreakEvenDetailScreen.swift */,
+				05BEBA255831F6961288573D /* BreakEvenTripRowsScreen.swift */,
 				A23411D89E68A33C37908A7E /* ScenarioOverviewBreakEvenDetailModels.swift */,
 			);
 			path = BreakEven;
@@ -1171,6 +1174,7 @@
 				CE265FB941BC49B9CD0C77C2 /* AuthSessionStore.swift in Sources */,
 				BF7512A708DBB007884C1CEE /* BackendMetricDetailScreen.swift in Sources */,
 				D5F47819284043F2583E9667 /* BreakEvenDetailScreen.swift in Sources */,
+				9A7F1E41C2EB8F3009A3EA41 /* BreakEvenTripRowsScreen.swift in Sources */,
 				5303A3789B9B63CF56A7284F /* ComparableEditorIsland.swift in Sources */,
 				3727827A8DBCBB519AE157BF /* ComparableOptionRow.swift in Sources */,
 				4FF3C0FA4001C086BA2D0ABB /* CompareBenchmarkChart.swift in Sources */,

@@ -244,6 +244,7 @@ struct ScenarioComparison: Decodable, Hashable {
         let carTotalCost: Double?
         let alternativeTotalCost: Double?
         let savingsAmount: Double?
+        let dynamicTripSavings: DynamicTripSavings?
 
         var id: UUID { alternativeId }
 
@@ -253,6 +254,29 @@ struct ScenarioComparison: Decodable, Hashable {
             case unreachable
             case insufficientData = "insufficient_data"
         }
+    }
+
+    struct DynamicTripSavings: Decodable, Hashable {
+        let carTotalCost: Double
+        let alternativeTotalCost: Double
+        let savingsAmount: Double
+        let distanceKm: Double
+        let tripCount: Int
+        let items: [DynamicTripSavingsItem]
+    }
+
+    struct DynamicTripSavingsItem: Decodable, Identifiable, Hashable {
+        let usageEventId: UUID
+        let date: Date
+        let distanceKm: Double
+        let durationMinutes: Int
+        let carCostPerKm: Double?
+        let carTripCost: Double?
+        let alternativeCostPerKm: Double?
+        let alternativeTripCost: Double?
+        let savingsAmount: Double?
+
+        var id: UUID { usageEventId }
     }
 
     struct CostBreakdown: Decodable, Hashable {

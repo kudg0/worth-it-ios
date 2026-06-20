@@ -28,14 +28,18 @@ extension ScenarioOverviewView {
 
     var selectedMileageDetailModel: MileageTripDetailScreen.Model? {
         guard let selectedMileageDetailId,
-              let event = usageEvents.first(where: { $0.id == selectedMileageDetailId && $0.eventType == "trip" }),
-              let costPerDistance = tripCostPerDistanceValue(for: event)
+              let event = usageEvents.first(where: { $0.id == selectedMileageDetailId && $0.eventType == "trip" })
         else {
             return nil
         }
 
+        let dynamicTrip = dynamicTripSavingsItem(for: event)
+        guard let costPerDistance = dynamicTrip?.carCostPerKm ?? tripCostPerDistanceValue(for: event) else {
+            return nil
+        }
+
         let monthStart = expenseHistoryMonthStart(for: event.date)
-        let estimatedCost = event.distanceValue * costPerDistance
+        let estimatedCost = dynamicTrip?.carTripCost ?? event.distanceValue * costPerDistance
         let note = mileageEventSubtitle(event.note, fallback: "Trip Added")
         let monthLabel = Self.monthYearFormatter.string(from: monthStart)
 
@@ -44,7 +48,9 @@ extension ScenarioOverviewView {
             estimatedCostText: "\(currencySymbol)\(formatDouble(estimatedCost, fractionDigits: 2))",
             distanceText: "\(formatDouble(event.distanceValue, fractionDigits: 1)) \(event.distanceUnit)",
             costPerDistanceText: "\(currencySymbol)\(formatDouble(costPerDistance, fractionDigits: 2))",
-            costPerDistanceSourceText: tripCostPerDistanceSourceText(for: event),
+            costPerDistanceSourceText: dynamicTrip == nil
+                ? tripCostPerDistanceSourceText(for: event)
+                : "Dynamic savings snapshot for this trip",
             unitText: event.distanceUnit,
             dateTimeText: "\(Self.mileageDateFormatter.string(from: event.date)), \(Self.mileageTimeFormatter.string(from: event.date))",
             notesText: event.note?.isEmpty == false ? event.note! : "No notes",
@@ -72,7 +78,9 @@ extension ScenarioOverviewView {
         alternatives
             .filter(\.isIncluded)
             .compactMap { alternative -> MileageTripDetailScreen.ComparableCost? in
-                guard let breakdown = comparableTripCostBreakdown(for: alternative, event: event) else { return nil }
+                guard let breakdown = dynamicComparableTripCostBreakdown(for: alternative, event: event)
+                    ?? comparableTripCostBreakdown(for: alternative, event: event)
+                else { return nil }
                 let delta = breakdown.total - ownershipTripCost
 
                 return MileageTripDetailScreen.ComparableCost(
@@ -90,6 +98,45 @@ extension ScenarioOverviewView {
             .sorted { lhs, rhs in
                 lhs.costValue < rhs.costValue
             }
+    }
+
+    func dynamicTripSavingsItem(for event: UsageEvent) -> ScenarioComparison.DynamicTripSavingsItem? {
+        currentComparison?.alternativeBreakEvens
+            .compactMap(\.dynamicTripSavings)
+            .flatMap(\.items)
+            .first { $0.usageEventId == event.id }
+    }
+
+    func dynamicComparableTripCostBreakdown(
+        for alternative: AlternativeOption,
+        event: UsageEvent
+    ) -> ComparableTripCostBreakdown? {
+        guard let item = currentComparison?.alternativeBreakEvens
+            .first(where: { $0.alternativeId == alternative.id })?
+            .dynamicTripSavings?
+            .items
+            .first(where: { $0.usageEventId == event.id }),
+            let alternativeTripCost = item.alternativeTripCost
+        else {
+            return nil
+        }
+
+        let carRate = item.carCostPerKm.map {
+            "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))/km"
+        } ?? "-"
+        let alternativeRate = item.alternativeCostPerKm.map {
+            "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))/km"
+        } ?? "-"
+        let carCost = item.carTripCost.map {
+            "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))"
+        } ?? "-"
+
+        return ComparableTripCostBreakdown(
+            total: alternativeTripCost,
+            detailLines: [
+                "Dynamic trip savings source: car \(carRate) = \(carCost); \(alternative.name) \(alternativeRate) = \(currencySymbol)\(formatDouble(alternativeTripCost, fractionDigits: 2))"
+            ]
+        )
     }
 
     func comparableTripCostBreakdown(

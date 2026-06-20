@@ -42,10 +42,12 @@ extension ScenarioOverviewView {
             selectedOptionId: selected?.alternativeId,
             options: rows.map { BreakEvenDetailScreen.Option(id: $0.alternativeId, title: $0.alternativeName) },
             calculationRows: savingsCalculationRows(for: selected, snapshot: snapshot),
+            tripRows: selected.map(savingsTripRows) ?? [],
             benchmarkRows: rows.map(savingsBenchmarkRow),
             explanationTitle: "How this is calculated",
             explanationBody: savingsExplanationBody(for: selected, snapshot: snapshot),
-            onSelectOption: selectBreakEvenAlternative
+            onSelectOption: selectBreakEvenAlternative,
+            onOpenTrip: openMileageDetail
         )
     }
 
@@ -73,6 +75,31 @@ extension ScenarioOverviewView {
             alternativeRateMin: row.alternativeCostPerKmMin,
             alternativeRateMax: row.alternativeCostPerKmMax
         )
+    }
+
+    func savingsTripRows(
+        for row: ScenarioComparison.AlternativeBreakEven
+    ) -> [BreakEvenDetailScreen.TripRow] {
+        guard let dynamic = row.dynamicTripSavings else { return [] }
+
+        return dynamic.items.reversed().map { item in
+            let carRate = item.carCostPerKm.map {
+                "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))/\(mileageDisplayUnit)"
+            } ?? "-"
+            let alternativeRate = item.alternativeCostPerKm.map {
+                "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))/\(mileageDisplayUnit)"
+            } ?? "-"
+            let savings = item.savingsAmount ?? 0
+            let valuePrefix = savings >= 0 ? "+" : "-"
+
+            return BreakEvenDetailScreen.TripRow(
+                id: item.usageEventId,
+                title: "\(formatDouble(item.distanceKm, fractionDigits: 0)) \(mileageDisplayUnit) · \(Self.shortDateFormatter.string(from: item.date))",
+                subtitle: "Car \(carRate) · \(row.alternativeName) \(alternativeRate)",
+                value: "\(valuePrefix)\(currencySymbol)\(formatDouble(abs(savings), fractionDigits: 0))",
+                valueColor: savings >= 0 ? WorthItColor.accentGold : WorthItColor.danger
+            )
+        }
     }
 
     func savingsHeroValue(for snapshot: AlternativeSavingsSnapshot?) -> String {
@@ -200,6 +227,10 @@ extension ScenarioOverviewView {
 
         guard snapshot != nil else {
             return row.reason ?? "Savings needs mileage, your car cost per \(mileageDisplayUnit), and the selected alternative cost per \(mileageDisplayUnit)."
+        }
+
+        if row.dynamicTripSavings != nil {
+            return "Each mileage entry is priced with the car cost per \(mileageDisplayUnit) that existed on that date, then compared with \(row.alternativeName) for the same entry. Early trips can be expensive, later trips can get cheaper as total mileage grows."
         }
 
         return "We compare your actual ownership and running costs against estimated \(row.alternativeName) cost for the same \(formatDouble(row.currentDistanceKm, fractionDigits: 0)) \(mileageDisplayUnit). Positive means the car saved money; negative means the alternative would have been cheaper."

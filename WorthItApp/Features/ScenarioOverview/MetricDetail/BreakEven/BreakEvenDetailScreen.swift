@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct BreakEvenDetailScreen: View {
+    private struct TripRowsSheet: Identifiable {
+        let id = "tripRows"
+        let rows: [TripRow]
+    }
+
     struct Option: Identifiable {
         let id: UUID
         let title: String
@@ -23,6 +28,14 @@ struct BreakEvenDetailScreen: View {
         let isSaving: Bool
     }
 
+    struct TripRow: Identifiable {
+        let id: UUID
+        let title: String
+        let subtitle: String
+        let value: String
+        let valueColor: Color
+    }
+
     struct Model {
         let eyebrow: String
         let value: String
@@ -33,13 +46,16 @@ struct BreakEvenDetailScreen: View {
         let selectedOptionId: UUID?
         let options: [Option]
         let calculationRows: [CalculationRow]
+        let tripRows: [TripRow]
         let benchmarkRows: [BenchmarkRow]
         let explanationTitle: String
         let explanationBody: String
         let onSelectOption: (UUID) -> Void
+        let onOpenTrip: (UUID) -> Void
     }
 
     let model: Model
+    @State private var tripRowsSheet: TripRowsSheet?
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxxl) {
@@ -47,7 +63,13 @@ struct BreakEvenDetailScreen: View {
             optionSelector
             calculation
             otherBenchmarks
+            tripBreakdown
             explanation
+        }
+        .sheet(item: $tripRowsSheet) { sheet in
+            BreakEvenTripRowsScreen(rows: sheet.rows, onOpenTrip: openTrip)
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
 
@@ -194,6 +216,51 @@ struct BreakEvenDetailScreen: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var tripBreakdown: some View {
+        if !model.tripRows.isEmpty {
+            WIIsland(title: i18n.t("Mileage Entries"), systemIcon: "road.lanes", spacing: WorthItSpacing.l, padding: WorthItSpacing.xl) {
+                VStack(spacing: WorthItSpacing.m) {
+                    HStack(alignment: .center, spacing: WorthItSpacing.m) {
+                        Text("Latest \(tripPreviewRows.count) of \(model.tripRows.count)")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(WorthItColor.textSecondary)
+                            .tracking(0.7)
+                            .textCase(.uppercase)
+
+                        Spacer(minLength: WorthItSpacing.m)
+
+                        if model.tripRows.count > tripPreviewRows.count {
+                            Button {
+                                tripRowsSheet = TripRowsSheet(rows: model.tripRows)
+                            } label: {
+                                Text(i18n.t("View All"))
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundStyle(WorthItColor.primaryContainer)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    ForEach(tripPreviewRows) { row in
+                        BreakEvenTripRow(row: row) {
+                            openTrip(row.id)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var tripPreviewRows: [TripRow] {
+        Array(model.tripRows.prefix(4))
+    }
+
+    private func openTrip(_ id: UUID) {
+        tripRowsSheet = nil
+        model.onOpenTrip(id)
     }
 
     private var largestBenchmarkMagnitude: Double {

@@ -11,7 +11,7 @@ extension ScenarioOverviewView {
                 VStack(alignment: .leading, spacing: WorthItSpacing.xxxxl) {
                     metricSpecificDetail(metric)
 
-                    if let selectedDetailMetricPayload {
+                    if selectedDetailMetric != .paybackDistance, let selectedDetailMetricPayload {
                         BackendMetricBreakdownView(payload: selectedDetailMetricPayload)
                     } else if let metricDetailError {
                         BackendMetricDetailErrorView(message: friendlyMetricDetailError(metricDetailError)) {
