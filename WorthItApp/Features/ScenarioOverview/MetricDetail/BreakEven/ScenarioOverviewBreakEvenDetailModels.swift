@@ -33,7 +33,7 @@ extension ScenarioOverviewView {
         let selectedName = selected?.alternativeName ?? "Alternative"
 
         return BreakEvenDetailScreen.Model(
-            eyebrow: "Saved vs \(selectedName)",
+            eyebrow: "Compared vs \(selectedName)",
             value: savingsHeroValue(for: snapshot),
             valueColor: savingsColor(for: snapshot),
             subtitle: savingsSubtitle(for: selected, snapshot: snapshot),
@@ -90,13 +90,12 @@ extension ScenarioOverviewView {
                 "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))/\(mileageDisplayUnit)"
             } ?? "-"
             let savings = item.savingsAmount ?? 0
-            let valuePrefix = savings >= 0 ? "+" : "-"
 
             return BreakEvenDetailScreen.TripRow(
                 id: item.usageEventId,
                 title: "\(formatDouble(item.distanceKm, fractionDigits: 0)) \(mileageDisplayUnit) · \(Self.shortDateFormatter.string(from: item.date))",
                 subtitle: "Car \(carRate) · \(row.alternativeName) \(alternativeRate)",
-                value: "\(valuePrefix)\(currencySymbol)\(formatDouble(abs(savings), fractionDigits: 0))",
+                value: savingsDeltaDisplay(savings, includesOutcome: true),
                 valueColor: savings >= 0 ? WorthItColor.accentGold : WorthItColor.danger
             )
         }
@@ -104,8 +103,7 @@ extension ScenarioOverviewView {
 
     func savingsHeroValue(for snapshot: AlternativeSavingsSnapshot?) -> String {
         guard let snapshot else { return "-" }
-        let prefix = snapshot.savings >= 0 ? "+" : "-"
-        return "\(prefix)\(currencySymbol)\(formatDouble(abs(snapshot.savings), fractionDigits: 0))"
+        return savingsDeltaDisplay(snapshot.savings, includesOutcome: false)
     }
 
     func savingsColor(for snapshot: AlternativeSavingsSnapshot?) -> Color {
@@ -115,7 +113,7 @@ extension ScenarioOverviewView {
 
     func savingsStatusPill(for snapshot: AlternativeSavingsSnapshot?) -> String {
         guard let snapshot else { return "NEED MORE DATA" }
-        return snapshot.isSaving ? "SAVED" : "BEHIND"
+        return savingsOutcomeLabel(snapshot.savings).uppercased()
     }
 
     func savingsSubtitle(
@@ -198,8 +196,21 @@ extension ScenarioOverviewView {
 
     func savingsBenchmarkStatus(for snapshot: AlternativeSavingsSnapshot?) -> String {
         guard let snapshot else { return "-" }
-        let suffix = snapshot.isSaving ? " saved" : " behind"
-        return "\(savingsHeroValue(for: snapshot))\(suffix)"
+        return savingsDeltaDisplay(snapshot.savings, includesOutcome: true)
+    }
+
+    func savingsDeltaDisplay(_ value: Double, includesOutcome: Bool) -> String {
+        let prefix = value >= 0 ? "+" : "-"
+        let absoluteValue = abs(value)
+        let fractionDigits = absoluteValue > 0 && absoluteValue < 1 ? 2 : 0
+        let money = "\(prefix)\(currencySymbol)\(formatDouble(absoluteValue, fractionDigits: fractionDigits))"
+
+        guard includesOutcome else { return money }
+        return "\(money) \(savingsOutcomeLabel(value))"
+    }
+
+    func savingsOutcomeLabel(_ value: Double) -> String {
+        value >= 0 ? "ahead" : "behind"
     }
 
     func alternativeRateDisplay(for snapshot: AlternativeSavingsSnapshot) -> String {
@@ -230,9 +241,9 @@ extension ScenarioOverviewView {
         }
 
         if row.dynamicTripSavings != nil {
-            return "Each mileage entry is priced with the car cost per \(mileageDisplayUnit) that existed on that date, then compared with \(row.alternativeName) for the same entry. Early trips can be expensive, later trips can get cheaper as total mileage grows."
+            return "Each mileage entry is priced on its own date. The car side uses the car cost per \(mileageDisplayUnit) known on that trip date, so early trips can be higher before more mileage spreads the ownership cost. The \(row.alternativeName) side uses that option's pricing for the same entry. We add those entry-level results to show whether the car is ahead or behind."
         }
 
-        return "We compare your actual ownership and running costs against estimated \(row.alternativeName) cost for the same \(formatDouble(row.currentDistanceKm, fractionDigits: 0)) \(mileageDisplayUnit). Positive means the car saved money; negative means the alternative would have been cheaper."
+        return "We compare your actual ownership and running costs against estimated \(row.alternativeName) cost for the same \(formatDouble(row.currentDistanceKm, fractionDigits: 0)) \(mileageDisplayUnit). Positive means the car is ahead; negative means the car is behind."
     }
 }

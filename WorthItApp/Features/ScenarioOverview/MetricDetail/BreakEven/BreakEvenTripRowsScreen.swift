@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BreakEvenTripRowsScreen: View {
     let rows: [BreakEvenDetailScreen.TripRow]
+    let comparisonTitle: String
     let onOpenTrip: (UUID) -> Void
     @Environment(\.dismiss) private var dismiss
 
@@ -9,6 +10,18 @@ struct BreakEvenTripRowsScreen: View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: WorthItSpacing.m) {
+                    VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
+                        Text("\(rows.count) entries")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(WorthItColor.textPrimary)
+
+                        Text("Compared vs \(comparisonTitle)")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(WorthItColor.textSecondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.bottom, WorthItSpacing.s)
+
                     ForEach(rows) { row in
                         BreakEvenTripRow(row: row) {
                             dismiss()

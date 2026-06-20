@@ -4,6 +4,7 @@ struct BreakEvenDetailScreen: View {
     private struct TripRowsSheet: Identifiable {
         let id = "tripRows"
         let rows: [TripRow]
+        let comparisonTitle: String
     }
 
     struct Option: Identifiable {
@@ -67,7 +68,11 @@ struct BreakEvenDetailScreen: View {
             explanation
         }
         .sheet(item: $tripRowsSheet) { sheet in
-            BreakEvenTripRowsScreen(rows: sheet.rows, onOpenTrip: openTrip)
+            BreakEvenTripRowsScreen(
+                rows: sheet.rows,
+                comparisonTitle: sheet.comparisonTitle,
+                onOpenTrip: openTrip
+            )
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
         }
@@ -234,7 +239,10 @@ struct BreakEvenDetailScreen: View {
 
                         if model.tripRows.count > tripPreviewRows.count {
                             Button {
-                                tripRowsSheet = TripRowsSheet(rows: model.tripRows)
+                                tripRowsSheet = TripRowsSheet(
+                                    rows: model.tripRows,
+                                    comparisonTitle: selectedOptionTitle
+                                )
                             } label: {
                                 Text(i18n.t("View All"))
                                     .font(.system(size: 12, weight: .bold))

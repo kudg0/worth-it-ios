@@ -50,7 +50,7 @@ extension ScenarioOverviewView {
             costPerDistanceText: "\(currencySymbol)\(formatDouble(costPerDistance, fractionDigits: 2))",
             costPerDistanceSourceText: dynamicTrip == nil
                 ? tripCostPerDistanceSourceText(for: event)
-                : "Dynamic savings snapshot for this trip",
+                : "Car cost per km on this trip date",
             unitText: event.distanceUnit,
             dateTimeText: "\(Self.mileageDateFormatter.string(from: event.date)), \(Self.mileageTimeFormatter.string(from: event.date))",
             notesText: event.note?.isEmpty == false ? event.note! : "No notes",
@@ -90,7 +90,7 @@ extension ScenarioOverviewView {
                     durationText: comparableDurationText(for: event),
                     costValue: breakdown.total,
                     costText: "\(currencySymbol)\(formatDouble(breakdown.total, fractionDigits: 2))",
-                    deltaText: "\(delta >= 0 ? "+" : "-")\(currencySymbol)\(formatDouble(abs(delta), fractionDigits: 2))",
+                    deltaText: savingsDeltaDisplay(delta, includesOutcome: true),
                     isCheaper: delta < 0,
                     detailLines: breakdown.detailLines
                 )
