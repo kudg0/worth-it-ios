@@ -1,4 +1,11 @@
+import Photos
+import PhotosUI
 import SwiftUI
+import UIKit
+
+private enum ProfilePhotoReadError: Error {
+    case unavailable
+}
 
 struct EditProfileDraft {
     let name: String
@@ -9,24 +16,33 @@ struct EditProfileDraft {
 struct EditProfileScreen: View {
     let user: AuthUser?
     let onSave: (EditProfileDraft) async throws -> AuthUser
+    let onUploadProfileImage: (ProfileImageUploadDraft) async throws -> String
     let onDiscard: () -> Void
 
     @Environment(\.i18n) private var i18n
     @State private var fullName: String
     @State private var email: String
+    @State private var profileImageURL: String?
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var selectedAvatarData: Data?
     @State private var errorText: String?
+    @State private var photoErrorText: String?
     @State private var isSaving = false
+    @State private var isUploadingPhoto = false
 
     init(
         user: AuthUser?,
         onSave: @escaping (EditProfileDraft) async throws -> AuthUser,
+        onUploadProfileImage: @escaping (ProfileImageUploadDraft) async throws -> String,
         onDiscard: @escaping () -> Void
     ) {
         self.user = user
         self.onSave = onSave
+        self.onUploadProfileImage = onUploadProfileImage
         self.onDiscard = onDiscard
         _fullName = State(initialValue: Self.displayName(for: user))
         _email = State(initialValue: user?.email ?? "")
+        _profileImageURL = State(initialValue: user?.image)
     }
 
     var body: some View {
@@ -55,8 +71,12 @@ struct EditProfileScreen: View {
                     .fill(WorthItColor.surfaceContainerHigh.opacity(0.34))
                     .frame(width: 180, height: 180)
                     .blur(radius: 80)
-                    .offset(y: -120)
+                .offset(y: -120)
             }
+        }
+        .onChange(of: selectedPhotoItem) { _, item in
+            guard let item else { return }
+            Task { await uploadSelectedPhoto(item) }
         }
     }
 
@@ -92,7 +112,13 @@ struct EditProfileScreen: View {
 
     private var identityCard: some View {
         VStack(spacing: WorthItSpacing.xxxxl) {
-            editableAvatar
+            VStack(spacing: WorthItSpacing.m) {
+                editableAvatar
+
+                if let photoErrorText {
+                    photoError(photoErrorText)
+                }
+            }
 
             VStack(spacing: WorthItSpacing.xl) {
                 AccountProfileField(
@@ -134,18 +160,13 @@ struct EditProfileScreen: View {
 
     private var editableAvatar: some View {
         ZStack(alignment: .bottomTrailing) {
-            Text(initials)
-                .font(.system(size: 30, weight: .heavy))
-                .foregroundStyle(WorthItColor.primaryContainer)
-                .frame(width: 112, height: 112)
-                .background(WorthItColor.surfaceContainerHigh, in: Circle())
-                .overlay {
-                    Circle()
-                        .stroke(WorthItColor.outlineInput, lineWidth: 1)
-                }
-                .shadow(color: .black.opacity(0.18), radius: 24, y: 12)
+            avatarImage
 
-            Button {} label: {
+            PhotosPicker(
+                selection: $selectedPhotoItem,
+                matching: .images,
+                preferredItemEncoding: .current
+            ) {
                 Image(systemName: "pencil")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Color(hex: 0x122F5F))
@@ -158,7 +179,78 @@ struct EditProfileScreen: View {
                     .shadow(color: .black.opacity(0.20), radius: 12, y: 6)
             }
             .buttonStyle(.plain)
+            .disabled(isUploadingPhoto || isSaving)
+            .simultaneousGesture(TapGesture().onEnded { photoErrorText = nil })
             .accessibilityLabel(i18n.t(.profile.edit.accessibility.changePhoto))
+        }
+    }
+
+    @ViewBuilder
+    private var avatarImage: some View {
+        ZStack {
+            if let selectedAvatarData, let uiImage = UIImage(data: selectedAvatarData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+            } else if let profileImageURL,
+                      let url = URL(string: profileImageURL),
+                      url.scheme == "http" || url.scheme == "https" {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    default:
+                        initialsAvatar
+                    }
+                }
+            } else {
+                initialsAvatar
+            }
+
+            if isUploadingPhoto {
+                Circle()
+                    .fill(WorthItColor.surfaceLowest.opacity(0.58))
+                ProgressView()
+                    .tint(WorthItColor.primaryContainer)
+            }
+        }
+        .frame(width: 112, height: 112)
+        .clipShape(Circle())
+        .overlay {
+            Circle()
+                .stroke(WorthItColor.outlineInput, lineWidth: 1)
+        }
+        .shadow(color: .black.opacity(0.18), radius: 24, y: 12)
+    }
+
+    private var initialsAvatar: some View {
+        Text(initials)
+            .font(.system(size: 30, weight: .heavy))
+            .foregroundStyle(WorthItColor.primaryContainer)
+            .frame(width: 112, height: 112)
+            .background(WorthItColor.surfaceContainerHigh, in: Circle())
+    }
+
+    private func photoError(_ text: String) -> some View {
+        HStack(alignment: .top, spacing: WorthItSpacing.s) {
+            Image(systemName: "exclamationmark.circle.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(Color(hex: 0xFFB4AB))
+
+            Text(text)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Color(hex: 0xFFB4AB))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, WorthItSpacing.m)
+        .padding(.vertical, WorthItSpacing.s)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(hex: 0xFFB4AB).opacity(0.08), in: RoundedRectangle(cornerRadius: WorthItRadius.m))
+        .overlay {
+            RoundedRectangle(cornerRadius: WorthItRadius.m)
+                .stroke(Color(hex: 0xFFB4AB).opacity(0.22), lineWidth: 1)
         }
     }
 
@@ -202,8 +294,8 @@ struct EditProfileScreen: View {
             WIButton(title: i18n.t(.profile.edit.actions.saveChanges), height: 56) {
                 save()
             }
-            .opacity(isSaving ? 0.62 : 1)
-            .allowsHitTesting(!isSaving)
+            .opacity(isSaving || isUploadingPhoto ? 0.62 : 1)
+            .allowsHitTesting(!isSaving && !isUploadingPhoto)
 
             WIButton(title: i18n.t(.profile.edit.actions.discard), style: .outline, height: 56, action: onDiscard)
         }
@@ -248,7 +340,7 @@ struct EditProfileScreen: View {
                 _ = try await onSave(EditProfileDraft(
                     name: trimmedName,
                     email: trimmedEmail,
-                    image: user?.image
+                    image: profileImageURL
                 ))
             } catch {
                 errorText = profileSaveErrorText(error)
@@ -256,6 +348,198 @@ struct EditProfileScreen: View {
 
             isSaving = false
         }
+    }
+
+    private func uploadSelectedPhoto(_ item: PhotosPickerItem) async {
+        isUploadingPhoto = true
+        photoErrorText = nil
+
+        do {
+            let photoData = try await loadPhotoData(from: item)
+
+            guard let jpegData = Self.jpegProfileImageData(from: photoData) else {
+                photoErrorText = "Could not prepare this photo. Try another image."
+                isUploadingPhoto = false
+                selectedPhotoItem = nil
+                return
+            }
+
+            selectedAvatarData = jpegData
+            profileImageURL = try await onUploadProfileImage(
+                ProfileImageUploadDraft(
+                    data: jpegData,
+                    fileName: "profile-\(UUID().uuidString).jpg",
+                    contentType: "image/jpeg"
+                )
+            )
+        } catch {
+            #if DEBUG
+            print("Profile image upload failed:", String(describing: error))
+            #endif
+            photoErrorText = photoUploadErrorText(error)
+        }
+
+        isUploadingPhoto = false
+        selectedPhotoItem = nil
+    }
+
+    private func loadPhotoData(from item: PhotosPickerItem) async throws -> Data {
+        do {
+            if let data = try await item.loadTransferable(type: Data.self) {
+                return data
+            }
+        } catch {
+            #if DEBUG
+            print(
+                "Profile image primary PhotosPicker read failed, trying PHAsset fallback:",
+                "itemIdentifier=\(item.itemIdentifier ?? "nil")",
+                String(describing: error)
+            )
+            #endif
+
+            guard let fallbackData = try await Self.loadPhotoAssetData(localIdentifier: item.itemIdentifier) else {
+                throw error
+            }
+
+            return fallbackData
+        }
+
+        guard let fallbackData = try await Self.loadPhotoAssetData(localIdentifier: item.itemIdentifier) else {
+            throw ProfilePhotoReadError.unavailable
+        }
+
+        return fallbackData
+    }
+
+    private static func jpegProfileImageData(from data: Data) -> Data? {
+        guard let image = UIImage(data: data) else { return nil }
+        return image.jpegData(compressionQuality: 0.82)
+    }
+
+    private static func loadPhotoAssetData(localIdentifier: String?) async throws -> Data? {
+        guard let localIdentifier else { return nil }
+
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: [localIdentifier], options: nil)
+        guard let asset = assets.firstObject else { return nil }
+
+        let options = PHImageRequestOptions()
+        options.deliveryMode = .highQualityFormat
+        options.isNetworkAccessAllowed = true
+        options.resizeMode = .none
+        options.version = .current
+
+        return try await withCheckedThrowingContinuation { continuation in
+            var didResume = false
+
+            let resumeOnce: (Result<Data?, Error>) -> Void = { result in
+                guard !didResume else { return }
+                didResume = true
+
+                switch result {
+                case .success(let data):
+                    continuation.resume(returning: data)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+
+            PHImageManager.default().requestImageDataAndOrientation(
+                for: asset,
+                options: options
+            ) { data, _, _, info in
+                if (info?[PHImageResultIsDegradedKey] as? Bool) == true {
+                    return
+                }
+
+                if let error = info?[PHImageErrorKey] as? Error {
+                    resumeOnce(.failure(error))
+                    return
+                }
+
+                if (info?[PHImageCancelledKey] as? Bool) == true {
+                    resumeOnce(.success(nil))
+                    return
+                }
+
+                resumeOnce(.success(data))
+            }
+        }
+    }
+
+    private func photoUploadErrorText(_ error: Error) -> String {
+        if case APIError.requestFailed(let statusCode, let body) = error {
+            if statusCode == 413 || body.contains("PROFILE_IMAGE_TOO_LARGE") {
+                return "Photo is too large. Try a smaller image."
+            }
+
+            if statusCode == 422 {
+                return "This image format is not supported. Try another photo."
+            }
+
+            if statusCode == 404 {
+                return "Photo upload is not available yet. Restart the app backend and try again."
+            }
+
+            if statusCode == 401 {
+                return "Your session expired. Sign in again, then retry photo upload."
+            }
+
+            if statusCode == 403 {
+                return "You do not have access to update this profile photo."
+            }
+
+            if statusCode >= 500 {
+                return "Photo upload service failed. Try again in a moment."
+            }
+        }
+
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .cannotConnectToHost, .notConnectedToInternet, .networkConnectionLost, .timedOut:
+                return "Could not reach photo upload service. Check connection and try again."
+            default:
+                return "Could not upload this photo. Try again in a moment."
+            }
+        }
+
+        if error is DecodingError {
+            return "Photo upload response was not readable. Restart the app and try again."
+        }
+
+        if case ProfilePhotoReadError.unavailable = error {
+            return "Could not read this photo. Try another image."
+        }
+
+        if isPhotosReadError(error) {
+            return "Could not read this photo from iCloud Photos. Open it in Photos first, then try again."
+        }
+
+        return "Could not upload this photo. Try again in a moment."
+    }
+
+    private func isPhotosReadError(_ error: Error) -> Bool {
+        var currentError: NSError? = error as NSError
+
+        while let nsError = currentError {
+            let combinedText = [
+                nsError.domain,
+                nsError.localizedDescription,
+                "\(nsError.code)",
+            ].joined(separator: " ")
+
+            if combinedText.contains("NSItemProviderErrorDomain") ||
+                combinedText.contains(NSItemProvider.errorDomain) ||
+                combinedText.contains("PHAssetExportRequestErrorDomain") ||
+                combinedText.contains("CloudPhotoLibraryErrorDomain") ||
+                combinedText.contains("Cannot load representation") ||
+                combinedText.contains("helper application") {
+                return true
+            }
+
+            currentError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
+        }
+
+        return false
     }
 
     private func profileSaveErrorText(_ error: Error) -> String {
@@ -349,6 +633,7 @@ private struct AccountInfoRow: View {
     EditProfileScreen(
         user: AuthUser(id: UUID(), name: "Ilya Brusenko", email: "ilya@example.com", image: nil),
         onSave: { _ in AuthUser(id: UUID(), name: "Ilya Brusenko", email: "ilya@example.com", image: nil) },
+        onUploadProfileImage: { _ in "local://preview" },
         onDiscard: {}
     )
 }

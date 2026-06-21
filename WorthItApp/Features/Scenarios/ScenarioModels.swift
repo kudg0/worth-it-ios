@@ -15,6 +15,8 @@ struct ScenarioListItem: Decodable, Identifiable, Hashable {
     let loanTermMonths: Int?
     let loanAnnualInterestRate: String?
     let isFavorite: Bool
+    let currentOdometerKm: Double?
+    let costPerKm: Double?
 }
 
 struct CreateScenarioRequest: Encodable {

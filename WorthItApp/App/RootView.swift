@@ -51,6 +51,10 @@ struct RootView: View {
                     authSessionStore.updateUser(user)
                     return user
                 },
+                onProfileImageUploaded: { draft in
+                    let token = authSessionStore.session?.token ?? ""
+                    return try await AuthRepository(baseURL: apiBaseURL).uploadProfileImage(draft, token: token)
+                },
                 onLoadUserSettings: {
                     let token = authSessionStore.session?.token ?? ""
                     return try await AuthRepository(baseURL: apiBaseURL).getSettings(token: token)

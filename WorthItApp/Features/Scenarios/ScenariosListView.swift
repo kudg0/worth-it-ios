@@ -15,6 +15,7 @@ struct ScenariosListView: View {
     let onOpenScenario: (ScenarioListItem) -> Void
     let onScenariosLoaded: ([ScenarioListItem]) -> Void
     let onProfileUpdated: (EditProfileDraft) async throws -> AuthUser
+    let onProfileImageUploaded: (ProfileImageUploadDraft) async throws -> String
     let onLoadUserSettings: () async throws -> UserSettings
     let onLoadUserSettingsOptions: () async throws -> UserSettingsOptions
     let onUpdateUserSettings: (UserSettingsPatch) async throws -> UserSettings
@@ -41,6 +42,7 @@ struct ScenariosListView: View {
                         isEditingProfile = false
                         return updatedUser
                     },
+                    onUploadProfileImage: onProfileImageUploaded,
                     onDiscard: {
                         isEditingProfile = false
                     }
@@ -195,9 +197,11 @@ struct ScenariosListView: View {
                 } label: {
                     WIScenarioCard(
                         title: scenario.name,
-                        subtitle: i18n.t(.scenarios.card.type.carOwnership),
-                        metric1: WIScenarioMetric(label: i18n.t(.scenarios.metrics.purchase), value: scenario.formattedPurchasePrice),
-                        metric2: WIScenarioMetric(label: i18n.t(.scenarios.metrics.odometer), value: scenario.formattedOdometer)
+                        metric1: scenario.primaryListMetric(i18n: i18n),
+                        metric2: WIScenarioMetric(
+                            label: i18n.t(.scenarios.metrics.currentOdometer),
+                            value: scenario.formattedCurrentOdometer
+                        )
                     )
                 }
                 .buttonStyle(.plain)
@@ -345,12 +349,27 @@ private struct ErrorStateView: View {
 }
 
 private extension ScenarioListItem {
+    func primaryListMetric(i18n: I18n) -> WIScenarioMetric {
+        if let costPerKm, costPerKm > 0 {
+            return WIScenarioMetric(
+                label: i18n.t(.scenarios.metrics.pricePerKm),
+                value: "\(ScenarioCompareFormatter.money(costPerKm, currency: currency))/km"
+            )
+        }
+
+        return WIScenarioMetric(label: i18n.t(.scenarios.metrics.purchase), value: formattedPurchasePrice)
+    }
+
     var formattedPurchasePrice: String {
         let decimal = Decimal(string: purchasePrice) ?? 0
         return "\(currency) \(Self.formatDecimal(decimal, fractionDigits: 0))"
     }
 
-    var formattedOdometer: String {
+    var formattedCurrentOdometer: String {
+        if let currentOdometerKm {
+            return "\(Self.formatInt(Int(currentOdometerKm.rounded()))) km"
+        }
+
         guard let purchaseOdometer else { return "—" }
         return "\(Self.formatInt(purchaseOdometer)) km"
     }
@@ -371,6 +390,16 @@ private extension ScenarioListItem {
         formatter.numberStyle = .decimal
         formatter.usesGroupingSeparator = true
         formatter.maximumFractionDigits = 0
+        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+
+    private static func formatDouble(_ value: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.locale = .autoupdatingCurrent
+        formatter.numberStyle = .decimal
+        formatter.usesGroupingSeparator = true
+        formatter.maximumFractionDigits = value.rounded() == value ? 0 : 1
+        formatter.minimumFractionDigits = 0
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
 }

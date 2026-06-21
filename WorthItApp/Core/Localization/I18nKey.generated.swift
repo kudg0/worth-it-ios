@@ -382,7 +382,9 @@ struct ScenariosKeys {
     }
 
     struct MetricsKeys {
+        let currentOdometer = I18nKey("scenarios.metrics.currentOdometer")
         let odometer = I18nKey("scenarios.metrics.odometer")
+        let pricePerKm = I18nKey("scenarios.metrics.pricePerKm")
         let purchase = I18nKey("scenarios.metrics.purchase")
     }
 
@@ -397,4 +399,4 @@ struct TabsKeys {
     let scenarios = I18nKey("tabs.scenarios")
 }
 
-// Skipped 0 legacy non-semantic catalog keys.
+// Skipped 114 legacy non-semantic catalog keys.

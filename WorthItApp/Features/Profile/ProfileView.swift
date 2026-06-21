@@ -162,16 +162,39 @@ struct ProfileView: View {
     }
 
     private var avatar: some View {
+        ZStack {
+            if let imageURL = user?.image,
+               let url = URL(string: imageURL),
+               url.scheme == "http" || url.scheme == "https" {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    default:
+                        initialsAvatar
+                    }
+                }
+            } else {
+                initialsAvatar
+            }
+        }
+        .frame(width: 48, height: 48)
+        .clipShape(Circle())
+        .overlay {
+            Circle()
+                .stroke(WorthItColor.outlineInput, lineWidth: 2)
+        }
+        .shadow(color: WorthItColor.primaryContainer.opacity(0.15), radius: 30)
+    }
+
+    private var initialsAvatar: some View {
         Text(initials)
             .font(.system(size: 15, weight: .heavy))
             .foregroundStyle(WorthItColor.primaryContainer)
             .frame(width: 48, height: 48)
             .background(WorthItColor.surfaceContainerHigh, in: Circle())
-            .overlay {
-                Circle()
-                    .stroke(WorthItColor.outlineInput, lineWidth: 2)
-            }
-            .shadow(color: WorthItColor.primaryContainer.opacity(0.15), radius: 30)
     }
 
     private var displayName: String {

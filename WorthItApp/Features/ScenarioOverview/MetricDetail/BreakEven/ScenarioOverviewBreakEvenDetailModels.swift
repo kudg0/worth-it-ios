@@ -6,6 +6,8 @@ struct AlternativeSavingsSnapshot {
     let alternativeTotal: Double
     let savings: Double
     let carRate: Double
+    let carRateMin: Double?
+    let carRateMax: Double?
     let alternativeRate: Double
     let alternativeRateMin: Double?
     let alternativeRateMax: Double?
@@ -65,15 +67,22 @@ extension ScenarioOverviewView {
             return nil
         }
 
+        let dynamicCarRates = dynamicRateRange(row.dynamicTripSavings?.items.compactMap(\.carCostPerKm) ?? [])
+        let dynamicAlternativeRates = dynamicRateRange(
+            row.dynamicTripSavings?.items.compactMap(\.alternativeCostPerKm) ?? []
+        )
+
         return AlternativeSavingsSnapshot(
             row: row,
             carTotal: carTotal,
             alternativeTotal: alternativeTotal,
             savings: savings,
             carRate: carRate,
+            carRateMin: dynamicCarRates?.min,
+            carRateMax: dynamicCarRates?.max,
             alternativeRate: alternativeRate,
-            alternativeRateMin: row.alternativeCostPerKmMin,
-            alternativeRateMax: row.alternativeCostPerKmMax
+            alternativeRateMin: dynamicAlternativeRates?.min ?? row.alternativeCostPerKmMin,
+            alternativeRateMax: dynamicAlternativeRates?.max ?? row.alternativeCostPerKmMax
         )
     }
 
@@ -95,7 +104,7 @@ extension ScenarioOverviewView {
                 id: item.usageEventId,
                 title: "\(formatDouble(item.distanceKm, fractionDigits: 0)) \(mileageDisplayUnit) · \(Self.shortDateFormatter.string(from: item.date))",
                 subtitle: "Car \(carRate) · \(row.alternativeName) \(alternativeRate)",
-                value: savingsDeltaDisplay(savings, includesOutcome: true),
+                value: tripSavingsDeltaDisplay(savings, includesOutcome: true),
                 valueColor: savings >= 0 ? WorthItColor.accentGold : WorthItColor.danger
             )
         }
@@ -167,7 +176,7 @@ extension ScenarioOverviewView {
             BreakEvenDetailScreen.CalculationRow(
                 id: "car-rate",
                 title: i18n.t("Car \(currencySymbol)/\(mileageDisplayUnit)"),
-                value: snapshot.map { "\(currencySymbol)\(formatDouble($0.carRate, fractionDigits: 2))" } ?? "-",
+                value: snapshot.map(carRateDisplay) ?? "-",
                 accentColor: WorthItColor.textPrimary,
                 showsDot: false
             ),
@@ -209,20 +218,56 @@ extension ScenarioOverviewView {
         return "\(money) \(savingsOutcomeLabel(value))"
     }
 
+    func tripSavingsDeltaDisplay(_ value: Double, includesOutcome: Bool) -> String {
+        let prefix = value >= 0 ? "+" : "-"
+        let money = "\(prefix)\(currencySymbol)\(formatDouble(abs(value), fractionDigits: 2))"
+
+        guard includesOutcome else { return money }
+        return "\(money) \(savingsOutcomeLabel(value))"
+    }
+
     func savingsOutcomeLabel(_ value: Double) -> String {
         value >= 0 ? "ahead" : "behind"
     }
 
+    func dynamicRateRange(_ rates: [Double]) -> (min: Double, max: Double)? {
+        guard let min = rates.min(), let max = rates.max() else {
+            return nil
+        }
+
+        return (min, max)
+    }
+
+    func carRateDisplay(for snapshot: AlternativeSavingsSnapshot) -> String {
+        rateDisplay(
+            fallbackRate: snapshot.carRate,
+            minRate: snapshot.carRateMin,
+            maxRate: snapshot.carRateMax
+        )
+    }
+
     func alternativeRateDisplay(for snapshot: AlternativeSavingsSnapshot) -> String {
+        rateDisplay(
+            fallbackRate: snapshot.alternativeRate,
+            minRate: snapshot.alternativeRateMin,
+            maxRate: snapshot.alternativeRateMax
+        )
+    }
+
+    func rateDisplay(
+        fallbackRate: Double,
+        minRate: Double?,
+        maxRate: Double?
+    ) -> String {
         guard
-            let min = snapshot.alternativeRateMin,
-            let max = snapshot.alternativeRateMax
+            let min = minRate,
+            let max = maxRate
         else {
-            return "\(currencySymbol)\(formatDouble(snapshot.alternativeRate, fractionDigits: 2))"
+            return "\(currencySymbol)\(formatDouble(fallbackRate, fractionDigits: 2))"
         }
 
         if abs(max - min) < 0.0001 {
-            return "\(currencySymbol)\(formatDouble(snapshot.alternativeRate, fractionDigits: 2))"
+            return "\(currencySymbol)\(formatDouble(fallbackRate, fractionDigits: 2))"
         }
 
         return "\(currencySymbol)\(formatDouble(min, fractionDigits: 2))-\(currencySymbol)\(formatDouble(max, fractionDigits: 2))"
@@ -241,7 +286,7 @@ extension ScenarioOverviewView {
         }
 
         if row.dynamicTripSavings != nil {
-            return "Each mileage entry is priced on its own date. The car side uses the car cost per \(mileageDisplayUnit) known on that trip date, so early trips can be higher before more mileage spreads the ownership cost. The \(row.alternativeName) side uses that option's pricing for the same entry. We add those entry-level results to show whether the car is ahead or behind."
+            return "Each mileage entry is priced on its own date. The calculation card shows the effective \(currencySymbol)/\(mileageDisplayUnit) range from those trip calculations, while each row shows the exact rate for that trip. We add the entry-level results to show whether the car is ahead or behind."
         }
 
         return "We compare your actual ownership and running costs against estimated \(row.alternativeName) cost for the same \(formatDouble(row.currentDistanceKm, fractionDigits: 0)) \(mileageDisplayUnit). Positive means the car is ahead; negative means the car is behind."

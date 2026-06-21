@@ -102,10 +102,18 @@ extension ScenarioOverviewView {
 
     func normalizedEfficiencyComparisonSeries(_ series: ScenarioCompareChartSeries) -> ScenarioCompareChartSeries {
         guard let id = UUID(uuidString: series.id),
-              let result = currentComparison?.alternatives.first(where: { $0.id == id }),
-              result.pricingMode == .distanceCurve,
-              let averageRate = distanceCurveAverageRate(from: result.costBreakdown)
+              let result = currentComparison?.alternatives.first(where: { $0.id == id })
         else {
+            return series
+        }
+
+        let breakEven = currentComparison?.alternativeBreakEvens.first { $0.alternativeId == id }
+        let normalizedRate = dynamicAlternativeAverageRate(for: breakEven)
+            ?? (result.pricingMode == .distanceCurve
+                ? distanceCurveAverageRate(from: result.costBreakdown)
+                : nil)
+
+        guard let normalizedRate else {
             return series
         }
 
@@ -113,7 +121,7 @@ extension ScenarioOverviewView {
             id: series.id,
             title: series.title,
             color: series.color,
-            points: series.points.map { ScenarioCompareChartPoint(date: $0.date, value: averageRate) },
+            points: series.points.map { ScenarioCompareChartPoint(date: $0.date, value: normalizedRate) },
             isBenchmark: series.isBenchmark
         )
     }

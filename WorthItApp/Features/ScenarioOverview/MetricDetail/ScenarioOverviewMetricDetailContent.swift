@@ -36,13 +36,13 @@ extension ScenarioOverviewView {
 
     func friendlyMetricDetailError(_ rawError: String) -> String {
         if rawError.contains("NSURLErrorDomain Code=-1004") || rawError.contains("Could not connect to the server") {
-            return "Backend analytics is unavailable. Start the local API server and retry."
+            return "Analytics detail is unavailable. Start the local API server and retry."
         }
 
         if rawError.contains("statusCode: 404") {
-            return "Backend analytics endpoint is not available in the running API server. Restart the API server and retry."
+            return "Analytics detail is not available in the running API server. Restart the API server and retry."
         }
 
-        return "Backend analytics could not be loaded. Retry in a moment."
+        return "Analytics detail could not be loaded. Retry in a moment."
     }
 }

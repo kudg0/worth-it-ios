@@ -156,7 +156,7 @@ struct MileageTripDetailScreen: View {
 
                     Text(item.deltaText)
                         .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(item.isCheaper ? Color(hex: 0xFFB4AB) : WorthItColor.primaryContainer)
+                        .foregroundStyle(item.isCheaper ? WorthItColor.danger : WorthItColor.accentGold)
                 }
 
                 Image(systemName: "chevron.right")
@@ -303,7 +303,7 @@ private struct ComparableCostDetailSheet: View {
 
                 Text(item.deltaText)
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(item.isCheaper ? Color(hex: 0xFFB4AB) : WorthItColor.primaryContainer)
+                    .foregroundStyle(item.isCheaper ? WorthItColor.danger : WorthItColor.accentGold)
             }
             .frame(maxWidth: .infinity, alignment: .trailing)
         }

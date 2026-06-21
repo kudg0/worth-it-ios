@@ -13,7 +13,6 @@ struct WIScenarioCard: View {
 
     var mode: Mode = .filled
     var title: String
-    var subtitle: String = "Car Ownership"
     var iconSystemName: String = "car.fill"
     var metric1: WIScenarioMetric?
     var metric2: WIScenarioMetric?
@@ -37,13 +36,6 @@ struct WIScenarioCard: View {
                     .background(WorthItColor.surfaceContainerHigh, in: RoundedRectangle(cornerRadius: WorthItRadius.s))
 
                 VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
-                    Text(subtitle)
-                        .font(WorthItTypography.overline)
-                        .foregroundStyle(WorthItColor.textTertiary)
-                        .tracking(1)
-                        .textCase(.uppercase)
-                        .lineLimit(1)
-
                     Text(title)
                         .font(WorthItTypography.cardTitle)
                         .foregroundStyle(WorthItColor.textPrimary)

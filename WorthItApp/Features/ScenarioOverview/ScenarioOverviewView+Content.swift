@@ -57,6 +57,11 @@ extension ScenarioOverviewView {
         }
     }
 
+    var editingAlternativeBreakEven: ScenarioComparison.AlternativeBreakEven? {
+        guard let editingAlternative else { return nil }
+        return currentComparison?.alternativeBreakEvens.first { $0.alternativeId == editingAlternative.id }
+    }
+
     @ViewBuilder
     var tabContent: some View {
         switch selectedTab {
@@ -119,6 +124,7 @@ extension ScenarioOverviewView {
                 manualTotal: $comparableManualTotal,
                 note: $comparableNote,
                 inheritedCostCategories: $comparableInheritedCostCategories,
+                breakEven: editingAlternativeBreakEven,
                 currencyCode: activeScenario.currency,
                 isIncluded: $isComparableIncluded,
                 onRemove: { Task { await deleteEditingComparable() } }

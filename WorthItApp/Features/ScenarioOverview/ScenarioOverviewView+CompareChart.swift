@@ -44,8 +44,15 @@ extension ScenarioOverviewView {
                 .enumerated()
                 .compactMap { index, alternative -> ScenarioCompareChartSeries? in
                     let comparisonResult = currentComparison?.alternatives.first { $0.id == alternative.id }
+                    let breakEven = currentComparison?.alternativeBreakEvens.first {
+                        $0.alternativeId == alternative.id
+                    }
                     let points = alternative.points.compactMap { point -> ScenarioCompareChartPoint? in
-                        guard let value = compareChartValue(point, result: comparisonResult) else { return nil }
+                        guard let value = compareChartValue(
+                            point,
+                            result: comparisonResult,
+                            breakEven: breakEven
+                        ) else { return nil }
                         return ScenarioCompareChartPoint(date: point.date, value: value)
                     }
                     guard !points.isEmpty else { return nil }
@@ -63,7 +70,16 @@ extension ScenarioOverviewView {
         return result
     }
 
-    func compareChartValue(_ point: ScenarioComparison.Series.Point, result: ScenarioComparison.AlternativeResult?) -> Double? {
+    func compareChartValue(
+        _ point: ScenarioComparison.Series.Point,
+        result: ScenarioComparison.AlternativeResult?,
+        breakEven: ScenarioComparison.AlternativeBreakEven?
+    ) -> Double? {
+        if compareMetric == .perKm,
+           let dynamicAverageRate = dynamicAlternativeAverageRate(for: breakEven) {
+            return dynamicAverageRate
+        }
+
         if compareMetric == .perKm,
            result?.pricingMode == .distanceCurve,
            let averageRate = distanceCurveAverageRate(from: result?.costBreakdown) {
@@ -71,6 +87,12 @@ extension ScenarioOverviewView {
         }
 
         return compareChartValue(point)
+    }
+
+    func dynamicAlternativeAverageRate(for row: ScenarioComparison.AlternativeBreakEven?) -> Double? {
+        let rates = row?.dynamicTripSavings?.items.compactMap(\.alternativeCostPerKm) ?? []
+        guard !rates.isEmpty else { return nil }
+        return rates.reduce(0, +) / Double(rates.count)
     }
 
     func compareChartValue(_ point: ScenarioComparison.Series.Point) -> Double? {

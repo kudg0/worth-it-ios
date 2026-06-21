@@ -11,6 +11,7 @@ struct AddComparableOptionScreen: View {
     let manualTotal: Binding<String>
     let note: Binding<String>
     let inheritedCostCategories: Binding<Set<String>>
+    let breakEven: ScenarioComparison.AlternativeBreakEven?
     let currencyCode: String
     let isIncluded: Binding<Bool>
     let onRemove: () -> Void
@@ -22,6 +23,7 @@ struct AddComparableOptionScreen: View {
             hero
             identityFields
             costParametersSection
+            dynamicTripRatesSection
             inheritedCostsSection
             controlsSection
         }
@@ -108,6 +110,7 @@ struct AddComparableOptionScreen: View {
 
                         ForEach(curvePoints.wrappedValue.indices, id: \.self) { index in
                             curvePriceField(
+                                index: index,
                                 point: Binding(
                                     get: { curvePoints.wrappedValue[index] },
                                     set: { curvePoints.wrappedValue[index] = $0 }
@@ -116,6 +119,15 @@ struct AddComparableOptionScreen: View {
                             ) {
                                 curvePoints.wrappedValue.remove(at: index)
                             }
+                        }
+
+                        if let curveSummaryCaption {
+                            Text(curveSummaryCaption)
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundStyle(WorthItColor.primaryContainer)
+                                .lineSpacing(3)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.top, WorthItSpacing.xs)
                         }
 
                         Button(action: addCurvePoint) {
@@ -151,9 +163,7 @@ struct AddComparableOptionScreen: View {
                     )
                 }
 
-                if pricingModel.wrappedValue == .distanceCurve {
-                    distanceCurveBreakdown
-                } else {
+                if pricingModel.wrappedValue != .distanceCurve {
                     WITextField(label: i18n.t("Note"), placeholder: i18n.t("City taxi, car share, rental..."), text: note)
                 }
             }
@@ -185,6 +195,92 @@ struct AddComparableOptionScreen: View {
             }
         }
         .padding(.vertical, WorthItSpacing.xxl)
+    }
+
+    @ViewBuilder
+    private var dynamicTripRatesSection: some View {
+        if let dynamicRateSummary {
+            ComparableEditorIsland(title: i18n.t("Trip Rate Breakdown"), systemName: "function") {
+                VStack(alignment: .leading, spacing: WorthItSpacing.l) {
+                    Text("Savings uses dated trip calculations. Each trip gets its own effective rate, then the card shows the min-max range.")
+                        .font(WorthItTypography.caption)
+                        .lineSpacing(3)
+                        .foregroundStyle(WorthItColor.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    if let dynamicRateBasisText {
+                        Text(dynamicRateBasisText)
+                            .font(WorthItTypography.caption)
+                            .lineSpacing(3)
+                            .foregroundStyle(WorthItColor.textTertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+
+                    VStack(alignment: .leading, spacing: WorthItSpacing.s) {
+                        dynamicSummaryRow(label: "Effective range", value: dynamicRateSummary.rangeText)
+                        dynamicSummaryRow(label: "Average", value: dynamicRateSummary.averageText)
+                        dynamicSummaryRow(label: "Trips", value: "\(dynamicRateSummary.tripCount)")
+                    }
+                    .padding(WorthItSpacing.l)
+                    .background(WorthItColor.surfaceLowest, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
+
+                    VStack(alignment: .leading, spacing: WorthItSpacing.m) {
+                        Text("Examples")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(WorthItColor.textTertiary)
+                            .tracking(1.2)
+                            .textCase(.uppercase)
+
+                        ForEach(dynamicRateSummary.examples) { example in
+                            dynamicExampleRow(example)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func dynamicSummaryRow(label: String, value: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: WorthItSpacing.m) {
+            Text(label)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(WorthItColor.textSecondary)
+
+            Spacer(minLength: WorthItSpacing.m)
+
+            Text(value)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(WorthItColor.textPrimary)
+                .multilineTextAlignment(.trailing)
+        }
+    }
+
+    private func dynamicExampleRow(_ example: DynamicRateExample) -> some View {
+        HStack(alignment: .top, spacing: WorthItSpacing.m) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(example.title)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(WorthItColor.textPrimary)
+
+                Text(example.subtitle)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(WorthItColor.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: WorthItSpacing.m)
+
+            Text(example.rateText)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(WorthItColor.primaryContainer)
+                .multilineTextAlignment(.trailing)
+        }
+        .padding(WorthItSpacing.m)
+        .background(WorthItColor.surfaceLowest.opacity(0.82), in: RoundedRectangle(cornerRadius: WorthItRadius.m))
+        .overlay {
+            RoundedRectangle(cornerRadius: WorthItRadius.m)
+                .stroke(WorthItColor.outlineSubtle.opacity(0.95), lineWidth: 1)
+        }
     }
 
     private var removeComparableRow: some View {
@@ -286,43 +382,55 @@ struct AddComparableOptionScreen: View {
     }
 
     private func curvePriceField(
+        index: Int,
         point: Binding<ComparableCurveInputPoint>,
         canRemove: Bool,
         onRemove: @escaping () -> Void
     ) -> some View {
-        HStack(alignment: .bottom, spacing: WorthItSpacing.m) {
-            WITextField(
-                label: i18n.t("Distance"),
-                placeholder: i18n.t("12"),
-                text: Binding(
-                    get: { point.wrappedValue.distanceKm },
-                    set: { point.wrappedValue.distanceKm = $0 }
-                ),
-                trailingText: "km",
-                keyboardType: .decimalPad
-            )
-            .frame(width: 112)
+        VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
+            HStack(alignment: .bottom, spacing: WorthItSpacing.m) {
+                WITextField(
+                    label: i18n.t("Distance"),
+                    placeholder: i18n.t("12"),
+                    text: Binding(
+                        get: { point.wrappedValue.distanceKm },
+                        set: { point.wrappedValue.distanceKm = $0 }
+                    ),
+                    trailingText: "km",
+                    keyboardType: .decimalPad
+                )
+                .frame(width: 112)
 
-            WITextField(
-                label: i18n.t("Trip price"),
-                placeholder: i18n.t("0.00"),
-                text: Binding(
-                    get: { point.wrappedValue.totalPrice },
-                    set: { point.wrappedValue.totalPrice = $0 }
-                ),
-                leadingText: currencySymbol,
-                keyboardType: .decimalPad
-            )
+                WITextField(
+                    label: i18n.t("Trip price"),
+                    placeholder: i18n.t("0.00"),
+                    text: Binding(
+                        get: { point.wrappedValue.totalPrice },
+                        set: { point.wrappedValue.totalPrice = $0 }
+                    ),
+                    leadingText: currencySymbol,
+                    keyboardType: .decimalPad
+                )
 
-            if canRemove {
-                Button(action: onRemove) {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(Color(hex: 0xFFB4AB))
-                        .frame(width: 32, height: 52)
+                if canRemove {
+                    Button(action: onRemove) {
+                        Image(systemName: "minus.circle.fill")
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(Color(hex: 0xFFB4AB))
+                            .frame(width: 32, height: 52)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Remove distance point")
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Remove distance point")
+            }
+
+            if let caption = curvePointCaption(at: index) {
+                Text(caption)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(WorthItColor.textTertiary)
+                    .lineSpacing(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.leading, 2)
             }
         }
     }
@@ -331,110 +439,67 @@ struct AddComparableOptionScreen: View {
         curvePoints.wrappedValue.append(ComparableCurveInputPoint())
     }
 
-    private var distanceCurveBreakdown: some View {
-        VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Curve Average")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(WorthItColor.textSecondary)
-                        .tracking(1.2)
-                        .textCase(.uppercase)
-
-                    Text("Average of known point €/km rates.")
-                        .font(.system(size: 11, weight: .regular))
-                        .foregroundStyle(WorthItColor.textTertiary)
-                }
-
-                Spacer(minLength: WorthItSpacing.m)
-
-                Text(distanceCurveAverageLabel)
-                    .font(.system(size: 18, weight: .heavy))
-                    .foregroundStyle(WorthItColor.primaryContainer)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.78)
-            }
-
-            VStack(alignment: .leading, spacing: WorthItSpacing.s) {
-                ForEach(distanceCurvePointRows, id: \.self) { row in
-                    Text(row)
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(WorthItColor.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-
-            if !distanceCurveSegmentRows.isEmpty {
-                Divider()
-                    .overlay(WorthItColor.outlineSubtle.opacity(0.45))
-
-                VStack(alignment: .leading, spacing: WorthItSpacing.s) {
-                    Text("Between known distances")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(WorthItColor.textSecondary)
-                        .tracking(1.1)
-                        .textCase(.uppercase)
-
-                    ForEach(distanceCurveSegmentRows, id: \.self) { row in
-                        Text(row)
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(WorthItColor.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-            }
-        }
-        .padding(WorthItSpacing.l)
-        .background(WorthItColor.surfaceContainerLow, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
-        .overlay {
-            RoundedRectangle(cornerRadius: WorthItRadius.l)
-                .stroke(WorthItColor.outlineSubtle.opacity(0.7), lineWidth: 1)
-        }
-    }
-
-    private var distanceCurveAverageLabel: String {
-        guard let average = distanceCurveAverageRate else { return "—/km" }
-        return "\(currencySymbol)\(formatCurveRate(average))/km"
-    }
-
-    private var distanceCurveAverageRate: Double? {
-        let rates = validCurvePoints.map(\.rate)
-        guard !rates.isEmpty else { return nil }
-        return rates.reduce(0, +) / Double(rates.count)
-    }
-
-    private var distanceCurvePointRows: [String] {
-        guard !validCurvePoints.isEmpty else {
-            return ["Add at least 2 distance points to see the curve average."]
+    private func curvePointCaption(at index: Int) -> String? {
+        guard curvePoints.wrappedValue.indices.contains(index),
+              let current = curvePointPreview(curvePoints.wrappedValue[index])
+        else {
+            return nil
         }
 
-        return validCurvePoints.map { point in
-            "\(formatCurveNumber(point.distanceKm)) km → \(currencySymbol)\(formatCurveNumber(point.totalPrice)) total → \(currencySymbol)\(formatCurveRate(point.rate))/km"
+        var parts = [
+            "\(currencySymbol)\(formatCurveRate(current.rate))/km point rate"
+        ]
+
+        if index > 0,
+           let previous = curvePointPreview(curvePoints.wrappedValue[index - 1]),
+           current.distanceKm > previous.distanceKm {
+            let segmentRate = (previous.rate + current.rate) / 2
+            parts.append(
+                "\(formatCurveNumber(previous.distanceKm))-\(formatCurveNumber(current.distanceKm)) km segment \(currencySymbol)\(formatCurveRate(segmentRate))/km"
+            )
         }
+
+        return parts.joined(separator: " · ")
     }
 
-    private var distanceCurveSegmentRows: [String] {
-        let points = validCurvePoints
-        guard points.count >= 2 else { return [] }
+    private var curveSummaryCaption: String? {
+        let points = curvePointPreviews
+        guard points.count >= 2 else { return nil }
 
-        return points.indices.dropFirst().compactMap { index in
+        let pointAverage = points.map(\.rate).reduce(0, +) / Double(points.count)
+        let segmentRates = curveSegmentRates(from: points)
+
+        if segmentRates.isEmpty {
+            return "Summary: \(currencySymbol)\(formatCurveRate(pointAverage))/km point average"
+        }
+
+        let segmentAverage = segmentRates.reduce(0, +) / Double(segmentRates.count)
+        guard let minSegment = segmentRates.min(), let maxSegment = segmentRates.max() else {
+            return "Summary: \(currencySymbol)\(formatCurveRate(pointAverage))/km point average"
+        }
+
+        return "Summary: \(currencySymbol)\(formatCurveRate(pointAverage))/km point average · \(currencySymbol)\(formatCurveRate(segmentAverage))/km segment average · range \(currencySymbol)\(formatCurveRate(minSegment))-\(currencySymbol)\(formatCurveRate(maxSegment))/km"
+    }
+
+    private var curvePointPreviews: [CurvePointPreview] {
+        curvePoints.wrappedValue
+            .compactMap(curvePointPreview)
+            .sorted { $0.distanceKm < $1.distanceKm }
+    }
+
+    private func curveSegmentRates(from points: [CurvePointPreview]) -> [Double] {
+        points.indices.dropFirst().compactMap { index in
             let previous = points[index - 1]
             let current = points[index]
-            let distanceDelta = current.distanceKm - previous.distanceKm
-            guard distanceDelta > 0 else { return nil }
-
-            let segmentRate = (previous.rate + current.rate) / 2
-            return "\(formatCurveNumber(previous.distanceKm))–\(formatCurveNumber(current.distanceKm)) km: \(currencySymbol)\(formatCurveRate(segmentRate))/km"
+            guard current.distanceKm > previous.distanceKm else { return nil }
+            return (previous.rate + current.rate) / 2
         }
     }
 
-    private var validCurvePoints: [CurvePointPreview] {
-        curvePoints.wrappedValue.compactMap { point in
-            guard let distance = curveDouble(point.distanceKm), distance > 0 else { return nil }
-            guard let total = curveDouble(point.totalPrice) else { return nil }
-            return CurvePointPreview(distanceKm: distance, totalPrice: total)
-        }
-        .sorted { $0.distanceKm < $1.distanceKm }
+    private func curvePointPreview(_ point: ComparableCurveInputPoint) -> CurvePointPreview? {
+        guard let distance = curveDouble(point.distanceKm), distance > 0 else { return nil }
+        guard let total = curveDouble(point.totalPrice) else { return nil }
+        return CurvePointPreview(distanceKm: distance, totalPrice: total)
     }
 
     private func curveDouble(_ value: String) -> Double? {
@@ -456,6 +521,98 @@ struct AddComparableOptionScreen: View {
         formatter.minimumFractionDigits = 2
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
     }
+
+    private var dynamicRateSummary: DynamicRateSummary? {
+        guard let dynamic = breakEven?.dynamicTripSavings else { return nil }
+
+        let ratedItems = dynamic.items.compactMap { item -> DynamicRatedTrip? in
+            guard let rate = item.alternativeCostPerKm,
+                  let total = item.alternativeTripCost,
+                  item.distanceKm > 0
+            else {
+                return nil
+            }
+
+            return DynamicRatedTrip(
+                id: item.usageEventId,
+                date: item.date,
+                distanceKm: item.distanceKm,
+                total: total,
+                rate: rate
+            )
+        }
+
+        guard !ratedItems.isEmpty,
+              let minRate = ratedItems.map(\.rate).min(),
+              let maxRate = ratedItems.map(\.rate).max()
+        else {
+            return nil
+        }
+
+        let average = ratedItems.map(\.rate).reduce(0, +) / Double(ratedItems.count)
+        let rangeText = abs(maxRate - minRate) < 0.0001
+            ? "\(money(minRate))/km"
+            : "\(money(minRate))-\(money(maxRate))/km"
+
+        return DynamicRateSummary(
+            rangeText: rangeText,
+            averageText: "\(money(average))/km",
+            tripCount: dynamic.tripCount,
+            examples: dynamicRateExamples(from: ratedItems)
+        )
+    }
+
+    private var dynamicRateBasisText: String? {
+        guard pricingModel.wrappedValue == .perPeriod,
+              let monthlyPrice = curveDouble(pricePerMonth.wrappedValue),
+              monthlyPrice > 0
+        else {
+            return nil
+        }
+
+        if inheritedCostCategories.wrappedValue.isEmpty {
+            return "For this option: monthly plan is allocated over dated trips, then divided by each trip distance."
+        }
+
+        let categories = inheritedCostCategories.wrappedValue
+            .sorted()
+            .joined(separator: ", ")
+        return "For this option: monthly plan is allocated over dated trips, inherited costs (\(categories)) are added, then total is divided by trip distance."
+    }
+
+    private func dynamicRateExamples(from trips: [DynamicRatedTrip]) -> [DynamicRateExample] {
+        let lowest = trips.min { $0.rate < $1.rate }
+        let highest = trips.max { $0.rate < $1.rate }
+        let latest = trips.max { $0.date < $1.date }
+
+        var examples: [DynamicRateExample] = []
+        for (label, trip) in [("Lowest", lowest), ("Highest", highest), ("Latest", latest)] {
+            guard let trip, !examples.contains(where: { $0.id == trip.id }) else { continue }
+            examples.append(dynamicRateExample(label: label, trip: trip))
+        }
+
+        return examples
+    }
+
+    private func dynamicRateExample(label: String, trip: DynamicRatedTrip) -> DynamicRateExample {
+        DynamicRateExample(
+            id: trip.id,
+            title: "\(label): \(formatCurveNumber(trip.distanceKm)) km",
+            subtitle: "\(Self.dynamicRateDateFormatter.string(from: trip.date)) • \(money(trip.total)) ÷ \(formatCurveNumber(trip.distanceKm)) km",
+            rateText: "\(money(trip.rate))/km"
+        )
+    }
+
+    private func money(_ value: Double) -> String {
+        "\(currencySymbol)\(formatCurveRate(value))"
+    }
+
+    private static let dynamicRateDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy"
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        return formatter
+    }()
 
     private var pricingSelection: Binding<String> {
         Binding {
@@ -491,4 +648,26 @@ private struct CurvePointPreview: Hashable {
     var rate: Double {
         totalPrice / distanceKm
     }
+}
+
+private struct DynamicRatedTrip: Identifiable, Hashable {
+    let id: UUID
+    let date: Date
+    let distanceKm: Double
+    let total: Double
+    let rate: Double
+}
+
+private struct DynamicRateSummary: Hashable {
+    let rangeText: String
+    let averageText: String
+    let tripCount: Int
+    let examples: [DynamicRateExample]
+}
+
+private struct DynamicRateExample: Identifiable, Hashable {
+    let id: UUID
+    let title: String
+    let subtitle: String
+    let rateText: String
 }

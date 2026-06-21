@@ -62,6 +62,25 @@ struct AuthRepository {
         return response.user
     }
 
+    func uploadProfileImage(_ draft: ProfileImageUploadDraft, token: String) async throws -> String {
+        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
+        let intent: ProfileImageUploadIntentResponse = try await client.post(
+            "/me/profile/avatar-upload-intents",
+            body: CreateProfileImageUploadIntentRequest(
+                fileName: draft.fileName,
+                contentType: draft.contentType,
+                byteSize: draft.data.count,
+                checksumSha256: nil
+            )
+        )
+
+        if intent.uploadUrl.scheme != "local" {
+            try await client.upload(data: draft.data, to: intent.uploadUrl, headers: intent.uploadHeaders)
+        }
+
+        return intent.imageUrl
+    }
+
     func getSettings(token: String) async throws -> UserSettings {
         let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
         let response: UserSettingsResponse = try await client.get("/me/settings")
@@ -112,6 +131,12 @@ struct UserSettingsPatch {
     var distanceUnit: String? = nil
     var currency: String? = nil
     var locale: String? = nil
+}
+
+struct ProfileImageUploadDraft {
+    let data: Data
+    let fileName: String
+    let contentType: String
 }
 
 struct UserSettingsOption: Identifiable, Equatable {
@@ -188,6 +213,20 @@ private struct UpdateUserProfileRequest: Encodable {
     let name: String
     let email: String
     let image: String?
+}
+
+private struct CreateProfileImageUploadIntentRequest: Encodable {
+    let fileName: String
+    let contentType: String
+    let byteSize: Int
+    let checksumSha256: String?
+}
+
+private struct ProfileImageUploadIntentResponse: Decodable {
+    let imageUrl: String
+    let uploadUrl: URL
+    let uploadHeaders: [String: String]
+    let expiresInSeconds: Int
 }
 
 private struct UserProfileResponse: Decodable {

@@ -50,6 +50,7 @@ struct ScenarioCompareScreen: View {
                             ComparableOptionRow(
                                 alternative: alternative,
                                 result: result(for: alternative.id),
+                                breakEven: breakEven(for: alternative.id),
                                 selectedMetric: selectedMetric.wrappedValue,
                                 currency: currency,
                                 summary: summary,
@@ -192,6 +193,10 @@ struct ScenarioCompareScreen: View {
         comparison?.alternatives.first(where: { $0.id == id })
     }
 
+    private func breakEven(for id: UUID) -> ScenarioComparison.AlternativeBreakEven? {
+        comparison?.alternativeBreakEvens.first(where: { $0.alternativeId == id })
+    }
+
     private var bestSelectedMetricResult: (result: ScenarioComparison.AlternativeResult, delta: Double)? {
         comparison?.alternatives
             .compactMap { result -> (ScenarioComparison.AlternativeResult, Double)? in
@@ -288,9 +293,10 @@ struct ScenarioCompareScreen: View {
     private func selectedMetricDelta(for result: ScenarioComparison.AlternativeResult) -> Double? {
         switch selectedMetric.wrappedValue {
         case .perKm:
-            let alternativeCostPerKm = result.pricingMode == .distanceCurve
-                ? distanceCurveAverageRate(from: result.costBreakdown)
-                : result.costBreakdown.perKm
+            let alternativeCostPerKm = dynamicAlternativeAverageRate(for: breakEven(for: result.id))
+                ?? (result.pricingMode == .distanceCurve
+                    ? distanceCurveAverageRate(from: result.costBreakdown)
+                    : result.costBreakdown.perKm)
             guard let ownershipValue = currentOwnershipChartValue ?? ownershipCostPerKm,
                   let alternativeCostPerKm
             else { return nil }
@@ -345,5 +351,11 @@ struct ScenarioCompareScreen: View {
         }
 
         return breakdown.inputs.averageCurvePricePerKm
+    }
+
+    private func dynamicAlternativeAverageRate(for row: ScenarioComparison.AlternativeBreakEven?) -> Double? {
+        let rates = row?.dynamicTripSavings?.items.compactMap(\.alternativeCostPerKm) ?? []
+        guard !rates.isEmpty else { return nil }
+        return rates.reduce(0, +) / Double(rates.count)
     }
 }
