@@ -263,7 +263,7 @@ private struct UserSettingsResponse: Decodable {
     }
 }
 
-private struct UserSettingsOptionsResponse: Decodable {
+struct UserSettingsOptionsResponse: Decodable {
     let regions: [UserSettingsOptionResponse]
     let currencies: [UserSettingsOptionResponse]
     let distanceUnits: [UserSettingsOptionResponse]
@@ -277,7 +277,7 @@ private struct UserSettingsOptionsResponse: Decodable {
     }
 }
 
-private struct UserSettingsOptionResponse: Decodable {
+struct UserSettingsOptionResponse: Decodable {
     let id: String
     let label: String
     let groupId: String?

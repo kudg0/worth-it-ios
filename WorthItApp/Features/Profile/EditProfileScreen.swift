@@ -54,7 +54,20 @@ struct EditProfileScreen: View {
                     identityCard
                     securitySection
                     if let errorText {
-                        WITipInfo(title: i18n.t(.profile.edit.errors.profileNotSaved), bodyText: errorText, size: .small, tone: .info)
+                        WITipInfo(
+                            title: i18n.t(.profile.edit.errors.profileNotSaved),
+                            bodyText: errorText,
+                            size: .small,
+                            tone: .danger,
+                            onDismiss: { self.errorText = nil }
+                        )
+                        .task(id: errorText) {
+                            try? await Task.sleep(for: .seconds(3))
+                            guard !Task.isCancelled else { return }
+                            await MainActor.run {
+                                self.errorText = nil
+                            }
+                        }
                     }
                     actionStack
                 }
@@ -547,11 +560,12 @@ struct EditProfileScreen: View {
             if statusCode == 409 || body.contains("EMAIL_ALREADY_IN_USE") {
                 return i18n.t(.profile.edit.errors.emailInUse)
             }
-
-            return "\(i18n.t(.profile.edit.errors.backendRejectedWithStatus)) \(statusCode)."
         }
 
-        return i18n.t(.profile.edit.errors.backendUnreachable)
+        return WIUpdateErrorText.message(
+            for: error,
+            fallback: i18n.t(.profile.edit.errors.backendUnreachable)
+        )
     }
 
     private static func displayName(for user: AuthUser?) -> String {

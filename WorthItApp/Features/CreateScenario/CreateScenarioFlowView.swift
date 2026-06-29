@@ -794,7 +794,9 @@ struct CreateScenarioFlowView: View {
             name: vehicleName.trimmingCharacters(in: .whitespacesAndNewlines),
             category: "car",
             scenarioType: "car_ownership",
+            baseUnit: "km",
             currency: currency,
+            region: "en-CY",
             startDate: purchaseDate ?? Date(),
             purchasePrice: decimalValue(vehiclePrice),
             purchaseOdometer: Int(odometer.trimmingCharacters(in: .whitespacesAndNewlines)),
@@ -811,7 +813,9 @@ struct CreateScenarioFlowView: View {
             name: vehicleName.trimmingCharacters(in: .whitespacesAndNewlines),
             category: "car",
             scenarioType: "car_ownership",
+            baseUnit: editingScenario?.baseUnit,
             currency: currency,
+            region: editingScenario?.region,
             startDate: purchaseDate ?? Date(),
             purchasePrice: decimalValue(vehiclePrice),
             purchaseOdometer: Int(odometer.trimmingCharacters(in: .whitespacesAndNewlines)),
@@ -820,7 +824,8 @@ struct CreateScenarioFlowView: View {
             loanAmount: acquisitionType == .loan ? decimalValue(loanAmount) : nil,
             loanTermMonths: acquisitionType == .loan ? Int(loanTerm.trimmingCharacters(in: .whitespacesAndNewlines)) : nil,
             loanAnnualInterestRate: acquisitionType == .loan ? decimalValue(interestRate) : nil,
-            isFavorite: editingScenario?.isFavorite
+            isFavorite: editingScenario?.isFavorite,
+            analytics: nil
         )
     }
 

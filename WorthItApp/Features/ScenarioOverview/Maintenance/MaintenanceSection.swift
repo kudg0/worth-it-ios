@@ -13,6 +13,7 @@ struct MaintenanceSection: View {
         let onOpenScheduledServices: () -> Void
         let onOpenScheduledService: (UUID) -> Void
         let onOpenScheduledServiceActions: (UUID) -> Void
+        let onRetry: () -> Void
     }
 
     let model: Model
@@ -22,7 +23,11 @@ struct MaintenanceSection: View {
             ScenarioSectionTitle(title: i18n.t("Maintenance"))
 
             if let error = model.error {
-                WITipInfo(title: i18n.t("Service schedule unavailable"), bodyText: error, size: .medium, tone: .info)
+                ScenarioLoadErrorCard(
+                    title: i18n.t("Service schedule unavailable"),
+                    message: error,
+                    onRetry: model.onRetry
+                )
             } else {
                 scheduledServicesSection
                 completedServicesSection

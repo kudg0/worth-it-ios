@@ -25,3 +25,10 @@ Default communication mode for every new chat:
 - Use `WorthItColor.accentGold` for positive money/savings values.
 - Use `WorthItColor.danger` for negative/loss/behind values.
 - Keep savings/comparison detail pages visually aligned with existing islands, spacing, typography, and DS surfaces.
+
+## Localization Rules
+
+- All new user-facing app text must go through `WorthItApp/Resources/Localizable.xcstrings`.
+- Prefer typed keys from `I18nKey.generated.swift` via `i18n.t(...)` or `@Environment(\.i18n)`.
+- After adding semantic localization keys, run `python3 Scripts/generate_i18n_keys.py`.
+- Do not add new hardcoded English strings in SwiftUI views, API error mappers, alerts, buttons, placeholders, or validation messages.

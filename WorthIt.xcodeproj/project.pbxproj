@@ -11,6 +11,7 @@
 		00850B808062BD297FA814FC /* ScenarioCompareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41BF9D682142DDEB6D2A898 /* ScenarioCompareFormatter.swift */; };
 		02A936016786267FD697FB3C /* MaintenanceSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C214341CBA3CEEC3CB14F8F6 /* MaintenanceSection.swift */; };
 		03B084115497D9A72AC6B531 /* CostPerKmDetailHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 922C86414F0E644E0CEC9909 /* CostPerKmDetailHero.swift */; };
+		04BED99126CBD32AE8B8C88E /* WIAchievementProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79246016124C9D1C5CAC643 /* WIAchievementProgressRing.swift */; };
 		0535F2BF28576FBB5F6A2916 /* CostPerKmTrendPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD38464CA68F9126970A1CF /* CostPerKmTrendPanel.swift */; };
 		05EEB061E98DD10CB489F11A /* ScenarioSettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD24C10D4AA574FB28A6E36 /* ScenarioSettingsScreen.swift */; };
 		05F9D7C55836D455D08C86FB /* ExpenseSpendMiniBars.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B198A203EB29BA0CA9C94B /* ExpenseSpendMiniBars.swift */; };
@@ -32,6 +33,7 @@
 		2162A32A4CBD18833A66C0F1 /* ScenarioOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB4161DD79E46720CE24175F /* ScenarioOverviewView.swift */; };
 		231FA0F32DE5E0B3BCC3AAFD /* ScenarioAtmosphericGlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2D5B6C29C506CD085AE1A7 /* ScenarioAtmosphericGlow.swift */; };
 		23CF6E7259647A86853818DF /* ScenariosListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC9568D94EC8CCA5A1FF849F /* ScenariosListView.swift */; };
+		244D6F05B343F8992A6C1075 /* AchievementDetailValueGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00652530DD0E299C67CD18F9 /* AchievementDetailValueGrid.swift */; };
 		26C113FF3054AD2A023A3099 /* ScenarioOverviewScenarioActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38E6EF52928B30A895612325 /* ScenarioOverviewScenarioActions.swift */; };
 		2B148EB983C8A7B3B87A3E41 /* LogExpenseFieldPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6E2FABBB9D00A042CBEE845 /* LogExpenseFieldPrimitives.swift */; };
 		2B39B6A75103DAD629A0ABE1 /* AuthFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1AAA11F83008B6AD0B103F8 /* AuthFlowView.swift */; };
@@ -44,6 +46,7 @@
 		347C3FCA65783E1AFDAE985A /* ScenarioOverviewExpenseHistoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00B311068A0E4EBCA9D7E2A9 /* ScenarioOverviewExpenseHistoryModels.swift */; };
 		363312FFF697C7DE96C1C31C /* ScenarioOverviewMileageHistoryBars.swift in Sources */ = {isa = PBXBuildFile; fileRef = 991B9A8EDF6C3CFFC08BD12B /* ScenarioOverviewMileageHistoryBars.swift */; };
 		3727827A8DBCBB519AE157BF /* ComparableOptionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D292182DF6B16E9FADB8EF0 /* ComparableOptionRow.swift */; };
+		37A604499D5246D3378368CC /* WIUpdateErrorBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F046FFB84D7619A93FDCA8 /* WIUpdateErrorBanner.swift */; };
 		39BB1C711EADA6258D755B0E /* ScenarioOverviewNavigationPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998F4F2E7B0C5A4A6B2AEA6D /* ScenarioOverviewNavigationPath.swift */; };
 		3B146776FD5A1923AE00B0F3 /* ScenarioOverviewMaintenanceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E62F2221BC786A68A9EF3C1 /* ScenarioOverviewMaintenanceModels.swift */; };
 		3DF57F438E146702A6F4A68E /* ScenarioOverviewServiceDisplayHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 741C7D39541C2F1D82A2F99C /* ScenarioOverviewServiceDisplayHelpers.swift */; };
@@ -53,9 +56,12 @@
 		40EADA2A8E2022D51418590A /* WISelectField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2842C492BFF8E358CBB5BFD8 /* WISelectField.swift */; };
 		40FB5F871E381EA90ED9971D /* ScenarioOverviewExpenseDetailWeekRail.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBBA91709586CB65B658AB37 /* ScenarioOverviewExpenseDetailWeekRail.swift */; };
 		41A54F23BA72930F61DC0561 /* WIIconButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE22218F5CDE8BBC37B01294 /* WIIconButton.swift */; };
+		4272A516476763569897F4BE /* WIToastBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3595119EAE12C3168D44A278 /* WIToastBanner.swift */; };
 		429E39C254E4EEE208CF9EA4 /* WorthItApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B85C9E4F4D231A55C41F377 /* WorthItApp.swift */; };
 		42ACD9A3859C62785F51BD5E /* ScenarioOverviewMonthHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA637574FFB9C9750B4612F /* ScenarioOverviewMonthHelpers.swift */; };
 		42C9B64916451273951BF650 /* ScenarioOverviewLogExpenseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9F0168ABF1BA594235785BE /* ScenarioOverviewLogExpenseModels.swift */; };
+		42FF36098BC1D5015BE58306 /* ServiceCalendarExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876AF3C7BA646CCFF5129FAB /* ServiceCalendarExporter.swift */; };
+		4494747810742DB76C43D853 /* AchievementNavigationRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 774A9F7F3DDB436E4A8A13E4 /* AchievementNavigationRoute.swift */; };
 		481AA254443CC61EEEE8BC81 /* ScenarioOverviewMetricCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2ECE12E69CF4BE8FAD9C49E /* ScenarioOverviewMetricCatalog.swift */; };
 		4AEA3201D391178E773CF50E /* ScenarioOverviewMetricTrendChartModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F877C913B161A1525C301C /* ScenarioOverviewMetricTrendChartModels.swift */; };
 		4B70551090605310C58BA67F /* AddEntryChooserScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71870462D8FA450223CE96AF /* AddEntryChooserScreen.swift */; };
@@ -66,6 +72,7 @@
 		55E8B6ECAE0B36C10D581BB1 /* ScenarioOverviewExpenseHistoryBarChartData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3152EB0B5BA5AC37BA8B1DE /* ScenarioOverviewExpenseHistoryBarChartData.swift */; };
 		567855B97532212F09889136 /* ExpenseHistoryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B43D48A6B7D038C40BD9FD6 /* ExpenseHistoryScreen.swift */; };
 		56EEDC7523BF2512B49558B1 /* WorthItTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD57EA6945ECEFFA9D2BBD86 /* WorthItTheme.swift */; };
+		595B252BF8EE6DA083F3EA2F /* ComparableCategorySelectionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6E41E76DA4D0D0EC057945 /* ComparableCategorySelectionScreen.swift */; };
 		5B37A36AA651B0588E9FA017 /* ScenarioOverviewView+CostPerKmTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A6719C36436F21F4E60F5E4 /* ScenarioOverviewView+CostPerKmTrend.swift */; };
 		5BBB55988F0D676A7FB58DD4 /* GenericMetricHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A0084424BB460A36A950E7 /* GenericMetricHero.swift */; };
 		5BDEF643C1B868D9BA5B6A1C /* ScenarioInsightsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 693DC7F1310F313E59B8AABF /* ScenarioInsightsScreen.swift */; };
@@ -92,8 +99,11 @@
 		73D4247322845DA531B5FAFF /* ScenarioOverviewMetricDetailContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 048C0F9D11EF9022C02DE9A3 /* ScenarioOverviewMetricDetailContent.swift */; };
 		762A4EB564B5CEF781F7472F /* WIScenarioCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6A536EBDCE22066B4091E09 /* WIScenarioCard.swift */; };
 		77B018F791AE829C3F38B71B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5BC0EA6EFCE2984BAC6B170 /* Assets.xcassets */; };
+		7B904422EE37E7F01743F05C /* ScenarioPreferencesSettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF68189B47F45E1C122DB90D /* ScenarioPreferencesSettingsScreen.swift */; };
+		7BFACE0F38B410B9F51A964D /* ScenarioPhotoUploadInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A38418B9F4BA79FB459DEB /* ScenarioPhotoUploadInput.swift */; };
 		7CD496244323744FC448F911 /* ScenarioOverviewScheduleServiceActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4BD132ECE05B416E29EE84A /* ScenarioOverviewScheduleServiceActions.swift */; };
 		7E6882F1B6A9024416C18CFD /* CostPerKmFormulaCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98207C9E7F11A65ED95A2440 /* CostPerKmFormulaCard.swift */; };
+		7F8FD18B30FBBCFF08C2CA2C /* ScenarioLoadErrorCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6DBA9B724E1CA758CEFA5D /* ScenarioLoadErrorCard.swift */; };
 		7FAE74487D48A2B31ECD998A /* WITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BD3D886AF71B757A4AE9FDC /* WITextField.swift */; };
 		7FCB4981B8F2B89E2743CE1F /* ScenarioOverviewScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE121AEB1759922EE805C417 /* ScenarioOverviewScreen.swift */; };
 		81D8DEF9DB3F7A25D2C0EA99 /* AddComparableOptionFooter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99AB3AB6EA9925D6C830AFC7 /* AddComparableOptionFooter.swift */; };
@@ -103,6 +113,7 @@
 		87CF0246D5F312C8C38F2F3F /* ScenarioOverviewCostPerKmDetailModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38A93F6143E171575881CCF /* ScenarioOverviewCostPerKmDetailModels.swift */; };
 		8B8C7628D4BC8B60BB7D8BDD /* GenericMetricChartPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2014227518F6F054E1559DF4 /* GenericMetricChartPanel.swift */; };
 		8C657A94191870FE8AFF4D75 /* ScenarioOverviewCostPerKmBreakdownData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CED68C0608980F6B7E9AD0D /* ScenarioOverviewCostPerKmBreakdownData.swift */; };
+		8C7C6C7AC35A1283A973A411 /* ScenarioOverviewScheduledServiceCalendarExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E525308C16E8A88529881FA5 /* ScenarioOverviewScheduledServiceCalendarExport.swift */; };
 		8DB686088E3643258E020D3A /* WIIsland.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435D4A6DE7597A9B46701C3F /* WIIsland.swift */; };
 		91CCDCF2DB2BA91CE7AB2352 /* GenericMetricRecommendation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A62D46ADD65DB774FAE449FC /* GenericMetricRecommendation.swift */; };
 		952CDABA4B15BC8CC2E61663 /* WITopSpotlight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D22AB154C65FE0BC96F8915 /* WITopSpotlight.swift */; };
@@ -110,9 +121,11 @@
 		96A9AEFDA2E58582048C3933 /* ScheduledServiceMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDD6C6DBBA589695555196BB /* ScheduledServiceMenu.swift */; };
 		96D0438FA5ECFD11E7D87ECD /* WIFlowHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 197132E5B252E4E3BD3C22D5 /* WIFlowHeader.swift */; };
 		98CCD70A8C5A884F7559A8F7 /* ScenarioOverviewView+MetricTrendData.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB62D3D218EF2923FAF1CD19 /* ScenarioOverviewView+MetricTrendData.swift */; };
+		992231C96C4EBC4B4EFDF8AF /* WIUpdateErrorText.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE1FAD3F5E463C53A0F047CC /* WIUpdateErrorText.swift */; };
 		996389B3016BD5061D38491A /* FlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E125D40C3F0E2571AAF49D /* FlowLayout.swift */; };
 		9978F7471973D7328C998AD5 /* ScenarioOverviewView+MetricTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D79C03864574D3255BB8F6 /* ScenarioOverviewView+MetricTrend.swift */; };
 		9A7F1E41C2EB8F3009A3EA41 /* BreakEvenTripRowsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05BEBA255831F6961288573D /* BreakEvenTripRowsScreen.swift */; };
+		9BCCACBE80A042F24CD5AA31 /* AchievementGlyph.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5ACA71AFF18E94E1493DB69 /* AchievementGlyph.swift */; };
 		9EA2EA3321EE30FE73FCE22C /* LogExpenseRecurringSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19897B89FFAE8CBA8B4A3A7 /* LogExpenseRecurringSection.swift */; };
 		9F1D88AB9417BA351BD9CAED /* WIOptionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = E405D74CC9F1BDE822FDF7DD /* WIOptionCard.swift */; };
 		A07E36B3CC7927003511C3D8 /* OverviewMetricsGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85D77632A178C0661EFD1BCC /* OverviewMetricsGrid.swift */; };
@@ -122,14 +135,18 @@
 		A55B9127EF734CEBACC14B22 /* ScenarioBottomNav.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FC8ABD2106FCD7844FB081 /* ScenarioBottomNav.swift */; };
 		A639AAFE9593D0A350149945 /* ScenarioOverviewBreakEvenDetailModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A23411D89E68A33C37908A7E /* ScenarioOverviewBreakEvenDetailModels.swift */; };
 		AA33EF19E02F0D4C8D83E199 /* ScenarioOverviewMetricTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25B543F32B5E70B63D20C7C6 /* ScenarioOverviewMetricTypes.swift */; };
+		AAB0884B65B45ECBE5A3B10E /* AchievementHeroRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE31C63D86A4D62D206F2BB9 /* AchievementHeroRing.swift */; };
 		AC12DFE6EB96D3230AB601B1 /* ScenarioOverviewFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF5A921AD1401497B76D6E57 /* ScenarioOverviewFormatting.swift */; };
 		AE73DD3E4041673D3CA2DDF8 /* CostPerKmSourceTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF49DA7370D589ADDC6010F /* CostPerKmSourceTimeline.swift */; };
+		B1F9651FC456B48BE468944F /* AchievementMapLane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569FDD1D4E42CFF0FF81A5EF /* AchievementMapLane.swift */; };
 		B20F6D6E65C2634C5CB61091 /* MileageHistoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E730DC15EBDDB50A4E2E0DC /* MileageHistoryList.swift */; };
 		B266B5FEEDF27D402E61FA9A /* ScheduleServiceDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978842C3717CC45716D4E041 /* ScheduleServiceDivider.swift */; };
 		B348D3657FF386663F7CB92E /* ScheduleServiceTriggerSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F57456B94082988DB7BD349 /* ScheduleServiceTriggerSection.swift */; };
 		B5410C710745E5DF10D59F64 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5733A9FBF7142934CB2F7FD /* ProfileView.swift */; };
+		B629958E0CCAB3A193B5CEE0 /* AchievementMapScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7CC5ED1545531352E1D575 /* AchievementMapScreen.swift */; };
 		B8FE23FE16E0ECA2109D5D51 /* ScenarioOverviewMileageActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 447B2523CBBD14ED6752EAC1 /* ScenarioOverviewMileageActions.swift */; };
 		BA4A1E1865CA9F569BCB64D3 /* APIEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93806CD2D958DB8FE0775EDB /* APIEnvironment.swift */; };
+		BA6387CB0079585D83350493 /* ScenarioResourceLinkValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B525354864F923B0C06D50 /* ScenarioResourceLinkValidator.swift */; };
 		BAC964E72DA7B509716D9D6F /* ScenarioOverviewCostPerKmEfficiencyChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60D5D6ABED0A76F002A33A92 /* ScenarioOverviewCostPerKmEfficiencyChartState.swift */; };
 		BAD4972CAA807A9BFD5C01C0 /* ScenarioCompareScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9FCCCDA911077BF7B585FF /* ScenarioCompareScreen.swift */; };
 		BAFFCDEE6954E397A6C84F8C /* ScenarioOverviewNavigationPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F71B6FEA0AD8FA1B291935E8 /* ScenarioOverviewNavigationPathTests.swift */; };
@@ -152,6 +169,7 @@
 		C748C80ED18848C6F7C686C7 /* ScenarioOverviewExpenseHistoryHeroData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A79DDA0D2BAA4C4AE513A67A /* ScenarioOverviewExpenseHistoryHeroData.swift */; };
 		CC4BBF3A0AB2D9B2CC2039F2 /* ScenarioOverviewCostPerKmTrendData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C872F0429907CF931532B27 /* ScenarioOverviewCostPerKmTrendData.swift */; };
 		CC8F3081042F1FEC0FCDC69A /* I18n.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20D8710130AF9E6A19FDE1C /* I18n.swift */; };
+		CCC42E85771FEBECFA71250D /* AchievementRecentUnlocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00108855933CE1961E3EF8D1 /* AchievementRecentUnlocks.swift */; };
 		CD3756C03FA2719CA12151C4 /* AuthComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C6B5B0DDF0867EFF1DA8753 /* AuthComponents.swift */; };
 		CDFD679EB215F83B497453A3 /* ScenarioOverviewScheduledServicesCalendarState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3D27C02489E7B990F1D25CA /* ScenarioOverviewScheduledServicesCalendarState.swift */; };
 		CE265FB941BC49B9CD0C77C2 /* AuthSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251215249A945E834EBF154E /* AuthSessionStore.swift */; };
@@ -163,10 +181,12 @@
 		D5E2EFA5C4902552E1FD830B /* ScheduleServiceScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D46AF10E5FE4D4791AE3A215 /* ScheduleServiceScreen.swift */; };
 		D5F47819284043F2583E9667 /* BreakEvenDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62D36D93F09A17EFC20FE5C6 /* BreakEvenDetailScreen.swift */; };
 		D83D6672C59409F428F7046D /* ScenarioActionsOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 852AF8C6C99A03F31AA3B533 /* ScenarioActionsOverlay.swift */; };
+		D931BD1E94351C5649E55B0E /* AchievementModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCDD5FD67769327193FE4E4C /* AchievementModels.swift */; };
 		D95FDFB613A6D9EC5730FFC5 /* EditProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6C2DE6F7D36D2C8DEA0DDEC /* EditProfileScreen.swift */; };
 		DABA54B3BAF5BA9FBB03161D /* ScenarioOverviewLogExpenseFormState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30A522367A3371BE97A3240B /* ScenarioOverviewLogExpenseFormState.swift */; };
 		DAF679989B2BC7A7D630C4F5 /* OverviewQuickActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6A943BF3139834418286C6 /* OverviewQuickActions.swift */; };
 		DBCE5A0EED8B2FDB973E7C1D /* ScenarioOverviewNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB3E40FA184E6DC065395A4 /* ScenarioOverviewNavigation.swift */; };
+		DC9466879BCD2910E672525E /* AchievementsHubScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6813002B9A0F6A9945C73C7 /* AchievementsHubScreen.swift */; };
 		DCBC6EFAAD8E6B6089F801A1 /* CompletedServiceRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE19CCBD92AF60D22D1369CF /* CompletedServiceRow.swift */; };
 		DD0B71583D8689837E567BF6 /* CostPerKmInfoPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDC8480D62958DB50F0B6E4C /* CostPerKmInfoPanel.swift */; };
 		DDB1056B06CF0259356DF315 /* MileageTripDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = E941A77348F98295C84D534B /* MileageTripDetailScreen.swift */; };
@@ -183,7 +203,10 @@
 		ECE8559AC9272134F133ACEC /* ScenarioRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 588C34DE70BA2426E30716B3 /* ScenarioRepository.swift */; };
 		EEA92CD2B5F03C491715F240 /* WIInfoListRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB99FEC497F7767769065469 /* WIInfoListRow.swift */; };
 		EEBCD74EE62D2EDCCBDC8BA2 /* ScheduleServiceBasisSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55ECED5F13C8F2C37520B1FB /* ScheduleServiceBasisSection.swift */; };
+		EEDCE8751F3D4FA73D5A1726 /* AchievementCategoryDashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBE11E1D95D8AA82A0DD4975 /* AchievementCategoryDashboard.swift */; };
+		F04804CB96A8902FF43CCA2C /* ScenarioOverviewPreferencesSettingsData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 247AE6969DC0DAAF0CF74271 /* ScenarioOverviewPreferencesSettingsData.swift */; };
 		F0A2723BAB95F32C965EE2F7 /* ScenarioMileageScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5B7C10EA49B216C249E7787 /* ScenarioMileageScreen.swift */; };
+		F1CC42EC06E7308F380F2EAB /* AchievementDetailScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A5FCE35A9DE8E6F0AF33CA /* AchievementDetailScreen.swift */; };
 		F25930BC46BC87FD6DD6EA22 /* WIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CCF8CEF7D739B4D00A6EC7 /* WIButton.swift */; };
 		F27136314BB9EB270BCE1010 /* EmailSignInScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4186638CCF3EE8ECFE10BE /* EmailSignInScreen.swift */; };
 		F2B5EF1D535E58D7D2192C1F /* ScenarioOverviewMileageLogItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF034D9C1D6697C189EF4298 /* ScenarioOverviewMileageLogItems.swift */; };
@@ -191,9 +214,11 @@
 		F41AB40557D918ED484B15DA /* ScenarioExpensesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C191784F186E7343D9ECA968 /* ScenarioExpensesScreen.swift */; };
 		F51C95BBEDAE68437F510E9D /* ScenarioSectionTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF017C9B259BA371068EE2D /* ScenarioSectionTitle.swift */; };
 		F70DA3C1A0AA7E29EEE95F72 /* ScenarioStickyEntryCTA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 810ACB0FF7F27A67CBEC0D3E /* ScenarioStickyEntryCTA.swift */; };
+		F71A222E8F63732D2763BF4D /* AchievementInsightLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676FD57F97E9C8DCAF779275 /* AchievementInsightLine.swift */; };
 		F72ED85DE2D05EE621C37F1A /* CostPerKmSummaryGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47429398A8EC509223FB5C59 /* CostPerKmSummaryGrid.swift */; };
 		F7BB24353F3BCDAB1D6D9BAE /* RegistrationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 495BAF1DCDF1E4325471D584 /* RegistrationScreen.swift */; };
 		F84F773AB848DFC6DCC9185A /* ScenarioOverviewLoading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7B45627ADCBB2659E9E58B /* ScenarioOverviewLoading.swift */; };
+		F85053B15F32E05CD3B7972E /* AchievementNextUnlockCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01F739B18430C7D395DD8D78 /* AchievementNextUnlockCard.swift */; };
 		F8D3B40E91076E81EBC7BC64 /* ScenarioOverviewExpenseEditing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72B9B5DA79653F2C551FF4C9 /* ScenarioOverviewExpenseEditing.swift */; };
 		FB0494A9C8CD756640A70CD4 /* ScenarioResourceMetadataCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 704A640375523518B5203315 /* ScenarioResourceMetadataCard.swift */; };
 		FB7BE854B6843B2D6D477EAB /* ScenarioResourceMetadataEditors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C98F5DF9E32FE34D821629F /* ScenarioResourceMetadataEditors.swift */; };
@@ -216,9 +241,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		00108855933CE1961E3EF8D1 /* AchievementRecentUnlocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementRecentUnlocks.swift; sourceTree = "<group>"; };
+		00652530DD0E299C67CD18F9 /* AchievementDetailValueGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementDetailValueGrid.swift; sourceTree = "<group>"; };
 		00B311068A0E4EBCA9D7E2A9 /* ScenarioOverviewExpenseHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseHistoryModels.swift; sourceTree = "<group>"; };
 		00F87AFBC49D756824626B30 /* ScenarioModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioModels.swift; sourceTree = "<group>"; };
 		0147871B1EB885ED490D5F3A /* ScenarioOverviewMileageSummaryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMileageSummaryData.swift; sourceTree = "<group>"; };
+		01F739B18430C7D395DD8D78 /* AchievementNextUnlockCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementNextUnlockCard.swift; sourceTree = "<group>"; };
 		048C0F9D11EF9022C02DE9A3 /* ScenarioOverviewMetricDetailContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMetricDetailContent.swift; sourceTree = "<group>"; };
 		04A429D27B0D86009D19B8B9 /* ScenarioOverviewView+FinanceMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScenarioOverviewView+FinanceMetrics.swift"; sourceTree = "<group>"; };
 		05259FFFD8C93F53F4A0D513 /* AuthRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRepository.swift; sourceTree = "<group>"; };
@@ -241,6 +269,7 @@
 		195A7024A63710308BEC305D /* CostPerKmDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostPerKmDetailScreen.swift; sourceTree = "<group>"; };
 		197132E5B252E4E3BD3C22D5 /* WIFlowHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIFlowHeader.swift; sourceTree = "<group>"; };
 		1A6719C36436F21F4E60F5E4 /* ScenarioOverviewView+CostPerKmTrend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScenarioOverviewView+CostPerKmTrend.swift"; sourceTree = "<group>"; };
+		1A6E41E76DA4D0D0EC057945 /* ComparableCategorySelectionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparableCategorySelectionScreen.swift; sourceTree = "<group>"; };
 		1B43D48A6B7D038C40BD9FD6 /* ExpenseHistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseHistoryScreen.swift; sourceTree = "<group>"; };
 		1BC8F372EE853E11956EC8A6 /* ComparisonVisibilityFooter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonVisibilityFooter.swift; sourceTree = "<group>"; };
 		1E730DC15EBDDB50A4E2E0DC /* MileageHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MileageHistoryList.swift; sourceTree = "<group>"; };
@@ -250,6 +279,7 @@
 		22467492D59388A2E0DEC09E /* WISegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WISegmentedControl.swift; sourceTree = "<group>"; };
 		23EE9DB9E405DF43F154E452 /* ExpensesEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpensesEmptyState.swift; sourceTree = "<group>"; };
 		246A62373AD589237DDC67F0 /* AddComparableOptionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddComparableOptionScreen.swift; sourceTree = "<group>"; };
+		247AE6969DC0DAAF0CF74271 /* ScenarioOverviewPreferencesSettingsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewPreferencesSettingsData.swift; sourceTree = "<group>"; };
 		251215249A945E834EBF154E /* AuthSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSessionStore.swift; sourceTree = "<group>"; };
 		25B543F32B5E70B63D20C7C6 /* ScenarioOverviewMetricTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMetricTypes.swift; sourceTree = "<group>"; };
 		275DAB53183D4E818381DC33 /* GenericMetricDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericMetricDetailScreen.swift; sourceTree = "<group>"; };
@@ -259,6 +289,9 @@
 		2F4C664AD6B9C34A89D5FE6A /* ScenarioWideAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioWideAction.swift; sourceTree = "<group>"; };
 		30A522367A3371BE97A3240B /* ScenarioOverviewLogExpenseFormState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewLogExpenseFormState.swift; sourceTree = "<group>"; };
 		32F9BF2921FF4C5D173CB822 /* ScenarioOverviewExpenseHistoryBars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseHistoryBars.swift; sourceTree = "<group>"; };
+		33A5FCE35A9DE8E6F0AF33CA /* AchievementDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementDetailScreen.swift; sourceTree = "<group>"; };
+		3595119EAE12C3168D44A278 /* WIToastBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIToastBanner.swift; sourceTree = "<group>"; };
+		36F046FFB84D7619A93FDCA8 /* WIUpdateErrorBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIUpdateErrorBanner.swift; sourceTree = "<group>"; };
 		38E6EF52928B30A895612325 /* ScenarioOverviewScenarioActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewScenarioActions.swift; sourceTree = "<group>"; };
 		3C7FED96E9438F2D2353738B /* MileageHistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MileageHistoryScreen.swift; sourceTree = "<group>"; };
 		427E5B2336AAA63F77AEF3D4 /* ScenarioOverviewDateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewDateFormatters.swift; sourceTree = "<group>"; };
@@ -275,6 +308,7 @@
 		4EA1E591EE95828CDCA95D27 /* ScenarioOverviewScreenModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewScreenModels.swift; sourceTree = "<group>"; };
 		51AE003E21705849662D9848 /* ScenarioOverviewView+MetricTrendAxis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScenarioOverviewView+MetricTrendAxis.swift"; sourceTree = "<group>"; };
 		55ECED5F13C8F2C37520B1FB /* ScheduleServiceBasisSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleServiceBasisSection.swift; sourceTree = "<group>"; };
+		569FDD1D4E42CFF0FF81A5EF /* AchievementMapLane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementMapLane.swift; sourceTree = "<group>"; };
 		576AF652C76ABBB4B86B8C7E /* ScenarioResourceMetadataActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioResourceMetadataActions.swift; sourceTree = "<group>"; };
 		588C34DE70BA2426E30716B3 /* ScenarioRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioRepository.swift; sourceTree = "<group>"; };
 		58F063847138ADD32E8F6708 /* I18nKey.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = I18nKey.generated.swift; sourceTree = "<group>"; };
@@ -284,6 +318,7 @@
 		62D36D93F09A17EFC20FE5C6 /* BreakEvenDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreakEvenDetailScreen.swift; sourceTree = "<group>"; };
 		642566ED4658C10F108ACA8F /* CompareBenchmarkChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareBenchmarkChart.swift; sourceTree = "<group>"; };
 		64989EF901B58F595052B23A /* GenericMetricInsightGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericMetricInsightGrid.swift; sourceTree = "<group>"; };
+		676FD57F97E9C8DCAF779275 /* AchievementInsightLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementInsightLine.swift; sourceTree = "<group>"; };
 		693DC7F1310F313E59B8AABF /* ScenarioInsightsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioInsightsScreen.swift; sourceTree = "<group>"; };
 		69A218807E7EB1B2BE5C9B9C /* WorthIt.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WorthIt.entitlements; sourceTree = "<group>"; };
 		6B04BB62D47B719C9D7FC07A /* LogExpenseServiceLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExpenseServiceLink.swift; sourceTree = "<group>"; };
@@ -298,6 +333,7 @@
 		741C7D39541C2F1D82A2F99C /* ScenarioOverviewServiceDisplayHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewServiceDisplayHelpers.swift; sourceTree = "<group>"; };
 		747C4D28C89D6494921C8850 /* ScenarioOverviewCostPerKmOwnershipCostData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewCostPerKmOwnershipCostData.swift; sourceTree = "<group>"; };
 		77255761FDBBE15A32207FBC /* MileageHistoryHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MileageHistoryHero.swift; sourceTree = "<group>"; };
+		774A9F7F3DDB436E4A8A13E4 /* AchievementNavigationRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementNavigationRoute.swift; sourceTree = "<group>"; };
 		78FBEE66875A94964294E372 /* ScenarioOverviewPageNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewPageNavigation.swift; sourceTree = "<group>"; };
 		7C6A943BF3139834418286C6 /* OverviewQuickActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewQuickActions.swift; sourceTree = "<group>"; };
 		7F57456B94082988DB7BD349 /* ScheduleServiceTriggerSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduleServiceTriggerSection.swift; sourceTree = "<group>"; };
@@ -310,6 +346,7 @@
 		85D77632A178C0661EFD1BCC /* OverviewMetricsGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewMetricsGrid.swift; sourceTree = "<group>"; };
 		86B28F18499C223209BC732D /* ScenarioOverviewExpenseDisplayHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseDisplayHelpers.swift; sourceTree = "<group>"; };
 		86E948790701153370541E04 /* ScheduledServiceRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledServiceRow.swift; sourceTree = "<group>"; };
+		876AF3C7BA646CCFF5129FAB /* ServiceCalendarExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceCalendarExporter.swift; sourceTree = "<group>"; };
 		879512B8153C3C798A8BF039 /* ScenarioOverviewView+StateBindings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScenarioOverviewView+StateBindings.swift"; sourceTree = "<group>"; };
 		8CED68C0608980F6B7E9AD0D /* ScenarioOverviewCostPerKmBreakdownData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewCostPerKmBreakdownData.swift; sourceTree = "<group>"; };
 		8DD24C10D4AA574FB28A6E36 /* ScenarioSettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioSettingsScreen.swift; sourceTree = "<group>"; };
@@ -331,6 +368,8 @@
 		A192B2BEE877F97453DF19D6 /* ScenarioAnalyticsModelScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioAnalyticsModelScreen.swift; sourceTree = "<group>"; };
 		A23411D89E68A33C37908A7E /* ScenarioOverviewBreakEvenDetailModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewBreakEvenDetailModels.swift; sourceTree = "<group>"; };
 		A62D46ADD65DB774FAE449FC /* GenericMetricRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericMetricRecommendation.swift; sourceTree = "<group>"; };
+		A6813002B9A0F6A9945C73C7 /* AchievementsHubScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementsHubScreen.swift; sourceTree = "<group>"; };
+		A79246016124C9D1C5CAC643 /* WIAchievementProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIAchievementProgressRing.swift; sourceTree = "<group>"; };
 		A79DDA0D2BAA4C4AE513A67A /* ScenarioOverviewExpenseHistoryHeroData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseHistoryHeroData.swift; sourceTree = "<group>"; };
 		A9A02827DFDE236CA577A789 /* ScenarioOverviewMileageHistoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMileageHistoryModels.swift; sourceTree = "<group>"; };
 		AA03E7437D2BB96CF031D870 /* AppleSignInProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInProvider.swift; sourceTree = "<group>"; };
@@ -345,8 +384,11 @@
 		B23E1DA2B16E645E140ED175 /* LogExpenseAmountField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExpenseAmountField.swift; sourceTree = "<group>"; };
 		B3BF3AAE53BEF51090D74DF9 /* MileageHistoryMiniBars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MileageHistoryMiniBars.swift; sourceTree = "<group>"; };
 		B45199139FDC5D3CA3A64138 /* ScenarioOverviewMaintenanceDisplayData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMaintenanceDisplayData.swift; sourceTree = "<group>"; };
+		B5ACA71AFF18E94E1493DB69 /* AchievementGlyph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementGlyph.swift; sourceTree = "<group>"; };
 		B6A536EBDCE22066B4091E09 /* WIScenarioCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIScenarioCard.swift; sourceTree = "<group>"; };
 		BA528B2BFF34C074608C9EC6 /* ComparableEditorIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparableEditorIsland.swift; sourceTree = "<group>"; };
+		BA7CC5ED1545531352E1D575 /* AchievementMapScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementMapScreen.swift; sourceTree = "<group>"; };
+		BCDD5FD67769327193FE4E4C /* AchievementModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementModels.swift; sourceTree = "<group>"; };
 		BD5D34EA19A42A79FF7EB8B4 /* ExpenseDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseDetailScreen.swift; sourceTree = "<group>"; };
 		BE19CCBD92AF60D22D1369CF /* CompletedServiceRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletedServiceRow.swift; sourceTree = "<group>"; };
 		BF034D9C1D6697C189EF4298 /* ScenarioOverviewMileageLogItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMileageLogItems.swift; sourceTree = "<group>"; };
@@ -364,9 +406,11 @@
 		CB5B27CD9FF3BA700D223B3F /* CreateScenarioFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateScenarioFlowView.swift; sourceTree = "<group>"; };
 		CB62D3D218EF2923FAF1CD19 /* ScenarioOverviewView+MetricTrendData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ScenarioOverviewView+MetricTrendData.swift"; sourceTree = "<group>"; };
 		CC706CD4B5E9AE27D2B63EB9 /* ScenarioOverviewScheduleServiceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewScheduleServiceModels.swift; sourceTree = "<group>"; };
+		CD6DBA9B724E1CA758CEFA5D /* ScenarioLoadErrorCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioLoadErrorCard.swift; sourceTree = "<group>"; };
 		CDC8480D62958DB50F0B6E4C /* CostPerKmInfoPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostPerKmInfoPanel.swift; sourceTree = "<group>"; };
 		CE22218F5CDE8BBC37B01294 /* WIIconButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIIconButton.swift; sourceTree = "<group>"; };
 		CEF49DA7370D589ADDC6010F /* CostPerKmSourceTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostPerKmSourceTimeline.swift; sourceTree = "<group>"; };
+		CF68189B47F45E1C122DB90D /* ScenarioPreferencesSettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioPreferencesSettingsScreen.swift; sourceTree = "<group>"; };
 		D015C70ED5831B5843368052 /* ExpenseHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseHistoryList.swift; sourceTree = "<group>"; };
 		D09CC4CEFB0FFE40141A37A9 /* CostPerKmEfficiencyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CostPerKmEfficiencyCard.swift; sourceTree = "<group>"; };
 		D0CA16017CEDA27DA3F59DF6 /* ScenarioOverviewExpenseHistoryGraphModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseHistoryGraphModels.swift; sourceTree = "<group>"; };
@@ -384,12 +428,15 @@
 		DD57EA6945ECEFFA9D2BBD86 /* WorthItTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorthItTheme.swift; sourceTree = "<group>"; };
 		DD729E057F65B4A61D9A2D17 /* ScenarioCompareChartModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioCompareChartModels.swift; sourceTree = "<group>"; };
 		DDD6C6DBBA589695555196BB /* ScheduledServiceMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledServiceMenu.swift; sourceTree = "<group>"; };
+		DE1FAD3F5E463C53A0F047CC /* WIUpdateErrorText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIUpdateErrorText.swift; sourceTree = "<group>"; };
 		DF6E7F959A36D8E1E106630D /* ScenarioOverviewGenericMetricDetailModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewGenericMetricDetailModels.swift; sourceTree = "<group>"; };
 		DF9FBF1A2A3DE134F0C5CD32 /* LogMileageFieldPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMileageFieldPrimitives.swift; sourceTree = "<group>"; };
 		E14F37B3A6CAD148D565D673 /* ScenarioOverviewExpenseActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseActions.swift; sourceTree = "<group>"; };
+		E2B525354864F923B0C06D50 /* ScenarioResourceLinkValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioResourceLinkValidator.swift; sourceTree = "<group>"; };
 		E30AA0BD1550D42AC8845082 /* BackendMetricDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendMetricDetailScreen.swift; sourceTree = "<group>"; };
 		E3D5AD022E46C118E3B66A2C /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E405D74CC9F1BDE822FDF7DD /* WIOptionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIOptionCard.swift; sourceTree = "<group>"; };
+		E525308C16E8A88529881FA5 /* ScenarioOverviewScheduledServiceCalendarExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewScheduledServiceCalendarExport.swift; sourceTree = "<group>"; };
 		E5F877C913B161A1525C301C /* ScenarioOverviewMetricTrendChartModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewMetricTrendChartModels.swift; sourceTree = "<group>"; };
 		E6BC802B71B787CC259B2629 /* ScenarioOverviewAnalyticsSettingsData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewAnalyticsSettingsData.swift; sourceTree = "<group>"; };
 		E6E2FABBB9D00A042CBEE845 /* LogExpenseFieldPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExpenseFieldPrimitives.swift; sourceTree = "<group>"; };
@@ -398,7 +445,9 @@
 		E9F2CD287E2B3D0DCCF3AD8D /* WITipInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WITipInfo.swift; sourceTree = "<group>"; };
 		EB4161DD79E46720CE24175F /* ScenarioOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewView.swift; sourceTree = "<group>"; };
 		EBBA91709586CB65B658AB37 /* ScenarioOverviewExpenseDetailWeekRail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseDetailWeekRail.swift; sourceTree = "<group>"; };
+		EBE11E1D95D8AA82A0DD4975 /* AchievementCategoryDashboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementCategoryDashboard.swift; sourceTree = "<group>"; };
 		ECA7DB47A9FBEA2F8EDAE7AB /* HTTPAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPAPIClient.swift; sourceTree = "<group>"; };
+		EE31C63D86A4D62D206F2BB9 /* AchievementHeroRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementHeroRing.swift; sourceTree = "<group>"; };
 		EF4626D3DB8535650D3AEC54 /* ScenarioComparisonVisibilityScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioComparisonVisibilityScreen.swift; sourceTree = "<group>"; };
 		EF5A921AD1401497B76D6E57 /* ScenarioOverviewFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewFormatting.swift; sourceTree = "<group>"; };
 		F19897B89FFAE8CBA8B4A3A7 /* LogExpenseRecurringSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogExpenseRecurringSection.swift; sourceTree = "<group>"; };
@@ -407,6 +456,7 @@
 		F3EB48CF6888449CA528572B /* ScenarioOverviewHistoryTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewHistoryTypes.swift; sourceTree = "<group>"; };
 		F41BF9D682142DDEB6D2A898 /* ScenarioCompareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioCompareFormatter.swift; sourceTree = "<group>"; };
 		F4A1A01950FCDD37524B5223 /* ScenarioMetricPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioMetricPill.swift; sourceTree = "<group>"; };
+		F5A38418B9F4BA79FB459DEB /* ScenarioPhotoUploadInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioPhotoUploadInput.swift; sourceTree = "<group>"; };
 		F5BC0EA6EFCE2984BAC6B170 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F71B6FEA0AD8FA1B291935E8 /* ScenarioOverviewNavigationPathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewNavigationPathTests.swift; sourceTree = "<group>"; };
 		F8EE19402A2C8D7A0C644FDF /* ScheduledServiceDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledServiceDetailScreen.swift; sourceTree = "<group>"; };
@@ -485,6 +535,7 @@
 			children = (
 				99AB3AB6EA9925D6C830AFC7 /* AddComparableOptionFooter.swift */,
 				246A62373AD589237DDC67F0 /* AddComparableOptionScreen.swift */,
+				1A6E41E76DA4D0D0EC057945 /* ComparableCategorySelectionScreen.swift */,
 				BA528B2BFF34C074608C9EC6 /* ComparableEditorIsland.swift */,
 				0D292182DF6B16E9FADB8EF0 /* ComparableOptionRow.swift */,
 				642566ED4658C10F108ACA8F /* CompareBenchmarkChart.swift */,
@@ -501,11 +552,14 @@
 			isa = PBXGroup;
 			children = (
 				4C161D367A5CD2050644D3B3 /* ScenarioBottomActionSheet.swift */,
+				CD6DBA9B724E1CA758CEFA5D /* ScenarioLoadErrorCard.swift */,
 				F4A1A01950FCDD37524B5223 /* ScenarioMetricPill.swift */,
 				427E5B2336AAA63F77AEF3D4 /* ScenarioOverviewDateFormatters.swift */,
 				EF5A921AD1401497B76D6E57 /* ScenarioOverviewFormatting.swift */,
 				0AA637574FFB9C9750B4612F /* ScenarioOverviewMonthHelpers.swift */,
 				38E6EF52928B30A895612325 /* ScenarioOverviewScenarioActions.swift */,
+				F5A38418B9F4BA79FB459DEB /* ScenarioPhotoUploadInput.swift */,
+				E2B525354864F923B0C06D50 /* ScenarioResourceLinkValidator.swift */,
 				D19E3730E5E66B164C0B75DF /* ScenarioResourceManagementSection.swift */,
 				576AF652C76ABBB4B86B8C7E /* ScenarioResourceMetadataActions.swift */,
 				704A640375523518B5203315 /* ScenarioResourceMetadataCard.swift */,
@@ -577,6 +631,7 @@
 				8DD24C10D4AA574FB28A6E36 /* ScenarioSettingsScreen.swift */,
 				D00320FA58CB5946E6D04654 /* Analytics */,
 				7987736CBE9CAEAB5AC755BC /* Comparison */,
+				2DF6481046A1729ED692E718 /* Preferences */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -589,6 +644,23 @@
 			path = Hero;
 			sourceTree = "<group>";
 		};
+		2BB74FE0954DD247E34C5E02 /* CalendarExport */ = {
+			isa = PBXGroup;
+			children = (
+				876AF3C7BA646CCFF5129FAB /* ServiceCalendarExporter.swift */,
+			);
+			path = CalendarExport;
+			sourceTree = "<group>";
+		};
+		2DF6481046A1729ED692E718 /* Preferences */ = {
+			isa = PBXGroup;
+			children = (
+				247AE6969DC0DAAF0CF74271 /* ScenarioOverviewPreferencesSettingsData.swift */,
+				CF68189B47F45E1C122DB90D /* ScenarioPreferencesSettingsScreen.swift */,
+			);
+			path = Preferences;
+			sourceTree = "<group>";
+		};
 		2E3D4D8CEE7A2BC729A13386 /* Maintenance */ = {
 			isa = PBXGroup;
 			children = (
@@ -596,6 +668,7 @@
 				C214341CBA3CEEC3CB14F8F6 /* MaintenanceSection.swift */,
 				B45199139FDC5D3CA3A64138 /* ScenarioOverviewMaintenanceDisplayData.swift */,
 				0E62F2221BC786A68A9EF3C1 /* ScenarioOverviewMaintenanceModels.swift */,
+				E525308C16E8A88529881FA5 /* ScenarioOverviewScheduledServiceCalendarExport.swift */,
 				D3D27C02489E7B990F1D25CA /* ScenarioOverviewScheduledServicesCalendarState.swift */,
 				741C7D39541C2F1D82A2F99C /* ScenarioOverviewServiceDisplayHelpers.swift */,
 				156D3CA2BCEC2562225A4BB8 /* ScheduledServiceActionOverlay.swift */,
@@ -619,6 +692,7 @@
 		39426B61DC8B147E666C953E /* DesignSystem */ = {
 			isa = PBXGroup;
 			children = (
+				A79246016124C9D1C5CAC643 /* WIAchievementProgressRing.swift */,
 				C8CCF8CEF7D739B4D00A6EC7 /* WIButton.swift */,
 				71BF56791A6E87453750F96A /* WIDateField.swift */,
 				5A94294D7783CA4A8A11A2DE /* WIFieldPrimitives.swift */,
@@ -631,7 +705,9 @@
 				2842C492BFF8E358CBB5BFD8 /* WISelectField.swift */,
 				0BD3D886AF71B757A4AE9FDC /* WITextField.swift */,
 				E9F2CD287E2B3D0DCCF3AD8D /* WITipInfo.swift */,
+				3595119EAE12C3168D44A278 /* WIToastBanner.swift */,
 				9D22AB154C65FE0BC96F8915 /* WITopSpotlight.swift */,
+				36F046FFB84D7619A93FDCA8 /* WIUpdateErrorBanner.swift */,
 				DD57EA6945ECEFFA9D2BBD86 /* WorthItTheme.swift */,
 			);
 			path = DesignSystem;
@@ -670,6 +746,26 @@
 				20F249AF9EE52A3ACE7F963A /* MetricTrend */,
 			);
 			path = Graphs;
+			sourceTree = "<group>";
+		};
+		54C9526C985127B909CE5237 /* Achievements */ = {
+			isa = PBXGroup;
+			children = (
+				EBE11E1D95D8AA82A0DD4975 /* AchievementCategoryDashboard.swift */,
+				33A5FCE35A9DE8E6F0AF33CA /* AchievementDetailScreen.swift */,
+				00652530DD0E299C67CD18F9 /* AchievementDetailValueGrid.swift */,
+				B5ACA71AFF18E94E1493DB69 /* AchievementGlyph.swift */,
+				EE31C63D86A4D62D206F2BB9 /* AchievementHeroRing.swift */,
+				676FD57F97E9C8DCAF779275 /* AchievementInsightLine.swift */,
+				569FDD1D4E42CFF0FF81A5EF /* AchievementMapLane.swift */,
+				BA7CC5ED1545531352E1D575 /* AchievementMapScreen.swift */,
+				BCDD5FD67769327193FE4E4C /* AchievementModels.swift */,
+				774A9F7F3DDB436E4A8A13E4 /* AchievementNavigationRoute.swift */,
+				01F739B18430C7D395DD8D78 /* AchievementNextUnlockCard.swift */,
+				00108855933CE1961E3EF8D1 /* AchievementRecentUnlocks.swift */,
+				A6813002B9A0F6A9945C73C7 /* AchievementsHubScreen.swift */,
+			);
+			path = Achievements;
 			sourceTree = "<group>";
 		};
 		56F12E256B42FBB634110DEB /* Auth */ = {
@@ -868,6 +964,7 @@
 			children = (
 				93806CD2D958DB8FE0775EDB /* APIEnvironment.swift */,
 				ECA7DB47A9FBEA2F8EDAE7AB /* HTTPAPIClient.swift */,
+				DE1FAD3F5E463C53A0F047CC /* WIUpdateErrorText.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -932,6 +1029,7 @@
 				CB62D3D218EF2923FAF1CD19 /* ScenarioOverviewView+MetricTrendData.swift */,
 				6D339A99D0E65AF13B84ECC4 /* ScenarioOverviewView+MetricTrendSelection.swift */,
 				879512B8153C3C798A8BF039 /* ScenarioOverviewView+StateBindings.swift */,
+				54C9526C985127B909CE5237 /* Achievements */,
 				BAC28646803D0D88776845F1 /* AddEntryChooser */,
 				3D59FAAAA3D70AF758522C4E /* Chrome */,
 				15C1CA504ADFBC8831D93F56 /* Common */,
@@ -1013,6 +1111,7 @@
 			isa = PBXGroup;
 			children = (
 				BD92072213ECC5B134D8399F /* API */,
+				2BB74FE0954DD247E34C5E02 /* CalendarExport */,
 				39426B61DC8B147E666C953E /* DesignSystem */,
 				970FBE0EDD47BF489ED5C385 /* Localization */,
 			);
@@ -1162,6 +1261,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				BA4A1E1865CA9F569BCB64D3 /* APIEnvironment.swift in Sources */,
+				EEDCE8751F3D4FA73D5A1726 /* AchievementCategoryDashboard.swift in Sources */,
+				F1CC42EC06E7308F380F2EAB /* AchievementDetailScreen.swift in Sources */,
+				244D6F05B343F8992A6C1075 /* AchievementDetailValueGrid.swift in Sources */,
+				9BCCACBE80A042F24CD5AA31 /* AchievementGlyph.swift in Sources */,
+				AAB0884B65B45ECBE5A3B10E /* AchievementHeroRing.swift in Sources */,
+				F71A222E8F63732D2763BF4D /* AchievementInsightLine.swift in Sources */,
+				B1F9651FC456B48BE468944F /* AchievementMapLane.swift in Sources */,
+				B629958E0CCAB3A193B5CEE0 /* AchievementMapScreen.swift in Sources */,
+				D931BD1E94351C5649E55B0E /* AchievementModels.swift in Sources */,
+				4494747810742DB76C43D853 /* AchievementNavigationRoute.swift in Sources */,
+				F85053B15F32E05CD3B7972E /* AchievementNextUnlockCard.swift in Sources */,
+				CCC42E85771FEBECFA71250D /* AchievementRecentUnlocks.swift in Sources */,
+				DC9466879BCD2910E672525E /* AchievementsHubScreen.swift in Sources */,
 				81D8DEF9DB3F7A25D2C0EA99 /* AddComparableOptionFooter.swift in Sources */,
 				67545361679DF1901FB7F918 /* AddComparableOptionScreen.swift in Sources */,
 				4B70551090605310C58BA67F /* AddEntryChooserScreen.swift in Sources */,
@@ -1175,6 +1287,7 @@
 				BF7512A708DBB007884C1CEE /* BackendMetricDetailScreen.swift in Sources */,
 				D5F47819284043F2583E9667 /* BreakEvenDetailScreen.swift in Sources */,
 				9A7F1E41C2EB8F3009A3EA41 /* BreakEvenTripRowsScreen.swift in Sources */,
+				595B252BF8EE6DA083F3EA2F /* ComparableCategorySelectionScreen.swift in Sources */,
 				5303A3789B9B63CF56A7284F /* ComparableEditorIsland.swift in Sources */,
 				3727827A8DBCBB519AE157BF /* ComparableOptionRow.swift in Sources */,
 				4FF3C0FA4001C086BA2D0ABB /* CompareBenchmarkChart.swift in Sources */,
@@ -1245,6 +1358,7 @@
 				70F9EB778A046A42D8AD8126 /* ScenarioComparisonVisibilityScreen.swift in Sources */,
 				F41AB40557D918ED484B15DA /* ScenarioExpensesScreen.swift in Sources */,
 				5BDEF643C1B868D9BA5B6A1C /* ScenarioInsightsScreen.swift in Sources */,
+				7F8FD18B30FBBCFF08C2CA2C /* ScenarioLoadErrorCard.swift in Sources */,
 				0E1697A94A66E66D1D78E148 /* ScenarioMetricPill.swift in Sources */,
 				E7CB8016E995AC0B9210C59C /* ScenarioMileageLogRow.swift in Sources */,
 				F0A2723BAB95F32C965EE2F7 /* ScenarioMileageScreen.swift in Sources */,
@@ -1296,10 +1410,12 @@
 				39BB1C711EADA6258D755B0E /* ScenarioOverviewNavigationPath.swift in Sources */,
 				409CFD1946A1B8068473C63A /* ScenarioOverviewNavigationTypes.swift in Sources */,
 				2C3A81904B9472995746F541 /* ScenarioOverviewPageNavigation.swift in Sources */,
+				F04804CB96A8902FF43CCA2C /* ScenarioOverviewPreferencesSettingsData.swift in Sources */,
 				26C113FF3054AD2A023A3099 /* ScenarioOverviewScenarioActions.swift in Sources */,
 				7CD496244323744FC448F911 /* ScenarioOverviewScheduleServiceActions.swift in Sources */,
 				BC1565AD7A54B47E4332C6B5 /* ScenarioOverviewScheduleServiceFormHelpers.swift in Sources */,
 				C724A445FCC0BA71E528B75C /* ScenarioOverviewScheduleServiceModels.swift in Sources */,
+				8C7C6C7AC35A1283A973A411 /* ScenarioOverviewScheduledServiceCalendarExport.swift in Sources */,
 				CDFD679EB215F83B497453A3 /* ScenarioOverviewScheduledServicesCalendarState.swift in Sources */,
 				7FCB4981B8F2B89E2743CE1F /* ScenarioOverviewScreen.swift in Sources */,
 				0B170BE01523BE1609317940 /* ScenarioOverviewScreenModels.swift in Sources */,
@@ -1315,7 +1431,10 @@
 				FCCDDE3B1B8ECA37CEA76E5D /* ScenarioOverviewView+MetricTrendSelection.swift in Sources */,
 				A34C03CD01B9B457702C00DB /* ScenarioOverviewView+StateBindings.swift in Sources */,
 				2162A32A4CBD18833A66C0F1 /* ScenarioOverviewView.swift in Sources */,
+				7BFACE0F38B410B9F51A964D /* ScenarioPhotoUploadInput.swift in Sources */,
+				7B904422EE37E7F01743F05C /* ScenarioPreferencesSettingsScreen.swift in Sources */,
 				ECE8559AC9272134F133ACEC /* ScenarioRepository.swift in Sources */,
+				BA6387CB0079585D83350493 /* ScenarioResourceLinkValidator.swift in Sources */,
 				1EA56D02BC577951AC3CB408 /* ScenarioResourceManagementSection.swift in Sources */,
 				0E3143FB12B38F0B62BA076B /* ScenarioResourceMetadataActions.swift in Sources */,
 				FB0494A9C8CD756640A70CD4 /* ScenarioResourceMetadataCard.swift in Sources */,
@@ -1337,6 +1456,8 @@
 				96A9AEFDA2E58582048C3933 /* ScheduledServiceMenu.swift in Sources */,
 				204B19A6B06375F38CD723C8 /* ScheduledServiceRow.swift in Sources */,
 				96A2D1A0D03DE8A3B82753BD /* ScheduledServicesScreen.swift in Sources */,
+				42FF36098BC1D5015BE58306 /* ServiceCalendarExporter.swift in Sources */,
+				04BED99126CBD32AE8B8C88E /* WIAchievementProgressRing.swift in Sources */,
 				F25930BC46BC87FD6DD6EA22 /* WIButton.swift in Sources */,
 				340C64A3695F72EE6492AA86 /* WIDateField.swift in Sources */,
 				5FAF7C8CFBD4666A91EC007D /* WIFieldPrimitives.swift in Sources */,
@@ -1350,7 +1471,10 @@
 				40EADA2A8E2022D51418590A /* WISelectField.swift in Sources */,
 				7FAE74487D48A2B31ECD998A /* WITextField.swift in Sources */,
 				0B08EBCC8896B4CA2163D33F /* WITipInfo.swift in Sources */,
+				4272A516476763569897F4BE /* WIToastBanner.swift in Sources */,
 				952CDABA4B15BC8CC2E61663 /* WITopSpotlight.swift in Sources */,
+				37A604499D5246D3378368CC /* WIUpdateErrorBanner.swift in Sources */,
+				992231C96C4EBC4B4EFDF8AF /* WIUpdateErrorText.swift in Sources */,
 				429E39C254E4EEE208CF9EA4 /* WorthItApp.swift in Sources */,
 				56EEDC7523BF2512B49558B1 /* WorthItTheme.swift in Sources */,
 			);
@@ -1395,6 +1519,8 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Worth It";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Worth It uses calendar access to add service reminders you choose.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Worth It uses calendar access to add service reminders you choose.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -1420,6 +1546,8 @@
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Worth It";
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Worth It uses calendar access to add service reminders you choose.";
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Worth It uses calendar access to add service reminders you choose.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

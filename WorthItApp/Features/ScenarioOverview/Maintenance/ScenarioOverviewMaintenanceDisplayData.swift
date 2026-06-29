@@ -22,7 +22,11 @@ extension ScenarioOverviewView {
                     distanceRemaining: item.distanceRemainingValue,
                     distanceUnit: item.distanceRemainingUnit,
                     daysRemaining: item.daysRemaining,
-                    note: serviceNote?.isEmpty == false ? serviceNote : nil
+                    note: serviceNote?.isEmpty == false ? serviceNote : nil,
+                    calendarEligible: item.calendarEligible,
+                    calendarSuggestedDate: item.calendarSuggestedDate,
+                    calendarTitle: item.calendarTitle,
+                    calendarNotes: item.calendarNotes
                 )
             }
             .sorted { lhs, rhs in

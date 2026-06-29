@@ -6,17 +6,20 @@ struct AddComparableOptionScreen: View {
     let pricingModel: Binding<AlternativePricingMode>
     let pricePerKm: Binding<String>
     let pricePerMinute: Binding<String>
+    let averageSpeedKmh: Binding<String>
     let curvePoints: Binding<[ComparableCurveInputPoint]>
     let pricePerMonth: Binding<String>
     let manualTotal: Binding<String>
-    let note: Binding<String>
     let inheritedCostCategories: Binding<Set<String>>
     let breakEven: ScenarioComparison.AlternativeBreakEven?
+    let selectedCategory: AlternativeCategory
     let currencyCode: String
     let isIncluded: Binding<Bool>
     let onRemove: () -> Void
 
-    private let editablePricingOptions: [AlternativePricingMode] = [.perDistance, .mixed, .distanceCurve, .perPeriod, .manualEquivalent]
+    private var editablePricingOptions: [AlternativePricingMode] {
+        selectedCategory.allowedPricingModes
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 40) {
@@ -28,6 +31,10 @@ struct AddComparableOptionScreen: View {
             controlsSection
         }
         .padding(.bottom, 104)
+        .onAppear(perform: normalizePricingModelIfNeeded)
+        .onChange(of: selectedCategory) { _, _ in
+            normalizePricingModelIfNeeded()
+        }
     }
 
     private var hero: some View {
@@ -99,6 +106,14 @@ struct AddComparableOptionScreen: View {
                             trailingText: "/ min",
                             keyboardType: .decimalPad
                         )
+
+                        WITextField(
+                            label: i18n.t("Average Speed"),
+                            placeholder: i18n.t("70"),
+                            text: averageSpeedKmh,
+                            trailingText: "km/h",
+                            keyboardType: .decimalPad
+                        )
                     }
                 case .distanceCurve:
                     VStack(spacing: WorthItSpacing.l) {
@@ -153,7 +168,26 @@ struct AddComparableOptionScreen: View {
                         trailingText: "/ mo",
                         keyboardType: .decimalPad
                     )
-                case .manualEquivalent, .perTime:
+                case .perTime:
+                    VStack(spacing: WorthItSpacing.xxl) {
+                        WITextField(
+                            label: i18n.t("Cost per Minute"),
+                            placeholder: i18n.t("0.00"),
+                            text: pricePerMinute,
+                            leadingText: currencySymbol,
+                            trailingText: "/ min",
+                            keyboardType: .decimalPad
+                        )
+
+                        WITextField(
+                            label: i18n.t("Average Speed"),
+                            placeholder: i18n.t("70"),
+                            text: averageSpeedKmh,
+                            trailingText: "km/h",
+                            keyboardType: .decimalPad
+                        )
+                    }
+                case .manualEquivalent:
                     WITextField(
                         label: i18n.t("Total Equivalent Cost"),
                         placeholder: i18n.t("0.00"),
@@ -161,10 +195,6 @@ struct AddComparableOptionScreen: View {
                         leadingText: currencySymbol,
                         keyboardType: .decimalPad
                     )
-                }
-
-                if pricingModel.wrappedValue != .distanceCurve {
-                    WITextField(label: i18n.t("Note"), placeholder: i18n.t("City taxi, car share, rental..."), text: note)
                 }
             }
         }
@@ -618,17 +648,17 @@ struct AddComparableOptionScreen: View {
         Binding {
             pricingModel.wrappedValue.title
         } set: { title in
-            pricingModel.wrappedValue = editablePricingOptions.first(where: { $0.title == title }) ?? .perDistance
+            pricingModel.wrappedValue = editablePricingOptions.first(where: { $0.title == title }) ?? selectedCategory.defaultPricingMode
         }
     }
 
+    private func normalizePricingModelIfNeeded() {
+        guard !editablePricingOptions.contains(pricingModel.wrappedValue) else { return }
+        pricingModel.wrappedValue = selectedCategory.defaultPricingMode
+    }
+
     private var iconName: String {
-        let lowerName = name.wrappedValue.lowercased()
-        if lowerName.contains("taxi") { return "car.fill" }
-        if lowerName.contains("transport") || lowerName.contains("bus") { return "bus.fill" }
-        if lowerName.contains("share") { return "car.2.fill" }
-        if lowerName.contains("rental") { return "key.fill" }
-        return "arrow.triangle.branch"
+        selectedCategory.iconName
     }
 
     private var currencySymbol: String {

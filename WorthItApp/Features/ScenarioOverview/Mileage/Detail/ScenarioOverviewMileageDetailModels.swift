@@ -38,24 +38,30 @@ extension ScenarioOverviewView {
         let monthStart = expenseHistoryMonthStart(for: event.date)
         let note = mileageEventSubtitle(event.note, fallback: "Trip Added")
         let monthLabel = Self.monthYearFormatter.string(from: monthStart)
+        let tripDistance = usageDistanceInScenarioUnit(event)
+        let displayedCostPerDistance = distanceRateInScenarioUnit(costPerDistance, sourceUnit: "km")
 
         return MileageTripDetailScreen.Model(
             title: note,
             estimatedCostText: "\(currencySymbol)\(formatDouble(estimatedCost, fractionDigits: 2))",
-            distanceText: "\(formatDouble(event.distanceValue, fractionDigits: 1)) \(event.distanceUnit)",
-            costPerDistanceText: "\(currencySymbol)\(formatDouble(costPerDistance, fractionDigits: 2))",
+            distanceText: "\(formatDouble(tripDistance, fractionDigits: 1)) \(mileageDisplayUnit)",
+            costPerDistanceText: "\(currencySymbol)\(formatDouble(displayedCostPerDistance, fractionDigits: 2))",
             costPerDistanceSourceText: "Trip-date ownership rate",
-            unitText: event.distanceUnit,
+            unitText: mileageDisplayUnit,
             dateTimeText: "\(Self.mileageDateFormatter.string(from: event.date)), \(Self.mileageTimeFormatter.string(from: event.date))",
             notesText: event.note?.isEmpty == false ? event.note! : "No notes",
             periodLabel: monthLabel,
             confidenceLevel: "High",
             confidenceSource: "Calculated from trip-date pricing",
             dataSource: "Manual Entry",
+            attachments: event.attachments ?? [],
+            links: event.links ?? [],
             comparableCosts: comparableTripCosts(
                 for: event,
                 ownershipTripCost: estimatedCost
             ),
+            onOpenAttachment: { activeResourceAction = .attachment($0) },
+            onOpenLink: { activeResourceAction = .link($0) },
             onOpenLedger: {
                 openMileageHistory(focusedOn: event.id, monthStart: monthStart)
             },
@@ -81,7 +87,7 @@ extension ScenarioOverviewView {
                     id: alternative.id,
                     name: alternative.name,
                     iconSystemName: comparableIconName(for: alternative),
-                    durationText: comparableDurationText(for: event),
+                    basisText: i18n.t("Same trip distance"),
                     costValue: breakdown.total,
                     costText: "\(currencySymbol)\(formatDouble(breakdown.total, fractionDigits: 2))",
                     deltaText: tripSavingsDeltaDisplay(delta, includesOutcome: true),
@@ -116,10 +122,10 @@ extension ScenarioOverviewView {
         }
 
         let carRate = item.carCostPerKm.map {
-            "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))/km"
+            "\(currencySymbol)\(formatDouble(distanceRateInScenarioUnit($0, sourceUnit: "km"), fractionDigits: 2))/\(mileageDisplayUnit)"
         } ?? "-"
         let alternativeRate = item.alternativeCostPerKm.map {
-            "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))/km"
+            "\(currencySymbol)\(formatDouble(distanceRateInScenarioUnit($0, sourceUnit: "km"), fractionDigits: 2))/\(mileageDisplayUnit)"
         } ?? "-"
         let carCost = item.carTripCost.map {
             "\(currencySymbol)\(formatDouble($0, fractionDigits: 2))"
@@ -131,18 +137,6 @@ extension ScenarioOverviewView {
                 "Trip pricing: car \(carRate) = \(carCost); \(alternative.name) effective \(alternativeRate) = \(currencySymbol)\(formatDouble(alternativeTripCost, fractionDigits: 2))"
             ]
         )
-    }
-
-    func comparableDurationText(for event: UsageEvent) -> String {
-        "Est. ~\(estimatedComparableDurationMinutes(for: event)) mins"
-    }
-
-    func estimatedComparableDurationMinutes(for event: UsageEvent) -> Int {
-        if let durationMinutes = event.durationMinutes, durationMinutes > 0 {
-            return durationMinutes
-        }
-
-        return max(Int((event.distanceValue / 35 * 60).rounded()), 5)
     }
 
     func comparableIconName(for alternative: AlternativeOption) -> String {

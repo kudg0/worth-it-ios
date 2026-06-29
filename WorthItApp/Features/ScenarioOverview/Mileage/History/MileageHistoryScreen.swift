@@ -9,6 +9,7 @@ struct MileageHistoryScreen: View {
         let groupTotal: (ScenarioOverviewView.MileageMonthGroup) -> String
         let onOpenMileage: (UUID) -> Void
         let onEditMileage: (UUID) -> Void
+        let onRetry: () -> Void
     }
 
     let model: Model
@@ -18,7 +19,11 @@ struct MileageHistoryScreen: View {
             MileageHistoryHero(model: model.hero)
 
             if let usageEventsError = model.hero.usageEventsError {
-                WITipInfo(title: i18n.t("Mileage unavailable"), bodyText: usageEventsError)
+                ScenarioLoadErrorCard(
+                    title: i18n.t("Mileage unavailable"),
+                    message: usageEventsError,
+                    onRetry: model.onRetry
+                )
             } else if model.groups.isEmpty {
                 WITipInfo(
                     title: i18n.t("No mileage found"),

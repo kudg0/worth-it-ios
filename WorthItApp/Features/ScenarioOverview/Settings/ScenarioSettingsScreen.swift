@@ -95,7 +95,7 @@ struct ScenarioSettingsScreen: View {
                 SettingsItem(
                     id: "analytics",
                     title: i18n.t("Analytics Model"),
-                    subtitle: i18n.t("Cost per km inputs and calculation switches"),
+                    subtitle: i18n.t("Distance-rate inputs and calculation switches"),
                     status: analyticsSummary,
                     systemIcon: "slider.horizontal.3",
                     action: onOpenAnalytics

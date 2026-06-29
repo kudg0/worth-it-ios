@@ -13,6 +13,7 @@ struct ScenarioCompareScreen: View {
     let alternatives: [AlternativeOption]
     let alternativesError: String?
     let chartSeries: [ScenarioCompareChartSeries]
+    let mileageUnit: String
     let scenarioStartDate: Date
     let focusedComparableId: UUID?
     let onAddComparable: () -> Void
@@ -53,6 +54,7 @@ struct ScenarioCompareScreen: View {
                                 breakEven: breakEven(for: alternative.id),
                                 selectedMetric: selectedMetric.wrappedValue,
                                 currency: currency,
+                                mileageUnit: mileageUnit,
                                 summary: summary,
                                 ownershipCostPerKm: selectedMetric.wrappedValue == .perKm ? currentOwnershipChartValue ?? ownershipCostPerKm : ownershipCostPerKm,
                                 ownershipMonthlyCost: ownershipMonthlyCost,
@@ -104,40 +106,16 @@ struct ScenarioCompareScreen: View {
     private var accumulationIsland: some View {
         WIIsland(title: i18n.t("Cost Accumulation")) {
             VStack(alignment: .leading, spacing: WorthItSpacing.xxl) {
-                ownershipMetricHero
-
                 CompareBenchmarkChart(
                     series: chartSeries,
                     currency: currency,
                     selectedMetric: selectedMetric.wrappedValue,
+                    mileageUnit: mileageUnit,
                     scenarioStartDate: scenarioStartDate,
                     comparisonBaselineValue: comparisonBaselineValue
                 )
 
                 metricExplanation
-            }
-        }
-    }
-
-    private var ownershipMetricHero: some View {
-        VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
-            if let ownershipMetricCaption {
-                Text(ownershipMetricCaption)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(WorthItColor.textTertiary)
-                    .tracking(1.4)
-                    .textCase(.uppercase)
-            }
-
-            HStack(alignment: .lastTextBaseline, spacing: WorthItSpacing.s) {
-                Text(ownershipMetricText)
-                    .font(.system(size: 32, weight: .heavy))
-                    .foregroundStyle(WorthItColor.textPrimary)
-                    .tracking(-0.8)
-
-                Text(ownershipMetricUnit)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(WorthItColor.textSecondary)
             }
         }
     }
@@ -174,7 +152,7 @@ struct ScenarioCompareScreen: View {
                 selectedMetric.wrappedValue = metric
             }
         } label: {
-            Text(metric.title)
+            Text(metricTitle(metric))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(isSelected ? Color(hex: 0x385283) : WorthItColor.textSecondary)
                 .padding(.horizontal, WorthItSpacing.xl)
@@ -185,8 +163,19 @@ struct ScenarioCompareScreen: View {
                 }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(metric.title)
+        .accessibilityLabel(metricTitle(metric))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private func metricTitle(_ metric: ScenarioOverviewView.CompareMetric) -> String {
+        switch metric {
+        case .perKm:
+            return "Per \(mileageUnit.uppercased())"
+        case .perMonth:
+            return metric.title
+        case .totalCost:
+            return metric.title
+        }
     }
 
     private func result(for id: UUID) -> ScenarioComparison.AlternativeResult? {
@@ -221,7 +210,7 @@ struct ScenarioCompareScreen: View {
     private var metricExplanationText: String {
         switch selectedMetric.wrappedValue {
         case .perKm:
-            return "Per KM shows distance efficiency: total ownership cost spread across tracked kilometers. It can look strong even when monthly spend is high, because fixed ownership costs are diluted by usage."
+            return "Per \(mileageUnit.uppercased()) shows distance efficiency: total ownership cost spread across tracked \(mileageUnitName). It can look strong even when monthly spend is high, because fixed ownership costs are diluted by usage."
         case .perMonth:
             return "Per Month shows cumulative average monthly cost through each month. It keeps fixed ownership costs visible, so a car can be efficient per kilometer but still expensive to own each month."
         case .totalCost:
@@ -251,34 +240,6 @@ struct ScenarioCompareScreen: View {
         }
     }
 
-    private var ownershipMetricText: String {
-        switch selectedMetric.wrappedValue {
-        case .perKm:
-            currentOwnershipChartValue.map { money($0) } ?? ownershipCostPerKm.map { money($0) } ?? "-"
-        case .perMonth:
-            ownershipMonthlyCost.map { money($0) } ?? currentOwnershipChartValue.map { money($0) } ?? "-"
-        case .totalCost:
-            currentOwnershipChartValue.map { money($0) } ?? summary.map { money($0.netOwnershipCost) } ?? "-"
-        }
-    }
-
-    private var ownershipMetricUnit: String {
-        switch selectedMetric.wrappedValue {
-        case .perKm: "/ km"
-        case .perMonth: "/ month"
-        case .totalCost: "total"
-        }
-    }
-
-    private var ownershipMetricCaption: String? {
-        switch selectedMetric.wrappedValue {
-        case .perMonth:
-            return "Average monthly cost"
-        case .perKm, .totalCost:
-            return nil
-        }
-    }
-
     private var comparisonBaselineValue: Double? {
         switch selectedMetric.wrappedValue {
         case .perKm:
@@ -293,10 +254,7 @@ struct ScenarioCompareScreen: View {
     private func selectedMetricDelta(for result: ScenarioComparison.AlternativeResult) -> Double? {
         switch selectedMetric.wrappedValue {
         case .perKm:
-            let alternativeCostPerKm = dynamicAlternativeAverageRate(for: breakEven(for: result.id))
-                ?? (result.pricingMode == .distanceCurve
-                    ? distanceCurveAverageRate(from: result.costBreakdown)
-                    : result.costBreakdown.perKm)
+            let alternativeCostPerKm = alternativeCostPerDistance(for: result)
             guard let ownershipValue = currentOwnershipChartValue ?? ownershipCostPerKm,
                   let alternativeCostPerKm
             else { return nil }
@@ -353,9 +311,30 @@ struct ScenarioCompareScreen: View {
         return breakdown.inputs.averageCurvePricePerKm
     }
 
+    private func alternativeCostPerDistance(for result: ScenarioComparison.AlternativeResult) -> Double? {
+        if let dynamicAverage = dynamicAlternativeAverageRate(for: breakEven(for: result.id)) {
+            return distanceRateInDisplayUnit(dynamicAverage)
+        }
+
+        if result.pricingMode == .distanceCurve,
+           let average = distanceCurveAverageRate(from: result.costBreakdown) {
+            return distanceRateInDisplayUnit(average)
+        }
+
+        return result.costBreakdown.perKm.map(distanceRateInDisplayUnit)
+    }
+
     private func dynamicAlternativeAverageRate(for row: ScenarioComparison.AlternativeBreakEven?) -> Double? {
         let rates = row?.dynamicTripSavings?.items.compactMap(\.alternativeCostPerKm) ?? []
         guard !rates.isEmpty else { return nil }
         return rates.reduce(0, +) / Double(rates.count)
+    }
+
+    private func distanceRateInDisplayUnit(_ ratePerKm: Double) -> Double {
+        mileageUnit == "mi" ? ratePerKm * 1.609344 : ratePerKm
+    }
+
+    private var mileageUnitName: String {
+        mileageUnit == "mi" ? "miles" : "kilometers"
     }
 }

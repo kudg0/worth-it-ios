@@ -46,7 +46,7 @@ extension ScenarioOverviewView {
         if let range = backendEfficiencyMetric?.chart?.ranges?[chartRange.analyticsRangeKey],
            !range.points.isEmpty {
             return sortedTrendPoints(range.points.map {
-                MetricTrendPoint(date: $0.date, value: $0.value, isProjected: $0.isProjected ?? false)
+                MetricTrendPoint(date: $0.date, value: normalizedBackendDistanceMetricValue($0.value), isProjected: $0.isProjected ?? false)
             })
         }
 
@@ -55,8 +55,16 @@ extension ScenarioOverviewView {
         }
 
         return sortedTrendPoints(primary.points.map {
-            MetricTrendPoint(date: $0.date, value: $0.value, isProjected: $0.isProjected ?? false)
+            MetricTrendPoint(date: $0.date, value: normalizedBackendDistanceMetricValue($0.value), isProjected: $0.isProjected ?? false)
         })
+    }
+
+    var backendDistanceMetricNeedsKilometerToScenarioUnitConversion: Bool {
+        backendEfficiencyMetric?.card?.value.lowercased().contains("/km") == true && mileageDisplayUnit == "mi"
+    }
+
+    func normalizedBackendDistanceMetricValue(_ value: Double) -> Double {
+        backendDistanceMetricNeedsKilometerToScenarioUnitConversion ? value * kilometersPerMile : value
     }
 
     var monthlyEfficiencyChartPoints: [MetricTrendPoint] {

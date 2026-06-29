@@ -153,12 +153,12 @@ extension ScenarioOverviewView {
             .sorted { $0.date < $1.date }
 
         if let event = odometerEvents.last {
-            let value = Double(activeScenario.purchaseOdometer ?? 0) + mileageDistance(from: activeScenario.startDate, to: event.date.addingTimeInterval(0.001))
+            let value = purchaseOdometerInScenarioUnit + mileageDistance(from: activeScenario.startDate, to: event.date.addingTimeInterval(0.001))
             return (event.id, value, event.date)
         }
 
         if let purchaseOdometer = activeScenario.purchaseOdometer {
-            return (nil, Double(purchaseOdometer), activeScenario.startDate)
+            return (nil, distanceValue(Double(purchaseOdometer), from: "km", to: mileageDisplayUnit), activeScenario.startDate)
         }
 
         return nil

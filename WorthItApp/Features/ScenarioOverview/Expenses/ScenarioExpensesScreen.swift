@@ -8,6 +8,7 @@ struct ScenarioExpensesScreen: View {
         let currentMonthItems: [RecentExpenseItem]
         let maintenance: MaintenanceSection.Model
         let onOpenHistory: () -> Void
+        let onRetry: () -> Void
     }
 
     let model: Model
@@ -15,7 +16,11 @@ struct ScenarioExpensesScreen: View {
     var body: some View {
         VStack(spacing: WorthItSpacing.xxxxl) {
             if let costEventsError = model.costEventsError {
-                WITipInfo(title: i18n.t("Maintenance unavailable"), bodyText: costEventsError, size: .medium, tone: .info)
+                ScenarioLoadErrorCard(
+                    title: i18n.t("Expenses unavailable"),
+                    message: costEventsError,
+                    onRetry: model.onRetry
+                )
             } else if model.isEmpty {
                 ExpensesEmptyState()
             } else {

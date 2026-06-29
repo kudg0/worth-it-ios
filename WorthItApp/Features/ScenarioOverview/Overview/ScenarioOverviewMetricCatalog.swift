@@ -75,7 +75,7 @@ extension ScenarioOverviewView {
             let trend = costPerKmTrend
             return MetricSlide(
                 id: metric,
-                title: i18n.t("Cost per KM"),
+                title: i18n.t("Cost per \(mileageDisplayUnit.uppercased())"),
                 value: costPerKm,
                 subtitle: nil,
                 footer: trend.label,
@@ -182,7 +182,7 @@ extension ScenarioOverviewView {
 
         return MetricSlide(
             id: metric,
-            title: card.title,
+            title: normalizedMetricTitle(card.title, card: card),
             value: heroValue(for: card),
             subtitle: metric == .totalExpenses ? totalExpenseEntriesSubtitle : card.subtitle,
             footer: footerText(for: card),
@@ -212,9 +212,40 @@ extension ScenarioOverviewView {
             return card.value
         }
 
+        if let value = normalizedCurrencyPerDistanceValue(card) {
+            return "\(currencySymbol)\(formatDouble(value, fractionDigits: 2))"
+        }
+
         return card.value
             .replacingOccurrences(of: "/km", with: "")
             .replacingOccurrences(of: " / km", with: "")
+            .replacingOccurrences(of: "/mi", with: "")
+            .replacingOccurrences(of: " / mi", with: "")
+    }
+
+    func normalizedMetricTitle(_ title: String, card: ScenarioAnalyticsMetricPayload.Card) -> String {
+        guard card.unit == "currencyPerKm" else {
+            return title
+        }
+
+        return i18n.t("Cost per \(mileageDisplayUnit.uppercased())")
+    }
+
+    func normalizedCurrencyPerDistanceValue(_ card: ScenarioAnalyticsMetricPayload.Card) -> Double? {
+        guard let numericValue = card.numericValue else {
+            return nil
+        }
+
+        let lowercasedValue = card.value.lowercased()
+        if lowercasedValue.contains("/km"), mileageDisplayUnit == "mi" {
+            return numericValue * kilometersPerMile
+        }
+
+        if lowercasedValue.contains("/mi"), mileageDisplayUnit == "km" {
+            return numericValue / kilometersPerMile
+        }
+
+        return numericValue
     }
 
     func footerText(for card: ScenarioAnalyticsMetricPayload.Card) -> String? {

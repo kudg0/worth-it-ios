@@ -8,7 +8,8 @@ extension ScenarioOverviewView {
             hero: expenseHeroModel,
             currentMonthItems: currentMonthRecentExpenseItems,
             maintenance: maintenanceSectionModel,
-            onOpenHistory: { openExpenseHistory() }
+            onOpenHistory: { openExpenseHistory() },
+            onRetry: { Task { await loadSummary() } }
         )
     }
 

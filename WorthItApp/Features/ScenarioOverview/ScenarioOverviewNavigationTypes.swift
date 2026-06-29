@@ -100,9 +100,12 @@ enum ScenarioOverviewTab: Hashable {
     case mileage
     case insights
     case compare
+    case achievements
+    case chooseComparableOption
     case addComparableOption
     case analyticsSettings
     case comparisonSettings
+    case preferencesSettings
     case addEntryChooser
     case logExpense
     case scheduleService
@@ -115,16 +118,56 @@ enum ScenarioOverviewTab: Hashable {
     case metricDetail
     case logMileage
     case settings
+
+    var topLevelNavigationIndex: Int? {
+        switch self {
+        case .overview:
+            0
+        case .expenses:
+            1
+        case .mileage:
+            2
+        case .insights:
+            3
+        case .compare:
+            4
+        case .achievements:
+            5
+        default:
+            nil
+        }
+    }
+}
+
+enum ScenarioOverviewContentTransitionDirection {
+    case forward
+    case backward
+
+    var insertionEdge: Edge {
+        switch self {
+        case .forward: .trailing
+        case .backward: .leading
+        }
+    }
+
+    var removalEdge: Edge {
+        switch self {
+        case .forward: .leading
+        case .backward: .trailing
+        }
+    }
 }
 
 enum ScenarioResourceOwner: Identifiable, Hashable {
     case costEvent(UUID)
     case scheduledService(UUID)
+    case usageEvent(UUID)
 
     var id: String {
         switch self {
         case .costEvent(let id): "costEvent-\(id.uuidString)"
         case .scheduledService(let id): "scheduledService-\(id.uuidString)"
+        case .usageEvent(let id): "usageEvent-\(id.uuidString)"
         }
     }
 }

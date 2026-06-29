@@ -12,10 +12,22 @@ struct LogMileageScreen: View {
     let resultingOdometerText: String
     let dateText: String
     let timeText: String
+    let attachments: [ResourceAttachment]
+    let pendingPhotos: [ScenarioPendingResourcePhoto]
+    let links: [ResourceLink]
+    let linkDraft: Binding<String>
+    let linkValidationMessage: String?
     let sanitizeValue: (String) -> String
     let onModeChange: (ScenarioOverviewView.MileageMode) -> Void
     let onOpenDatePicker: () -> Void
     let onOpenTimePicker: () -> Void
+    let onAddPhoto: () -> Void
+    let onLinkDraftChange: () -> Void
+    let onOpenAttachment: (ResourceAttachment) -> Void
+    let onRemoveAttachment: (ResourceAttachment) -> Void
+    let onRemovePendingPhoto: (ScenarioPendingResourcePhoto) -> Void
+    let onOpenLink: (ResourceLink) -> Void
+    let onRemoveLink: (ResourceLink) -> Void
     let onDelete: () -> Void
 
     var body: some View {
@@ -95,6 +107,22 @@ struct LogMileageScreen: View {
             }
 
             LogMileageNotesField(notes: notes)
+
+            ScenarioPhotoUploadInput(
+                title: i18n.t("Photos"),
+                attachments: attachments,
+                pendingPhotos: pendingPhotos,
+                links: links,
+                linkDraft: linkDraft,
+                linkValidationMessage: linkValidationMessage,
+                onAddPhoto: onAddPhoto,
+                onLinkDraftChange: onLinkDraftChange,
+                onOpenAttachment: onOpenAttachment,
+                onRemoveAttachment: onRemoveAttachment,
+                onRemovePendingPhoto: onRemovePendingPhoto,
+                onOpenLink: onOpenLink,
+                onRemoveLink: onRemoveLink
+            )
         }
     }
 

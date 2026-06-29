@@ -79,4 +79,16 @@ struct ScenarioScheduledServiceDisplayItem: Identifiable {
     let distanceUnit: String
     let daysRemaining: Int?
     let note: String?
+    let calendarEligible: Bool
+    let calendarSuggestedDate: Date?
+    let calendarTitle: String?
+    let calendarNotes: String?
+
+    var calendarExportDate: Date? {
+        calendarSuggestedDate ?? date
+    }
+
+    var canExportToCalendar: Bool {
+        calendarExportDate != nil
+    }
 }

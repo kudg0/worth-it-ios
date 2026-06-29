@@ -1,4 +1,6 @@
+import PhotosUI
 import SwiftUI
+import UniformTypeIdentifiers
 
 extension ScenarioOverviewView {
     func openMileageForm(mode: MileageMode = .odometer) {
@@ -22,12 +24,16 @@ extension ScenarioOverviewView {
         mileageMode = event.eventType == "odometer_update" ? .odometer : .trip
         mileageDate = event.date
         mileageNotes = event.note ?? ""
+        mileagePendingPhotos = []
+        mileageRemovedAttachmentIds = []
+        mileageRemovedLinkIds = []
+        mileageLinkDraft = ""
 
         if mileageMode == .odometer {
-            let currentReading = Double(previousOdometerForMileageForm) + event.distanceValue
+            let currentReading = Double(previousOdometerForMileageForm) + usageDistanceInScenarioUnit(event)
             mileageValue = formatEditableNumber(currentReading)
         } else {
-            mileageValue = formatEditableNumber(event.distanceValue)
+            mileageValue = formatEditableNumber(usageDistanceInScenarioUnit(event))
         }
 
         withAnimation(.easeInOut(duration: 0.20)) {
@@ -90,42 +96,45 @@ extension ScenarioOverviewView {
             return
         }
 
+        let linkValidation = validatedMileageLinkURL()
+        guard linkValidation.isValid else { return }
+
         isSavingEntry = true
         actionError = nil
         defer { isSavingEntry = false }
 
         do {
+            let savedEvent: UsageEvent
             if let editingUsageEvent {
-                _ = try await repository.updateUsageEvent(
+                savedEvent = try await repository.updateUsageEvent(
                     usageEventId: editingUsageEvent.id,
                     request: UpdateUsageEventRequest(
                         eventType: mileageMode.eventType,
                         date: mileageDate,
                         distanceValue: mileageMode == .trip ? value : nil,
                         odometerValue: mileageMode == .odometer ? value : nil,
-                        durationMinutes: nil,
                         note: trimmedMileageNotes.isEmpty ? "" : trimmedMileageNotes
                     )
                 )
             } else {
-                _ = try await repository.createUsageEvent(
+                savedEvent = try await repository.createUsageEvent(
                     scenarioId: activeScenario.id,
                     request: CreateUsageEventRequest(
                         eventType: mileageMode.eventType,
                         date: mileageDate,
                         distanceValue: mileageMode == .trip ? value : nil,
                         odometerValue: mileageMode == .odometer ? value : nil,
-                        durationMinutes: nil,
                         note: trimmedMileageNotes.isEmpty ? nil : trimmedMileageNotes
                     )
                 )
             }
 
+            try await syncMileageResources(for: savedEvent.id, draftURL: linkValidation.url)
             await loadSummary()
             navigateAfterMileageSave()
             resetMileageForm()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error)
         }
     }
 
@@ -145,7 +154,7 @@ extension ScenarioOverviewView {
             navigateAfterMileageSave()
             resetMileageForm()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error, fallbackKey: .common.errors.update.deleteMileage)
         }
     }
 
@@ -159,7 +168,95 @@ extension ScenarioOverviewView {
         mileageValue = ""
         mileageDate = Date()
         mileageNotes = ""
+        mileagePendingPhotos = []
+        mileageRemovedAttachmentIds = []
+        mileageRemovedLinkIds = []
+        mileageLinkDraft = ""
+        mileageLinkError = nil
+        selectedMileagePhotoItem = nil
         activeMileagePicker = nil
+    }
+
+    var visibleMileageAttachments: [ResourceAttachment] {
+        (editingUsageEvent?.attachments ?? []).filter { !mileageRemovedAttachmentIds.contains($0.id) }
+    }
+
+    var visibleMileageLinks: [ResourceLink] {
+        (editingUsageEvent?.links ?? []).filter { !mileageRemovedLinkIds.contains($0.id) }
+    }
+
+    func stageMileagePhoto(_ item: PhotosPickerItem) async {
+        defer { selectedMileagePhotoItem = nil }
+
+        let contentType = item.supportedContentTypes.first(where: { $0.conforms(to: .image) }) ?? .jpeg
+        let fileExtension = contentType.preferredFilenameExtension ?? "jpg"
+        let fileName = "trip-photo-\(UUID().uuidString).\(fileExtension)"
+        let mimeType = contentType.preferredMIMEType ?? "image/jpeg"
+
+        do {
+            guard let photoData = try await item.loadTransferable(type: ScenarioResourcePhotoData.self) else {
+                actionError = "Could not read this photo. Try another photo."
+                return
+            }
+
+            guard photoData.data.count <= resourceAttachmentMaxBytes else {
+                actionError = resourceAttachmentTooLargeMessage
+                return
+            }
+
+            mileagePendingPhotos.append(
+                ScenarioPendingResourcePhoto(
+                    id: UUID(),
+                    data: photoData.data,
+                    fileName: fileName,
+                    contentType: mimeType
+                )
+            )
+        } catch {
+            actionError = friendlyResourceError(error, fallback: "Could not read this photo. Try another photo.")
+        }
+    }
+
+    func validatedMileageLinkURL() -> (isValid: Bool, url: URL?) {
+        let trimmedLink = mileageLinkDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedLink.isEmpty else {
+            mileageLinkError = nil
+            return (true, nil)
+        }
+
+        guard let url = ScenarioResourceLinkValidator.normalizedURL(from: trimmedLink) else {
+            mileageLinkError = ScenarioResourceLinkValidator.errorMessage
+            return (false, nil)
+        }
+
+        mileageLinkError = nil
+        return (true, url)
+    }
+
+    func syncMileageResources(for usageEventId: UUID, draftURL: URL?) async throws {
+        for attachmentId in mileageRemovedAttachmentIds {
+            try await repository.deleteAttachment(attachmentId: attachmentId)
+        }
+
+        for linkId in mileageRemovedLinkIds {
+            try await repository.deleteResourceLink(linkId: linkId)
+        }
+
+        for photo in mileagePendingPhotos {
+            try await uploadResourceData(
+                photo.data,
+                fileName: photo.fileName,
+                contentType: photo.contentType,
+                owner: .usageEvent(usageEventId)
+            )
+        }
+
+        if let draftURL {
+            _ = try await repository.createUsageEventLink(
+                usageEventId: usageEventId,
+                request: CreateResourceLinkRequest(label: nil, url: draftURL)
+            )
+        }
     }
 
     func navigateAfterMileageSave() {

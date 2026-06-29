@@ -5,17 +5,6 @@ extension ScenarioOverviewView {
         displayedScenario ?? scenario
     }
 
-    var hasActionError: Binding<Bool> {
-        Binding(
-            get: { actionError != nil },
-            set: { isPresented in
-                if !isPresented {
-                    actionError = nil
-                }
-            }
-        )
-    }
-
     var costPerKmFinancingBinding: Binding<Bool> {
         Binding(
             get: { costPerKmIncludesFinancing },

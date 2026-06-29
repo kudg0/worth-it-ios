@@ -5,6 +5,7 @@ struct CompareBenchmarkChart: View {
     let series: [ScenarioCompareChartSeries]
     let currency: String
     let selectedMetric: ScenarioOverviewView.CompareMetric
+    let mileageUnit: String
     let scenarioStartDate: Date
     let comparisonBaselineValue: Double?
     @State private var hiddenSeriesIds: Set<String> = []
@@ -237,7 +238,7 @@ struct CompareBenchmarkChart: View {
     private func yAxisLabel(_ value: Double) -> String {
         switch selectedMetric {
         case .perKm:
-            return "\(ScenarioCompareFormatter.money(value, currency: currency))/km"
+            return "\(ScenarioCompareFormatter.money(value, currency: currency))/\(mileageUnit)"
         case .perMonth:
             return "\(ScenarioCompareFormatter.money(value, currency: currency))/mo"
         case .totalCost:
@@ -319,7 +320,7 @@ struct CompareBenchmarkChart: View {
     private var deltaUnit: String {
         switch selectedMetric {
         case .perKm:
-            return "/km"
+            return "/\(mileageUnit)"
         case .perMonth:
             return "/mo"
         case .totalCost:

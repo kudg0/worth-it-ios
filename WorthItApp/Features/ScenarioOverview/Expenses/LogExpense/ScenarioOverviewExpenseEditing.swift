@@ -14,6 +14,12 @@ extension ScenarioOverviewView {
         expenseNotes = event.note ?? ""
         expenseCategory = expenseCategory(for: event.category)
         isRecurringExpense = event.kind == "recurring"
+        expensePendingResources = []
+        expenseRemovedAttachmentIds = []
+        expenseRemovedLinkIds = []
+        expenseLinkDraft = ""
+        expenseLinkError = nil
+        selectedExpensePhotoItem = nil
         selectedExpenseScheduledServiceId = event.scheduledServiceId
         isExpenseServiceLinkExpanded = event.scheduledServiceId != nil
         shouldCompleteLinkedScheduledService = scheduledServices.contains { service in

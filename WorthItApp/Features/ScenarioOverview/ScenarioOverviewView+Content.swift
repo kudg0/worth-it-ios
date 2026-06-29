@@ -14,6 +14,7 @@ extension ScenarioOverviewView {
                 serviceIconName: serviceIconName,
                 onEdit: beginEditingScheduledService,
                 onCompleteWithExpense: beginCompletingScheduledService,
+                onAddToCalendar: addScheduledServiceToCalendar,
                 onOpenActions: openScheduledServiceActions,
                 onOpenResourceAction: { activeResourceAction = $0 }
             )
@@ -92,7 +93,8 @@ extension ScenarioOverviewView {
                 currentMonthItems: currentMonthMileageLogItems,
                 onOpenHistory: { openMileageHistory() },
                 onOpenMileage: openMileageDetail,
-                onEditMileage: beginEditingMileage
+                onEditMileage: beginEditingMileage,
+                onRetry: { Task { await loadSummary() } }
             )
         case .insights:
             ScenarioInsightsScreen()
@@ -107,10 +109,22 @@ extension ScenarioOverviewView {
                 alternatives: alternatives,
                 alternativesError: alternativesError,
                 chartSeries: compareChartSeries,
+                mileageUnit: mileageDisplayUnit,
                 scenarioStartDate: activeScenario.startDate,
                 focusedComparableId: focusedComparableId,
                 onAddComparable: openAddComparableOption,
                 onEditComparable: beginEditingComparable
+            )
+        case .achievements:
+            AchievementsHubScreen(
+                repository: repository,
+                scenario: activeScenario,
+                route: $achievementRoute
+            )
+        case .chooseComparableOption:
+            ComparableCategorySelectionScreen(
+                selectedCategory: comparableCategory,
+                onSelectCategory: applyComparableCategory
             )
         case .addComparableOption:
             AddComparableOptionScreen(
@@ -119,12 +133,13 @@ extension ScenarioOverviewView {
                 pricingModel: $comparablePricingModel,
                 pricePerKm: $comparablePricePerKm,
                 pricePerMinute: $comparablePricePerMinute,
+                averageSpeedKmh: $comparableAverageSpeedKmh,
                 curvePoints: $comparableCurvePoints,
                 pricePerMonth: $comparablePricePerMonth,
                 manualTotal: $comparableManualTotal,
-                note: $comparableNote,
                 inheritedCostCategories: $comparableInheritedCostCategories,
                 breakEven: editingAlternativeBreakEven,
+                selectedCategory: comparableCategory,
                 currencyCode: activeScenario.currency,
                 isIncluded: $isComparableIncluded,
                 onRemove: { Task { await deleteEditingComparable() } }
@@ -138,6 +153,8 @@ extension ScenarioOverviewView {
             )
         case .analyticsSettings:
             analyticsModelScreen
+        case .preferencesSettings:
+            preferencesSettingsScreen
         case .addEntryChooser:
             AddEntryChooserScreen(
                 selectedEntryKind: $selectedEntryKind,
@@ -185,10 +202,24 @@ extension ScenarioOverviewView {
                 resultingOdometerText: resultingOdometerText,
                 dateText: Self.shortDateFormatter.string(from: mileageDate),
                 timeText: Self.timeFormatter.string(from: mileageDate),
+                attachments: visibleMileageAttachments,
+                pendingPhotos: mileagePendingPhotos,
+                links: visibleMileageLinks,
+                linkDraft: $mileageLinkDraft,
+                linkValidationMessage: mileageLinkError,
                 sanitizeValue: sanitizedDecimalInput,
                 onModeChange: resetMileageValueForMode,
                 onOpenDatePicker: { activeMileagePicker = .date },
                 onOpenTimePicker: { activeMileagePicker = .time },
+                onAddPhoto: { showsMileagePhotoPicker = true },
+                onLinkDraftChange: { mileageLinkError = nil },
+                onOpenAttachment: { activeResourceAction = .attachment($0) },
+                onRemoveAttachment: { mileageRemovedAttachmentIds.insert($0.id) },
+                onRemovePendingPhoto: { photo in
+                    mileagePendingPhotos.removeAll { $0.id == photo.id }
+                },
+                onOpenLink: { activeResourceAction = .link($0) },
+                onRemoveLink: { mileageRemovedLinkIds.insert($0.id) },
                 onDelete: { Task { await deleteEditingMileage() } }
             )
         case .settings:
@@ -203,7 +234,7 @@ extension ScenarioOverviewView {
                 onEditScenario: { onEditScenario(activeScenario) },
                 onOpenAnalytics: { openAnalyticsSettings() },
                 onOpenComparison: { openComparisonSettings() },
-                onOpenPreferences: {},
+                onOpenPreferences: { openPreferencesSettings() },
                 onDeleteScenario: { showsDeleteConfirmation = true }
             )
         }

@@ -6,6 +6,7 @@ struct ComparableOptionRow: View {
     let breakEven: ScenarioComparison.AlternativeBreakEven?
     let selectedMetric: ScenarioOverviewView.CompareMetric
     let currency: String
+    let mileageUnit: String
     let summary: ScenarioSummary?
     let ownershipCostPerKm: Double?
     let ownershipMonthlyCost: Double?
@@ -80,12 +81,7 @@ struct ComparableOptionRow: View {
     }
 
     private var iconName: String {
-        let name = alternative.name.lowercased()
-        if name.contains("taxi") { return "car.fill" }
-        if name.contains("share") { return "car.2.fill" }
-        if name.contains("rental") { return "key.fill" }
-        if name.contains("transport") || name.contains("bus") { return "bus.fill" }
-        return "arrow.triangle.branch"
+        alternative.category.iconName
     }
 
     private var deltaText: String {
@@ -111,10 +107,10 @@ struct ComparableOptionRow: View {
                 }
                 if alternative.pricingMode == .distanceCurve,
                    let average = distanceCurvePointAverageRate(from: result.costBreakdown) {
-                    return "\(ScenarioCompareFormatter.money(average, currency: currency)) per km"
+                    return "\(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(average), currency: currency)) per \(mileageUnit)"
                 }
                 guard let perKm = result.costBreakdown.perKm else { return pricingDescription }
-                return "\(ScenarioCompareFormatter.money(perKm, currency: currency)) per km"
+                return "\(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(perKm), currency: currency)) per \(mileageUnit)"
             case .perMonth:
                 guard let perMonth = chartMetricValue ?? result.costBreakdown.perMonth else { return pricingDescription }
                 return "\(ScenarioCompareFormatter.money(perMonth, currency: currency)) per month"
@@ -143,7 +139,7 @@ struct ComparableOptionRow: View {
             if alternative.pricingMode == .perPeriod {
                 return monthlyPlanPerKmFormula(breakdown: result.costBreakdown)
             }
-            return "\(total) ÷ \(ScenarioCompareFormatter.number(distance)) km • \(pricingBasisText)"
+            return "\(total) ÷ \(ScenarioCompareFormatter.number(distanceInDisplayUnit(distance))) \(mileageUnit) • \(pricingBasisText)"
         case .perMonth:
             if chartMetricValue != nil {
                 return monthlyAverageFormula(total: total, breakdown: result.costBreakdown)
@@ -169,18 +165,18 @@ struct ComparableOptionRow: View {
     private var pricingDescription: String {
         switch alternative.pricingMode {
         case .perDistance:
-            return "\(ScenarioCompareFormatter.money(alternative.paramsJson.pricePerKm ?? 0, currency: currency)) per km"
+            return "\(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(alternative.paramsJson.pricePerKm ?? 0), currency: currency)) per \(mileageUnit)"
         case .distanceCurve:
             let average = distanceCurvePointAverageRate ?? 0
-            return "\(ScenarioCompareFormatter.money(average, currency: currency)) avg per km"
+            return "\(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(average), currency: currency)) avg per \(mileageUnit)"
         case .perPeriod:
             return "\(ScenarioCompareFormatter.money(alternative.paramsJson.pricePerMonth ?? 0, currency: currency)) per month"
         case .perTime:
             return "\(ScenarioCompareFormatter.money(alternative.paramsJson.pricePerMinute ?? 0, currency: currency)) per minute"
         case .mixed:
-            let perKm = ScenarioCompareFormatter.money(alternative.paramsJson.pricePerKm ?? 0, currency: currency)
+            let perKm = ScenarioCompareFormatter.money(distanceRateInDisplayUnit(alternative.paramsJson.pricePerKm ?? 0), currency: currency)
             let perMinute = ScenarioCompareFormatter.money(alternative.paramsJson.pricePerMinute ?? 0, currency: currency)
-            return "\(perKm)/km + \(perMinute)/min"
+            return "\(perKm)/\(mileageUnit) + \(perMinute)/min"
         case .manualEquivalent:
             return "\(ScenarioCompareFormatter.money(alternative.paramsJson.value ?? 0, currency: currency)) total"
         }
@@ -189,9 +185,9 @@ struct ComparableOptionRow: View {
     private var pricingBasisText: String {
         switch alternative.pricingMode {
         case .perDistance:
-            return "configured \(ScenarioCompareFormatter.money(alternative.paramsJson.pricePerKm ?? 0, currency: currency))/km"
+            return "configured \(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(alternative.paramsJson.pricePerKm ?? 0), currency: currency))/\(mileageUnit)"
         case .distanceCurve:
-            return "avg of curve point €/km rates"
+            return "avg of curve point €/\(mileageUnit) rates"
         case .perPeriod:
             return "monthly plan estimate"
         case .perTime:
@@ -227,7 +223,7 @@ struct ComparableOptionRow: View {
                 return nil
             }
 
-            return (alternativeCostPerKm - ownershipCostPerKm, " / km")
+            return (distanceRateInDisplayUnit(alternativeCostPerKm) - ownershipCostPerKm, " / \(mileageUnit)")
         case .perMonth:
             guard let ownershipValue = chartOwnershipValue ?? ownershipMonthlyCost,
                   let alternativeCostPerMonth = chartMetricValue ?? result.costBreakdown.perMonth else {
@@ -251,8 +247,8 @@ struct ComparableOptionRow: View {
         let rateList = rates
             .map { ScenarioCompareFormatter.rate($0) }
             .joined(separator: " + ")
-        let average = ScenarioCompareFormatter.rate(rates.reduce(0, +) / Double(rates.count))
-        return "Avg of point rates: (\(rateList)) ÷ \(rates.count) = \(average) €/km"
+        let average = ScenarioCompareFormatter.rate(distanceRateInDisplayUnit(rates.reduce(0, +) / Double(rates.count)))
+        return "Avg of point rates: (\(rateList)) ÷ \(rates.count) = \(average) €/\(mileageUnit)"
     }
 
     private var dynamicAlternativeRates: [Double] {
@@ -277,10 +273,10 @@ struct ComparableOptionRow: View {
         guard let range = dynamicAlternativeRateRange else { return nil }
 
         if abs(range.max - range.min) < 0.0001 {
-            return "\(ScenarioCompareFormatter.money(range.min, currency: currency)) per km"
+            return "\(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(range.min), currency: currency)) per \(mileageUnit)"
         }
 
-        return "\(ScenarioCompareFormatter.money(range.min, currency: currency))-\(ScenarioCompareFormatter.money(range.max, currency: currency)) per km"
+        return "\(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(range.min), currency: currency))-\(ScenarioCompareFormatter.money(distanceRateInDisplayUnit(range.max), currency: currency)) per \(mileageUnit)"
     }
 
     private var dynamicDetailText: String? {
@@ -305,7 +301,7 @@ struct ComparableOptionRow: View {
         let rate = ScenarioCompareFormatter.money(breakdown.inputs.averageCurvePricePerKm ?? 0, currency: currency)
         let pointCount = breakdown.inputs.curvePointRates?.count ?? 0
         let pointSummary = pointCount > 0 ? "\(pointCount) point rates avg" : "Curve rates avg"
-        return "\(pointSummary) → \(rate)/km; × \(ScenarioCompareFormatter.number(distance)) km = \(total)"
+        return "\(pointSummary) → \(rate)/\(mileageUnit); × \(ScenarioCompareFormatter.number(distanceInDisplayUnit(distance))) \(mileageUnit) = \(total)"
     }
 
     private func monthlyPlanPerKmFormula(breakdown: ScenarioComparison.CostBreakdown) -> String {
@@ -313,8 +309,8 @@ struct ComparableOptionRow: View {
         let months = breakdown.inputs.monthsOwned
         let distance = breakdown.inputs.totalDistanceKm
         let inheritedText = breakdown.inheritedCostsTotal > 0 ? " + inherited \(ScenarioCompareFormatter.money(breakdown.inheritedCostsTotal, currency: currency))" : ""
-        let rate = breakdown.perKm ?? 0
-        return "(\(ScenarioCompareFormatter.money(monthlyPrice, currency: currency))/mo × \(ScenarioCompareFormatter.number(months)) mo\(inheritedText)) ÷ \(ScenarioCompareFormatter.number(distance)) km = \(ScenarioCompareFormatter.money(rate, currency: currency))/km"
+        let rate = distanceRateInDisplayUnit(breakdown.perKm ?? 0)
+        return "(\(ScenarioCompareFormatter.money(monthlyPrice, currency: currency))/mo × \(ScenarioCompareFormatter.number(months)) mo\(inheritedText)) ÷ \(ScenarioCompareFormatter.number(distanceInDisplayUnit(distance))) \(mileageUnit) = \(ScenarioCompareFormatter.money(rate, currency: currency))/\(mileageUnit)"
     }
 
     private func monthlyAverageFormula(
@@ -324,5 +320,13 @@ struct ComparableOptionRow: View {
         let months = breakdown.inputs.monthsOwned
         guard months > 0 else { return pricingBasisText }
         return "\(total) across tracked trips ÷ \(ScenarioCompareFormatter.number(months)) months"
+    }
+
+    private func distanceRateInDisplayUnit(_ ratePerKm: Double) -> Double {
+        mileageUnit == "mi" ? ratePerKm * 1.609344 : ratePerKm
+    }
+
+    private func distanceInDisplayUnit(_ distanceKm: Double) -> Double {
+        mileageUnit == "mi" ? distanceKm / 1.609344 : distanceKm
     }
 }

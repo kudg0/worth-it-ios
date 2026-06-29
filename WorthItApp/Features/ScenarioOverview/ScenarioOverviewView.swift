@@ -45,6 +45,7 @@ struct ScenarioOverviewView: View {
     @AppStorage("scenarioOverview.costPerKmBasis") var costPerKmBasisRawValue = ScenarioAnalyticsCostPerKmBasis.sincePurchase.rawValue
     @AppStorage("scenarioOverview.analyticsDeltaDisplay") var analyticsDeltaDisplayRawValue = ScenarioAnalyticsDeltaDisplay.absolute.rawValue
     @State var selectedTab: ScenarioTab = .overview
+    @State var achievementRoute: AchievementNavigationRoute = .hub
     @State var expenseHistoryFilter: ExpenseHistoryFilter = .all
     @State var selectedExpenseHistoryBarLabel: String?
     @State var focusedExpenseHistoryMonthStart: Date?
@@ -61,6 +62,7 @@ struct ScenarioOverviewView: View {
     @State var costPerKmTrendScope: CostPerKmTrendScope = .month
     @State var selectedEfficiencyChartDate: Date?
     @State var scenarioTabPath: [ScenarioTab] = []
+    @State var contentTransitionDirection: ScenarioOverviewContentTransitionDirection = .forward
     @State var selectedEntryKind: EntryKind = .expense
     @State var expenseAmount = ""
     @State var expenseDate = Date()
@@ -77,9 +79,14 @@ struct ScenarioOverviewView: View {
     @State var activeResourceLocationEditor: ScenarioResourceLocationEditor?
     @State var activeResourceAction: ScenarioResourceAction?
     @State var selectedResourcePhotoItem: PhotosPickerItem?
+    @State var selectedMileagePhotoItem: PhotosPickerItem?
+    @State var selectedExpensePhotoItem: PhotosPickerItem?
     @State var pendingResourceFileOwner: ScenarioResourceOwner?
     @State var showsResourcePhotoPicker = false
+    @State var showsMileagePhotoPicker = false
+    @State var showsExpensePhotoPicker = false
     @State var showsResourceFileImporter = false
+    @State var showsExpenseFileImporter = false
     @State var resourceLinkLabel = ""
     @State var resourceLinkURL = ""
     @State var resourceLocationLabel = ""
@@ -94,6 +101,11 @@ struct ScenarioOverviewView: View {
     @State var expenseNotes = ""
     @State var expenseCategory: ExpenseCategory = .fuel
     @State var isRecurringExpense = false
+    @State var expensePendingResources: [ScenarioPendingResourcePhoto] = []
+    @State var expenseRemovedAttachmentIds: Set<UUID> = []
+    @State var expenseRemovedLinkIds: Set<UUID> = []
+    @State var expenseLinkDraft = ""
+    @State var expenseLinkError: String?
     @State var recurringFrequency: RecurringFrequency = .monthly
     @State var recurringStartDate: Date?
     @State var recurringEndDate: Date?
@@ -115,6 +127,11 @@ struct ScenarioOverviewView: View {
     @State var mileageValue = ""
     @State var mileageDate = Date()
     @State var mileageNotes = ""
+    @State var mileagePendingPhotos: [ScenarioPendingResourcePhoto] = []
+    @State var mileageRemovedAttachmentIds: Set<UUID> = []
+    @State var mileageRemovedLinkIds: Set<UUID> = []
+    @State var mileageLinkDraft = ""
+    @State var mileageLinkError: String?
     @State var chartRange: ChartRange = .month
     @State var displayedScenario: ScenarioListItem?
     @State var currentSummary: ScenarioSummary?
@@ -125,11 +142,20 @@ struct ScenarioOverviewView: View {
     @State var costEvents: [CostEvent] = []
     @State var usageEvents: [UsageEvent] = []
     @State var alternatives: [AlternativeOption] = []
+    @State var alternativePresets: [AlternativePreset] = []
     @State var comparisonVisibleAlternativeIds: Set<UUID> = []
     @State var analyticsDraftIncludesResidualValue = true
     @State var analyticsDraftDefaultMetric: ScenarioAnalyticsDefaultMetric = .perKm
     @State var analyticsDraftCostPerKmBasis: ScenarioAnalyticsCostPerKmBasis = .sincePurchase
     @State var analyticsDraftDeltaDisplay: ScenarioAnalyticsDeltaDisplay = .absolute
+    @State var scenarioSettings: ScenarioSettings?
+    @State var scenarioSettingsOptions: UserSettingsOptions?
+    @State var scenarioDraftCurrency = ""
+    @State var scenarioDraftRegion = ""
+    @State var scenarioDraftDistanceUnit = "km"
+    @State var isLoadingScenarioSettings = false
+    @State var isSavingScenarioSettings = false
+    @State var scenarioSettingsError: String?
     @State var scheduledServices: [ScheduledService] = []
     @State var scheduledServiceDueItems: [ScheduledServiceDueItem] = []
     @State var summaryError: String?
@@ -146,16 +172,19 @@ struct ScenarioOverviewView: View {
     @State var showsScenarioActions = false
     @State var showsDeleteConfirmation = false
     @State var actionError: String?
+    @State var actionSuccess: String?
     @State var compareMetric: CompareMetric = .perKm
     @State var editingAlternative: AlternativeOption?
+    @State var comparableCategory: AlternativeCategory = .taxi
+    @State var comparablePresetKey: String?
     @State var comparableName = ""
     @State var comparablePricingModel: AlternativePricingMode = .distanceCurve
     @State var comparablePricePerKm = ""
     @State var comparablePricePerMinute = ""
+    @State var comparableAverageSpeedKmh = ""
     @State var comparableCurvePoints = Self.emptyComparableCurvePoints()
     @State var comparablePricePerMonth = ""
     @State var comparableManualTotal = ""
-    @State var comparableNote = ""
     @State var comparableInheritedCostCategories: Set<String> = []
     @State var isComparableIncluded = true
 
@@ -178,6 +207,7 @@ struct ScenarioOverviewView: View {
                     onAddEntry: openAddEntryChooserFromMaintenance,
                     onAddMileage: { openMileageForm() },
                     onAddComparable: openAddComparableOption,
+                    canRemoveComparable: editingAlternative != nil,
                     onRemoveComparable: { Task { await deleteEditingComparable() } },
                     onEditMileageDetail: editSelectedMileageDetail
                 )
@@ -186,16 +216,25 @@ struct ScenarioOverviewView: View {
                     ScenarioTabsBar(selectedTab: selectedTab, onSelect: navigateScenarioTab)
                 }
 
-                ScrollView {
-                    VStack(spacing: 40) {
+                Group {
+                    if selectedTab == .achievements {
                         tabContent
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 40) {
+                                tabContent
+                            }
+                            .padding(.horizontal, WorthItSpacing.xxl)
+                            .padding(.top, WorthItSpacing.xxxxl + WorthItSpacing.xl)
+                            .padding(.bottom, scrollBottomPadding)
+                        }
+                        .scrollIndicators(.hidden)
                     }
-                    .padding(.horizontal, WorthItSpacing.xxl)
-                    .padding(.top, WorthItSpacing.xxxxl + WorthItSpacing.xl)
-                    .padding(.bottom, scrollBottomPadding)
                 }
                 .id(selectedTab)
-                .scrollIndicators(.hidden)
+                .transition(scenarioContentTransition)
+                .animation(.smooth(duration: 0.30), value: selectedTab)
             }
 
             if showsBottomNav {
@@ -241,12 +280,26 @@ struct ScenarioOverviewView: View {
                 .ignoresSafeArea(edges: .bottom)
             }
 
+            if selectedTab == .chooseComparableOption {
+                AddComparableOptionFooter(
+                    title: "Continue",
+                    isLoading: false,
+                    onSave: openComparableEditorFromChoice
+                )
+                    .id(selectedTab)
+                    .transition(comparableFooterTransition)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
+            }
+
             if selectedTab == .addComparableOption {
                 AddComparableOptionFooter(
                     title: editingAlternative == nil ? "Save Comparable" : "Save Changes",
                     isLoading: isSavingEntry,
                     onSave: { Task { await saveComparable() } }
                 )
+                    .id(selectedTab)
+                    .transition(comparableFooterTransition)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                     .ignoresSafeArea(edges: .bottom)
             }
@@ -268,6 +321,13 @@ struct ScenarioOverviewView: View {
                 .footer
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                 .ignoresSafeArea(edges: .bottom)
+            }
+
+            if selectedTab == .preferencesSettings {
+                preferencesSettingsScreen
+                    .footer
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                    .ignoresSafeArea(edges: .bottom)
             }
 
             if let serviceId = activeScheduledServiceActionId {
@@ -346,6 +406,44 @@ struct ScenarioOverviewView: View {
                 )
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
+
+            if let actionError {
+                WIUpdateErrorBanner(message: actionError) {
+                    withAnimation(.easeInOut(duration: 0.18)) {
+                        self.actionError = nil
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .padding(.top, 88)
+                .zIndex(20)
+            }
+
+            if let actionSuccess {
+                WIToastBanner(
+                    message: actionSuccess,
+                    systemName: "calendar.badge.checkmark",
+                    tint: WorthItColor.accentGold,
+                    onDismiss: {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            self.actionSuccess = nil
+                        }
+                    }
+                )
+                .padding(.horizontal, WorthItSpacing.xxl)
+                .task(id: actionSuccess) {
+                    try? await Task.sleep(for: .seconds(3))
+                    guard !Task.isCancelled else { return }
+                    await MainActor.run {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            self.actionSuccess = nil
+                        }
+                    }
+                }
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .padding(.top, 88)
+                .zIndex(20)
+            }
         }
         #if os(iOS)
         .toolbar(.hidden, for: .navigationBar)
@@ -361,13 +459,6 @@ struct ScenarioOverviewView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("This will remove the scenario and all related entries.")
-        }
-        .alert("Scenario action failed", isPresented: hasActionError) {
-            Button("OK", role: .cancel) {
-                actionError = nil
-            }
-        } message: {
-            Text(actionError ?? "Please try again.")
         }
         .sheet(item: $activeLogExpensePicker) { picker in
             logExpensePickerSheet(picker)
@@ -419,12 +510,37 @@ struct ScenarioOverviewView: View {
             guard let item else { return }
             Task { await uploadResourcePhoto(item) }
         }
+        .photosPicker(
+            isPresented: $showsMileagePhotoPicker,
+            selection: $selectedMileagePhotoItem,
+            matching: .images
+        )
+        .onChange(of: selectedMileagePhotoItem) { _, item in
+            guard let item else { return }
+            Task { await stageMileagePhoto(item) }
+        }
+        .photosPicker(
+            isPresented: $showsExpensePhotoPicker,
+            selection: $selectedExpensePhotoItem,
+            matching: .images
+        )
+        .onChange(of: selectedExpensePhotoItem) { _, item in
+            guard let item else { return }
+            Task { await stageExpensePhoto(item) }
+        }
         .fileImporter(
             isPresented: $showsResourceFileImporter,
             allowedContentTypes: [.image, .pdf, .data],
             allowsMultipleSelection: false
         ) { result in
             Task { await handleResourceFileImport(result) }
+        }
+        .fileImporter(
+            isPresented: $showsExpenseFileImporter,
+            allowedContentTypes: [.image, .pdf, .data],
+            allowsMultipleSelection: false
+        ) { result in
+            Task { await stageExpenseFileImport(result) }
         }
         .task(id: scenario.id) {
             displayedScenario = scenario

@@ -3,14 +3,16 @@ import Foundation
 extension ScenarioOverviewView {
     var mileageLogItems: [MileageLogItem] {
         let sortedEvents = usageEvents.sorted { $0.date < $1.date }
-        var currentOdometer = activeScenario.purchaseOdometer.map(Double.init) ?? 0
+        var currentOdometer = purchaseOdometerInScenarioUnit
         var items: [MileageLogItem] = []
 
         for event in sortedEvents {
+            let scenarioDistance = usageDistanceInScenarioUnit(event)
+
             switch event.eventType {
             case "odometer_update":
                 let previousReading = Int(currentOdometer.rounded())
-                currentOdometer += event.distanceValue
+                currentOdometer += scenarioDistance
                 let currentReading = Int(currentOdometer.rounded())
 
                 items.append(
@@ -21,9 +23,9 @@ extension ScenarioOverviewView {
                         subtitle: mileageEventSubtitle(event.note, fallback: "Odometer reading"),
                         previousOdometer: previousReading,
                         currentOdometer: currentReading,
-                        distance: event.distanceValue,
+                        distance: scenarioDistance,
                         estimatedCostLabel: nil,
-                        unit: event.odometerUnit,
+                        unit: mileageDisplayUnit,
                         date: event.date
                     )
                 )
@@ -36,13 +38,13 @@ extension ScenarioOverviewView {
                         subtitle: mileageEventSubtitle(event.note, fallback: "Trip"),
                         previousOdometer: nil,
                         currentOdometer: nil,
-                        distance: event.distanceValue,
+                        distance: scenarioDistance,
                         estimatedCostLabel: estimatedTripCostLabel(for: event),
-                        unit: event.distanceUnit,
+                        unit: mileageDisplayUnit,
                         date: event.date
                     )
                 )
-                currentOdometer += event.distanceValue
+                currentOdometer += scenarioDistance
             default:
                 break
             }
@@ -66,7 +68,7 @@ extension ScenarioOverviewView {
             return nil
         }
 
-        let estimatedCost = event.distanceValue * costPerDistance
+        let estimatedCost = usageDistanceInScenarioUnit(event) * costPerDistance
         return "≈ \(currencySymbol)\(formatDouble(estimatedCost, fractionDigits: 2))"
     }
 
@@ -84,9 +86,9 @@ extension ScenarioOverviewView {
     func tripCostPerDistanceSourceText(for event: UsageEvent) -> String {
         switch costPerKmBasis {
         case .sincePurchase:
-            return "Cumulative car cost per \(event.distanceUnit) on \(Self.mileageDateFormatter.string(from: event.date))"
+            return "Cumulative car cost per \(mileageDisplayUnit) on \(Self.mileageDateFormatter.string(from: event.date))"
         case .currentMonth:
-            return "Monthly car cost per \(event.distanceUnit) for \(Self.monthYearFormatter.string(from: event.date))"
+            return "Monthly car cost per \(mileageDisplayUnit) for \(Self.monthYearFormatter.string(from: event.date))"
         }
     }
 
@@ -100,9 +102,10 @@ extension ScenarioOverviewView {
     func mileageDistance(for item: MileageLogItem) -> Double {
         switch item.kind {
         case .trip:
-            return item.distance ?? 0
+            return distanceValue(item.distance ?? 0, from: item.unit, to: mileageDisplayUnit)
         case .odometer:
-            return item.distance ?? max(Double((item.currentOdometer ?? 0) - (item.previousOdometer ?? 0)), 0)
+            let distance = item.distance ?? max(Double((item.currentOdometer ?? 0) - (item.previousOdometer ?? 0)), 0)
+            return distanceValue(distance, from: item.unit, to: mileageDisplayUnit)
         }
     }
 }

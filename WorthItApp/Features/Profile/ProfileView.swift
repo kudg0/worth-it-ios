@@ -42,7 +42,20 @@ struct ProfileView: View {
                 }
 
                 if let settingsError {
-                    WITipInfo(title: i18n.t(.profile.view.errors.settingsNotSaved), bodyText: settingsError, size: .small, tone: .info)
+                    WITipInfo(
+                        title: i18n.t(.profile.view.errors.settingsNotSaved),
+                        bodyText: settingsError,
+                        size: .small,
+                        tone: .danger,
+                        onDismiss: { self.settingsError = nil }
+                    )
+                    .task(id: settingsError) {
+                        try? await Task.sleep(for: .seconds(3))
+                        guard !Task.isCancelled else { return }
+                        await MainActor.run {
+                            self.settingsError = nil
+                        }
+                    }
                 }
 
                 ProfileSection(title: i18n.t(.profile.view.sections.security)) {
@@ -250,7 +263,10 @@ struct ProfileView: View {
             settings = try await onUpdateSettings(patch)
             settingsError = nil
         } catch {
-            settingsError = i18n.t(.profile.view.errors.updatePreference)
+            settingsError = WIUpdateErrorText.message(
+                for: error,
+                fallback: i18n.t(.profile.view.errors.updatePreference)
+            )
             throw error
         }
     }
@@ -525,7 +541,20 @@ private struct ProfileSettingsSelectSheet: View {
                             }
 
                             if let errorText {
-                                WITipInfo(title: i18n.t(.profile.preferences.errors.notSaved), bodyText: errorText, size: .small, tone: .info)
+                                WITipInfo(
+                                    title: i18n.t(.profile.preferences.errors.notSaved),
+                                    bodyText: errorText,
+                                    size: .small,
+                                    tone: .danger,
+                                    onDismiss: { self.errorText = nil }
+                                )
+                                .task(id: errorText) {
+                                    try? await Task.sleep(for: .seconds(3))
+                                    guard !Task.isCancelled else { return }
+                                    await MainActor.run {
+                                        self.errorText = nil
+                                    }
+                                }
                                     .padding(.top, WorthItSpacing.m)
                             }
                         }
@@ -745,7 +774,10 @@ private struct ProfileSettingsSelectSheet: View {
                 try await onSave(draftId)
                 dismiss()
             } catch {
-                errorText = i18n.t(.profile.preferences.errors.saveFailed)
+                errorText = WIUpdateErrorText.message(
+                    for: error,
+                    fallback: i18n.t(.profile.preferences.errors.saveFailed)
+                )
             }
 
             isSaving = false

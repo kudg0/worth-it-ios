@@ -17,6 +17,7 @@ enum WorthItColor {
     static let primaryContainer = Color(hex: 0xADC6FF)
     static let projectedBlue = Color(hex: 0x8EA3D1)
     static let accentGold = Color(hex: 0xFFDEA4)
+    static let accentGoldBright = Color(hex: 0xF2C879)
     static let danger = Color(hex: 0xFF8A8A)
 
     static let outlineSubtle = Color.white.opacity(0.05)

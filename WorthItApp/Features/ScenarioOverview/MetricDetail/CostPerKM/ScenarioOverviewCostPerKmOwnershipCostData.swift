@@ -1,6 +1,48 @@
 import Foundation
 
 extension ScenarioOverviewView {
+    var kilometersPerMile: Double {
+        1.609344
+    }
+
+    func distanceValue(_ value: Double, from sourceUnit: String, to targetUnit: String) -> Double {
+        guard sourceUnit != targetUnit else {
+            return value
+        }
+
+        if sourceUnit == "mi", targetUnit == "km" {
+            return value * kilometersPerMile
+        }
+
+        if sourceUnit == "km", targetUnit == "mi" {
+            return value / kilometersPerMile
+        }
+
+        return value
+    }
+
+    func usageDistanceInScenarioUnit(_ event: UsageEvent) -> Double {
+        let distanceKm = Double(event.distanceKm)
+        let sourceDistance = distanceKm ?? distanceValue(event.distanceValue, from: event.distanceUnit, to: "km")
+        return distanceValue(sourceDistance, from: "km", to: mileageDisplayUnit)
+    }
+
+    func distanceRateInScenarioUnit(_ rate: Double, sourceUnit: String) -> Double {
+        guard sourceUnit != mileageDisplayUnit else {
+            return rate
+        }
+
+        if sourceUnit == "km", mileageDisplayUnit == "mi" {
+            return rate * kilometersPerMile
+        }
+
+        if sourceUnit == "mi", mileageDisplayUnit == "km" {
+            return rate / kilometersPerMile
+        }
+
+        return rate
+    }
+
     func effectiveCostPerDistanceValue(asOf date: Date) -> Double? {
         effectiveCostPerDistanceValue(asOf: date, includesResidualValue: includesVehicleResidualValue)
     }
@@ -184,7 +226,7 @@ extension ScenarioOverviewView {
             .filter { event in
                 event.date >= start && event.date < end
             }
-            .reduce(0) { $0 + $1.distanceValue }
+            .reduce(0) { $0 + usageDistanceInScenarioUnit($1) }
     }
 
     func tripDistance(from start: Date, to end: Date) -> Double {
@@ -192,7 +234,7 @@ extension ScenarioOverviewView {
             .filter { event in
                 event.eventType == "trip" && event.date >= start && event.date < end
             }
-            .reduce(0) { $0 + $1.distanceValue }
+            .reduce(0) { $0 + usageDistanceInScenarioUnit($1) }
     }
 
     func odometerDelta(from start: Date, to end: Date) -> Double {
@@ -200,6 +242,6 @@ extension ScenarioOverviewView {
             .filter { event in
                 event.eventType == "odometer_update" && event.date >= start && event.date < end
             }
-            .reduce(0) { $0 + $1.distanceValue }
+            .reduce(0) { $0 + usageDistanceInScenarioUnit($1) }
     }
 }

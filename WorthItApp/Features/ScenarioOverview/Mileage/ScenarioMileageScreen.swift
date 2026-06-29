@@ -13,6 +13,7 @@ struct ScenarioMileageScreen: View {
     let onOpenHistory: () -> Void
     let onOpenMileage: (UUID) -> Void
     let onEditMileage: (UUID) -> Void
+    let onRetry: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 40) {
@@ -110,7 +111,11 @@ struct ScenarioMileageScreen: View {
     @ViewBuilder
     private var activityContent: some View {
         if let usageEventsError {
-            WITipInfo(title: i18n.t("Mileage unavailable"), bodyText: usageEventsError)
+            ScenarioLoadErrorCard(
+                title: i18n.t("Mileage unavailable"),
+                message: usageEventsError,
+                onRetry: onRetry
+            )
         } else if logItems.isEmpty {
             WITipInfo(
                 title: i18n.t("No mileage logged"),

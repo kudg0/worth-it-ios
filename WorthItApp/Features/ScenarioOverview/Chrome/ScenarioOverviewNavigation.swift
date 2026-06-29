@@ -7,10 +7,14 @@ extension ScenarioOverviewView {
             "Add Entry"
         case .addComparableOption:
             "Comparable Editor"
+        case .chooseComparableOption:
+            "Choose Alternative"
         case .analyticsSettings:
             "Analytics Model"
         case .comparisonSettings:
             "Comparison Options"
+        case .preferencesSettings:
+            "Preferences"
         case .logExpense:
             editingCostEvent == nil ? "Log Expense" : "Edit Expense"
         case .scheduleService:
@@ -31,6 +35,15 @@ extension ScenarioOverviewView {
             selectedDetailMetricSlide?.title ?? "Metric Detail"
         case .logMileage:
             editingUsageEvent == nil ? "Log Mileage" : "Edit Mileage"
+        case .achievements:
+            switch achievementRoute {
+            case .hub:
+                "Achievements"
+            case .map:
+                "Achievement Map"
+            case .detail(_, let title, _):
+                title
+            }
         case .settings:
             "Scenario Settings"
         default:
@@ -43,39 +56,74 @@ extension ScenarioOverviewView {
     }
 
     var isEntryFlowScreen: Bool {
-        selectedTab == .addEntryChooser || selectedTab == .addComparableOption || selectedTab == .analyticsSettings || selectedTab == .comparisonSettings || selectedTab == .logExpense || selectedTab == .scheduleService || selectedTab == .scheduledServices || selectedTab == .scheduledServiceDetail || selectedTab == .expenseDetail || selectedTab == .expenseHistory || selectedTab == .mileageHistory || selectedTab == .mileageDetail || selectedTab == .metricDetail || selectedTab == .logMileage
+        selectedTab == .addEntryChooser || selectedTab == .chooseComparableOption || selectedTab == .addComparableOption || selectedTab == .analyticsSettings || selectedTab == .comparisonSettings || selectedTab == .preferencesSettings || selectedTab == .logExpense || selectedTab == .scheduleService || selectedTab == .scheduledServices || selectedTab == .scheduledServiceDetail || selectedTab == .expenseDetail || selectedTab == .expenseHistory || selectedTab == .mileageHistory || selectedTab == .mileageDetail || selectedTab == .metricDetail || selectedTab == .logMileage || isAchievementPushedScreen
     }
 
     var showsScenarioNavigation: Bool {
-        selectedTab != .addEntryChooser && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .scheduledServices && selectedTab != .scheduledServiceDetail && selectedTab != .expenseDetail && selectedTab != .expenseHistory && selectedTab != .mileageHistory && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
-            && selectedTab != .settings
+        selectedTab != .addEntryChooser && selectedTab != .chooseComparableOption && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .preferencesSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .scheduledServices && selectedTab != .scheduledServiceDetail && selectedTab != .expenseDetail && selectedTab != .expenseHistory && selectedTab != .mileageHistory && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
+            && selectedTab != .settings && !isAchievementPushedScreen
     }
 
     var showsBottomNav: Bool {
-        selectedTab != .addEntryChooser && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .scheduledServiceDetail && selectedTab != .expenseDetail && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
+        selectedTab != .addEntryChooser && selectedTab != .chooseComparableOption && selectedTab != .addComparableOption && selectedTab != .analyticsSettings && selectedTab != .comparisonSettings && selectedTab != .preferencesSettings && selectedTab != .logExpense && selectedTab != .scheduleService && selectedTab != .scheduledServiceDetail && selectedTab != .expenseDetail && selectedTab != .mileageDetail && selectedTab != .metricDetail && selectedTab != .logMileage
+            && !isAchievementPushedScreen
     }
 
     var scrollBottomPadding: CGFloat {
         switch selectedTab {
-        case .mileage, .logExpense, .scheduleService, .logMileage, .addComparableOption, .analyticsSettings, .comparisonSettings:
+        case .mileage, .logExpense, .scheduleService, .logMileage, .chooseComparableOption, .addComparableOption, .analyticsSettings, .comparisonSettings, .preferencesSettings:
             224
         default:
             132
         }
     }
 
+    var scenarioContentTransition: AnyTransition {
+        .asymmetric(
+            insertion: .move(edge: contentTransitionDirection.insertionEdge).combined(with: .opacity),
+            removal: .move(edge: contentTransitionDirection.removalEdge).combined(with: .opacity)
+        )
+    }
+
+    var comparableFooterTransition: AnyTransition {
+        .asymmetric(
+            insertion: .move(edge: .bottom).combined(with: .opacity),
+            removal: .opacity
+        )
+    }
+
     var canGoBackInScenario: Bool {
-        selectedTab != .overview && !scenarioTabPath.isEmpty
+        isAchievementPushedScreen || (selectedTab != .overview && !scenarioTabPath.isEmpty)
+    }
+
+    var isAchievementPushedScreen: Bool {
+        selectedTab == .achievements && achievementRoute != .hub
+    }
+
+    func tabTransitionDirection(from currentTab: ScenarioTab, to nextTab: ScenarioTab) -> ScenarioOverviewContentTransitionDirection {
+        guard let currentIndex = currentTab.topLevelNavigationIndex,
+              let nextIndex = nextTab.topLevelNavigationIndex
+        else {
+            return .forward
+        }
+
+        return nextIndex < currentIndex ? .backward : .forward
     }
 
     func navigateScenarioTab(_ tab: ScenarioTab) {
         guard selectedTab != tab else { return }
 
+        contentTransitionDirection = tabTransitionDirection(from: selectedTab, to: tab)
         withAnimation(.easeInOut(duration: 0.20)) {
             if tab == .overview {
                 scenarioTabPath = []
+                achievementRoute = .hub
+            } else if tab == .achievements {
+                scenarioTabPath = []
+                achievementRoute = .hub
             } else {
                 pushScenarioTab(selectedTab == .settings ? .overview : selectedTab)
+                achievementRoute = .hub
             }
 
             selectedTab = tab
@@ -87,10 +135,32 @@ extension ScenarioOverviewView {
     }
 
     func popScenarioTab() {
+        if selectedTab == .achievements {
+            switch achievementRoute {
+            case .hub:
+                break
+            case .map:
+                withAnimation(.smooth(duration: 0.30)) {
+                    achievementRoute = .hub
+                }
+                return
+            case .detail(_, _, let returnCategory):
+                withAnimation(.smooth(duration: 0.30)) {
+                    if let returnCategory {
+                        achievementRoute = .map(initialCategory: returnCategory)
+                    } else {
+                        achievementRoute = .hub
+                    }
+                }
+                return
+            }
+        }
+
         let result = ScenarioOverviewNavigationPath.popped(scenarioTabPath)
         guard let previousTab = result.tab else { return }
 
-        withAnimation(.easeInOut(duration: 0.20)) {
+        contentTransitionDirection = .backward
+        withAnimation(.smooth(duration: 0.30)) {
             scenarioTabPath = result.path
             if selectedTab == .logExpense {
                 editingCostEvent = nil
@@ -188,14 +258,25 @@ extension ScenarioOverviewView {
 
     func openAddComparableOption() {
         resetComparableForm()
-        withAnimation(.easeInOut(duration: 0.20)) {
+        applyComparableCategory(.taxi)
+        contentTransitionDirection = .forward
+        withAnimation(.smooth(duration: 0.30)) {
             scenarioTabPath = [.compare]
+            selectedTab = .chooseComparableOption
+        }
+    }
+
+    func openComparableEditorFromChoice() {
+        contentTransitionDirection = .forward
+        withAnimation(.smooth(duration: 0.30)) {
+            pushScenarioTab(.chooseComparableOption)
             selectedTab = .addComparableOption
         }
     }
 
     func closeComparableEditor() {
-        withAnimation(.easeInOut(duration: 0.20)) {
+        contentTransitionDirection = .backward
+        withAnimation(.smooth(duration: 0.30)) {
             scenarioTabPath = []
             selectedTab = .compare
         }
@@ -204,14 +285,16 @@ extension ScenarioOverviewView {
     func beginEditingComparable(_ alternativeId: UUID) {
         guard let alternative = alternatives.first(where: { $0.id == alternativeId }) else { return }
         editingAlternative = alternative
+        comparableCategory = alternative.category
+        comparablePresetKey = alternative.presetKey
         comparableName = alternative.name
         comparablePricingModel = editablePricingMode(for: alternative)
         comparablePricePerKm = alternative.paramsJson.pricePerKm.map(formatEditableNumber) ?? ""
         comparablePricePerMinute = alternative.paramsJson.pricePerMinute.map(formatEditableNumber) ?? ""
+        comparableAverageSpeedKmh = alternative.paramsJson.averageSpeedKmh.map(formatEditableNumber) ?? defaultAverageSpeedKmh(for: alternative.category)
         comparableCurvePoints = curvePoints(for: alternative)
         comparablePricePerMonth = alternative.paramsJson.pricePerMonth.map(formatEditableNumber) ?? ""
         comparableManualTotal = alternative.paramsJson.value.map(formatEditableNumber) ?? ""
-        comparableNote = alternative.note ?? ""
         comparableInheritedCostCategories = Set(alternative.paramsJson.includedCostCategories ?? [])
         isComparableIncluded = alternative.isIncluded
 
@@ -234,24 +317,53 @@ extension ScenarioOverviewView {
 
     func resetComparableForm() {
         editingAlternative = nil
+        comparableCategory = .taxi
+        comparablePresetKey = nil
         comparableName = ""
         comparablePricingModel = .distanceCurve
         comparablePricePerKm = ""
         comparablePricePerMinute = ""
+        comparableAverageSpeedKmh = ""
         comparableCurvePoints = Self.emptyComparableCurvePoints()
         comparablePricePerMonth = ""
         comparableManualTotal = ""
-        comparableNote = ""
         comparableInheritedCostCategories = []
         isComparableIncluded = true
     }
 
+    func applyComparableCategory(_ category: AlternativeCategory) {
+        comparableCategory = category
+        comparablePresetKey = nil
+        comparableName = category.defaultComparableName
+        comparablePricingModel = category.defaultPricingMode
+        comparablePricePerKm = category.defaultPricePerKm
+        comparablePricePerMinute = category.defaultPricePerMinute
+        comparableAverageSpeedKmh = defaultAverageSpeedKmh(for: category)
+        comparableCurvePoints = category.defaultCurvePoints
+        comparablePricePerMonth = category.defaultPricePerMonth
+        comparableManualTotal = category.defaultManualTotal
+        comparableInheritedCostCategories = category.defaultInheritedCostCategories
+    }
+
     func editablePricingMode(for alternative: AlternativeOption) -> AlternativePricingMode {
         switch alternative.pricingMode {
-        case .perDistance, .distanceCurve, .perPeriod, .mixed, .manualEquivalent:
+        case .perDistance, .distanceCurve, .perPeriod, .perTime, .mixed, .manualEquivalent:
             alternative.pricingMode
-        case .perTime:
-            .manualEquivalent
+        }
+    }
+
+    func defaultAverageSpeedKmh(for category: AlternativeCategory) -> String {
+        switch category {
+        case .taxi, .carSharing, .rentalCar:
+            "70"
+        case .publicTransport:
+            "30"
+        case .bicycle, .electricScooter:
+            "18"
+        case .motorcycle:
+            "70"
+        case .custom:
+            "50"
         }
     }
 
@@ -276,16 +388,20 @@ extension ScenarioOverviewView {
     }
 
     func openScenarioHome() {
+        contentTransitionDirection = tabTransitionDirection(from: selectedTab, to: .overview)
         withAnimation(.easeInOut(duration: 0.20)) {
             selectedTab = .overview
             scenarioTabPath = []
+            achievementRoute = .hub
         }
     }
 
     func openSettings() {
+        contentTransitionDirection = .forward
         withAnimation(.easeInOut(duration: 0.20)) {
             selectedTab = .settings
             scenarioTabPath = []
+            achievementRoute = .hub
         }
     }
 
@@ -299,6 +415,7 @@ extension ScenarioOverviewView {
     }
 
     func openMetricDetail(_ metric: OverviewMetric) {
+        syncMetricDetailSelection(for: metric)
         selectedDetailMetric = metric
         selectedDetailMetricPayload = nil
         metricDetailError = nil
@@ -312,6 +429,20 @@ extension ScenarioOverviewView {
         }
 
         Task { await loadSelectedMetricDetail() }
+    }
+
+    func syncMetricDetailSelection(for metric: OverviewMetric) {
+        guard metric == .paybackDistance,
+              let payload = analyticsOverview?.metrics.first(where: { $0.metricId.overviewMetric == metric }),
+              let entityRef = payload.card?.entityRef,
+              entityRef.type == "alternative",
+              let alternativeId = UUID(uuidString: entityRef.id)
+        else {
+            return
+        }
+
+        selectedBreakEvenAlternativeId = alternativeId
+        UserDefaults.standard.set(alternativeId.uuidString, forKey: selectedBreakEvenStorageKey(for: activeScenario.id))
     }
 
     func openExpenseHistory(focusedOn expenseId: UUID? = nil, monthStart: Date? = nil) {

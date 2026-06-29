@@ -160,7 +160,7 @@ extension ScenarioOverviewView {
             navigateAfterEntrySave()
             resetScheduledServiceForm()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error)
         }
     }
 

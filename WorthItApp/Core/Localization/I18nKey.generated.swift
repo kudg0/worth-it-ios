@@ -177,9 +177,29 @@ struct BrandKeys {
 
 struct CommonKeys {
     let actions = ActionsKeys()
+    let errors = ErrorsKeys()
 
     struct ActionsKeys {
         let retry = I18nKey("common.actions.retry")
+    }
+
+    struct ErrorsKeys {
+        let update = UpdateKeys()
+
+        struct UpdateKeys {
+            let connectionSaveChanges = I18nKey("common.errors.update.connectionSaveChanges")
+            let currencyLocked = I18nKey("common.errors.update.currencyLocked")
+            let deleteComparable = I18nKey("common.errors.update.deleteComparable")
+            let deleteExpense = I18nKey("common.errors.update.deleteExpense")
+            let deleteMileage = I18nKey("common.errors.update.deleteMileage")
+            let deleteScenario = I18nKey("common.errors.update.deleteScenario")
+            let invalidResponse = I18nKey("common.errors.update.invalidResponse")
+            let notFound = I18nKey("common.errors.update.notFound")
+            let serverSaveChanges = I18nKey("common.errors.update.serverSaveChanges")
+            let sessionExpired = I18nKey("common.errors.update.sessionExpired")
+            let settingsSaveChanges = I18nKey("common.errors.update.settingsSaveChanges")
+            let validationSaveChanges = I18nKey("common.errors.update.validationSaveChanges")
+        }
     }
 }
 
@@ -351,6 +371,7 @@ struct ScenariosKeys {
     let actions = ActionsKeys()
     let card = CardKeys()
     let cards = CardsKeys()
+    let maintenance = MaintenanceKeys()
     let metrics = MetricsKeys()
     let offline = OfflineKeys()
     let subtitle = I18nKey("scenarios.subtitle")
@@ -381,6 +402,24 @@ struct ScenariosKeys {
         }
     }
 
+    struct MaintenanceKeys {
+        let calendar = CalendarKeys()
+
+        struct CalendarKeys {
+            let addAction = I18nKey("scenarios.maintenance.calendar.addAction")
+            let errors = ErrorsKeys()
+            let successMessage = I18nKey("scenarios.maintenance.calendar.successMessage")
+            let successTitle = I18nKey("scenarios.maintenance.calendar.successTitle")
+
+            struct ErrorsKeys {
+                let accessDenied = I18nKey("scenarios.maintenance.calendar.errors.accessDenied")
+                let calendarUnavailable = I18nKey("scenarios.maintenance.calendar.errors.calendarUnavailable")
+                let noDate = I18nKey("scenarios.maintenance.calendar.errors.noDate")
+                let saveFailed = I18nKey("scenarios.maintenance.calendar.errors.saveFailed")
+            }
+        }
+    }
+
     struct MetricsKeys {
         let currentOdometer = I18nKey("scenarios.metrics.currentOdometer")
         let odometer = I18nKey("scenarios.metrics.odometer")
@@ -399,4 +438,4 @@ struct TabsKeys {
     let scenarios = I18nKey("tabs.scenarios")
 }
 
-// Skipped 114 legacy non-semantic catalog keys.
+// Skipped 118 legacy non-semantic catalog keys.

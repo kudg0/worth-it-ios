@@ -13,7 +13,8 @@ extension ScenarioOverviewView {
             serviceIconName: serviceIconName,
             onOpenScheduledServices: openScheduledServices,
             onOpenScheduledService: openScheduledServiceDetail,
-            onOpenScheduledServiceActions: openScheduledServiceActions
+            onOpenScheduledServiceActions: openScheduledServiceActions,
+            onRetry: { Task { await loadSummary() } }
         )
     }
 

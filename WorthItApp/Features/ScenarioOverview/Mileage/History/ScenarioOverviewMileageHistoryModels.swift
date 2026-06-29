@@ -9,7 +9,8 @@ extension ScenarioOverviewView {
             currentMonthStart: currentMonthStart,
             groupTotal: mileageMonthTotalText,
             onOpenMileage: openMileageDetail,
-            onEditMileage: beginEditingMileage
+            onEditMileage: beginEditingMileage,
+            onRetry: { Task { await loadSummary() } }
         )
     }
 

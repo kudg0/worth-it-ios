@@ -12,6 +12,7 @@ struct ScenarioTopBar: View {
     let onAddEntry: () -> Void
     let onAddMileage: () -> Void
     let onAddComparable: () -> Void
+    let canRemoveComparable: Bool
     let onRemoveComparable: () -> Void
     let onEditMileageDetail: () -> Void
 
@@ -58,8 +59,14 @@ struct ScenarioTopBar: View {
 
     @ViewBuilder
     private var trailingAction: some View {
-        if selectedTab == .addComparableOption {
-            iconButton(systemName: "trash", accessibilityLabel: "Remove comparable", action: onRemoveComparable)
+        if selectedTab == .chooseComparableOption {
+            comparableStepProgress(currentStep: 1)
+        } else if selectedTab == .addComparableOption {
+            if canRemoveComparable {
+                iconButton(systemName: "trash", accessibilityLabel: "Remove comparable", action: onRemoveComparable)
+            } else {
+                comparableStepProgress(currentStep: 2)
+            }
         } else if selectedTab == .mileageDetail {
             iconButton(systemName: "pencil", accessibilityLabel: "Edit trip", action: onEditMileageDetail)
         } else if usesEntryTitleStyle {
@@ -78,6 +85,26 @@ struct ScenarioTopBar: View {
                 Color.clear.frame(width: 28, height: 40)
             }
         }
+    }
+
+    private func comparableStepProgress(currentStep: Int) -> some View {
+        VStack(alignment: .trailing, spacing: WorthItSpacing.s) {
+            Text("STEP \(currentStep) OF 2")
+                .font(.system(size: 10, weight: .bold))
+                .foregroundStyle(WorthItColor.textSecondary.opacity(0.60))
+                .tracking(1)
+                .contentTransition(.numericText())
+
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(Color.white.opacity(0.05))
+                Capsule()
+                    .fill(Color(hex: 0xD8E2FF))
+                    .frame(width: currentStep == 1 ? 32 : 64)
+            }
+            .frame(width: 64, height: 4)
+        }
+        .animation(.smooth(duration: 0.30), value: currentStep)
     }
 
     private func iconButton(

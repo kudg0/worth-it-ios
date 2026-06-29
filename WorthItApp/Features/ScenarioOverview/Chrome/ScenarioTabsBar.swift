@@ -13,6 +13,7 @@ struct ScenarioTabsBar: View {
                     chip("Mileage", tab: .mileage)
                     chip("Insights", tab: .insights)
                     chip("Compare", tab: .compare)
+                    chip("Achievements", tab: .achievements)
                 }
                 .padding(.horizontal, WorthItSpacing.xxl)
                 .padding(.vertical, WorthItSpacing.l)

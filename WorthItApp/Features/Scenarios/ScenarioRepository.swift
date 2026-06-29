@@ -15,6 +15,19 @@ struct ScenarioRepository: Sendable {
         try await client.patch("/scenarios/\(apiId(scenarioId))", body: request)
     }
 
+    func getScenarioSettings(scenarioId: UUID) async throws -> ScenarioSettings {
+        try await client.get("/scenarios/\(apiId(scenarioId))/settings")
+    }
+
+    func updateScenarioSettings(scenarioId: UUID, request: ScenarioSettingsPatch) async throws -> ScenarioSettings {
+        try await client.patch("/scenarios/\(apiId(scenarioId))/settings", body: request)
+    }
+
+    func getSettingsOptions() async throws -> UserSettingsOptions {
+        let response: UserSettingsOptionsResponse = try await client.get("/me/settings/options")
+        return response.options
+    }
+
     func deleteScenario(scenarioId: UUID) async throws {
         try await client.delete("/scenarios/\(apiId(scenarioId))")
     }
@@ -80,8 +93,27 @@ struct ScenarioRepository: Sendable {
         return try await client.get(path, queryItems: queryItems)
     }
 
+    func listAchievements() async throws -> [AchievementProgress] {
+        try await client.get("/achievements")
+    }
+
+    func listAchievementAwards() async throws -> [AchievementAward] {
+        try await client.get("/achievements/awards")
+    }
+
     func listAlternatives(scenarioId: UUID) async throws -> [AlternativeOption] {
         try await client.get("/scenarios/\(apiId(scenarioId))/alternatives")
+    }
+
+    func listAlternativePresets(region: String? = nil) async throws -> [AlternativePreset] {
+        guard let region, !region.isEmpty else {
+            return try await client.get("/alternatives/presets")
+        }
+
+        return try await client.get(
+            "/alternatives/presets",
+            queryItems: [URLQueryItem(name: "region", value: region)]
+        )
     }
 
     func createAlternative(scenarioId: UUID, request: CreateAlternativeRequest) async throws -> AlternativeOption {
@@ -137,6 +169,17 @@ struct ScenarioRepository: Sendable {
 
     func createCostEventLink(costEventId: UUID, request: CreateResourceLinkRequest) async throws -> ResourceLink {
         try await client.post("/cost-events/\(apiId(costEventId))/links", body: request)
+    }
+
+    func createUsageEventAttachmentUploadIntent(
+        usageEventId: UUID,
+        request: CreateAttachmentUploadIntentRequest
+    ) async throws -> AttachmentUploadIntentResponse {
+        try await client.post("/usage-events/\(apiId(usageEventId))/attachments/upload-intents", body: request)
+    }
+
+    func createUsageEventLink(usageEventId: UUID, request: CreateResourceLinkRequest) async throws -> ResourceLink {
+        try await client.post("/usage-events/\(apiId(usageEventId))/links", body: request)
     }
 
     func createCostEventLocation(
@@ -242,7 +285,9 @@ struct ScenarioRepository: Sendable {
                 name: "My Car",
                 category: "car",
                 scenarioType: "car_ownership",
+                baseUnit: "km",
                 currency: "EUR",
+                region: "en-CY",
                 startDate: Date(),
                 purchasePrice: 20_000,
                 purchaseOdometer: nil,

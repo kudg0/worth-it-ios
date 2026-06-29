@@ -1,4 +1,6 @@
+import PhotosUI
 import SwiftUI
+import UniformTypeIdentifiers
 
 extension ScenarioOverviewView {
     func beginCompletingScheduledService(_ serviceId: UUID) {
@@ -23,6 +25,9 @@ extension ScenarioOverviewView {
             actionError = "Enter expense amount."
             return
         }
+
+        let linkValidation = validatedExpenseLinkURL()
+        guard linkValidation.isValid else { return }
 
         let savedExpenseDate = expenseDate
 
@@ -63,11 +68,12 @@ extension ScenarioOverviewView {
             }
 
             try await syncLinkedServiceCompletion(for: savedEvent)
+            try await syncExpenseResources(for: savedEvent.id, draftURL: linkValidation.url)
             await loadSummary()
             navigateAfterEntrySave(savedExpenseDate: savedExpenseDate)
             resetExpenseForm()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error)
         }
     }
 
@@ -113,7 +119,7 @@ extension ScenarioOverviewView {
             navigateAfterEntrySave()
             resetExpenseForm()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error, fallbackKey: .common.errors.update.deleteExpense)
         }
     }
 
@@ -128,9 +134,142 @@ extension ScenarioOverviewView {
         expenseNotes = ""
         expenseCategory = .fuel
         isRecurringExpense = false
+        expensePendingResources = []
+        expenseRemovedAttachmentIds = []
+        expenseRemovedLinkIds = []
+        expenseLinkDraft = ""
+        expenseLinkError = nil
+        selectedExpensePhotoItem = nil
+        showsExpenseFileImporter = false
         isExpenseServiceLinkExpanded = false
         selectedExpenseScheduledServiceId = nil
         shouldCompleteLinkedScheduledService = false
+    }
+
+    var visibleExpenseAttachments: [ResourceAttachment] {
+        (editingCostEvent?.attachments ?? []).filter { !expenseRemovedAttachmentIds.contains($0.id) }
+    }
+
+    var visibleExpenseLinks: [ResourceLink] {
+        (editingCostEvent?.links ?? []).filter { !expenseRemovedLinkIds.contains($0.id) }
+    }
+
+    func stageExpensePhoto(_ item: PhotosPickerItem) async {
+        defer { selectedExpensePhotoItem = nil }
+
+        let contentType = item.supportedContentTypes.first(where: { $0.conforms(to: .image) }) ?? .jpeg
+        let fileExtension = contentType.preferredFilenameExtension ?? "jpg"
+        let fileName = "expense-photo-\(UUID().uuidString).\(fileExtension)"
+        let mimeType = contentType.preferredMIMEType ?? "image/jpeg"
+
+        guard isSupportedResourceContentType(mimeType) else {
+            actionError = "Add a JPG, PNG, WebP, or PDF file."
+            return
+        }
+
+        do {
+            guard let photoData = try await item.loadTransferable(type: ScenarioResourcePhotoData.self) else {
+                actionError = "Could not read this photo. Try another photo."
+                return
+            }
+
+            guard photoData.data.count <= resourceAttachmentMaxBytes else {
+                actionError = resourceAttachmentTooLargeMessage
+                return
+            }
+
+            expensePendingResources.append(
+                ScenarioPendingResourcePhoto(
+                    id: UUID(),
+                    data: photoData.data,
+                    fileName: fileName,
+                    contentType: mimeType
+                )
+            )
+        } catch {
+            actionError = friendlyResourceError(error, fallback: "Could not read this photo. Try another photo.")
+        }
+    }
+
+    func stageExpenseFileImport(_ result: Result<[URL], Error>) async {
+        do {
+            guard let url = try result.get().first else { return }
+            let didAccess = url.startAccessingSecurityScopedResource()
+            defer {
+                if didAccess {
+                    url.stopAccessingSecurityScopedResource()
+                }
+            }
+
+            let contentType = UTType(filenameExtension: url.pathExtension)?.preferredMIMEType ?? "application/octet-stream"
+            guard isSupportedResourceContentType(contentType) else {
+                actionError = "Add a JPG, PNG, WebP, or PDF file."
+                return
+            }
+
+            let data = try Data(contentsOf: url)
+            guard data.count <= resourceAttachmentMaxBytes else {
+                actionError = resourceAttachmentTooLargeMessage
+                return
+            }
+
+            expensePendingResources.append(
+                ScenarioPendingResourcePhoto(
+                    id: UUID(),
+                    data: data,
+                    fileName: url.lastPathComponent,
+                    contentType: contentType
+                )
+            )
+        } catch {
+            actionError = friendlyResourceError(error, fallback: "Could not import this file.")
+        }
+    }
+
+    func validatedExpenseLinkURL() -> (isValid: Bool, url: URL?) {
+        let trimmedLink = expenseLinkDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedLink.isEmpty else {
+            expenseLinkError = nil
+            return (true, nil)
+        }
+
+        guard let url = ScenarioResourceLinkValidator.normalizedURL(from: trimmedLink) else {
+            expenseLinkError = ScenarioResourceLinkValidator.errorMessage
+            return (false, nil)
+        }
+
+        expenseLinkError = nil
+        return (true, url)
+    }
+
+    func syncExpenseResources(for costEventId: UUID, draftURL: URL?) async throws {
+        for attachmentId in expenseRemovedAttachmentIds {
+            try await repository.deleteAttachment(attachmentId: attachmentId)
+        }
+
+        for linkId in expenseRemovedLinkIds {
+            try await repository.deleteResourceLink(linkId: linkId)
+        }
+
+        for resource in expensePendingResources {
+            try await uploadResourceData(
+                resource.data,
+                fileName: resource.fileName,
+                contentType: resource.contentType,
+                owner: .costEvent(costEventId)
+            )
+        }
+
+        if let draftURL {
+            _ = try await repository.createCostEventLink(
+                costEventId: costEventId,
+                request: CreateResourceLinkRequest(label: nil, url: draftURL)
+            )
+        }
+    }
+
+    func isSupportedResourceContentType(_ contentType: String) -> Bool {
+        ["image/jpeg", "image/png", "image/webp", "application/pdf"].contains(contentType)
     }
 
     func navigateAfterEntrySave(savedExpenseDate: Date? = nil) {

@@ -5,7 +5,7 @@ struct MileageTripDetailScreen: View {
         let id: UUID
         let name: String
         let iconSystemName: String
-        let durationText: String
+        let basisText: String
         let costValue: Double
         let costText: String
         let deltaText: String
@@ -26,7 +26,11 @@ struct MileageTripDetailScreen: View {
         let confidenceLevel: String
         let confidenceSource: String
         let dataSource: String
+        let attachments: [ResourceAttachment]
+        let links: [ResourceLink]
         let comparableCosts: [ComparableCost]
+        let onOpenAttachment: (ResourceAttachment) -> Void
+        let onOpenLink: (ResourceLink) -> Void
         let onOpenLedger: () -> Void
         let onOpenComparableInCompare: (UUID) -> Void
     }
@@ -39,6 +43,7 @@ struct MileageTripDetailScreen: View {
         VStack(alignment: .leading, spacing: 40) {
             hero
             analytics
+            resources
             metadata
             ledgerButton
         }
@@ -113,6 +118,25 @@ struct MileageTripDetailScreen: View {
     }
 
     @ViewBuilder
+    private var resources: some View {
+        if !model.attachments.isEmpty || !model.links.isEmpty {
+            WIIsland(title: i18n.t("Photos & Links"), systemIcon: "paperclip") {
+                ScenarioPhotoUploadInput(
+                    title: i18n.t("Photos"),
+                    attachments: model.attachments,
+                    pendingPhotos: [],
+                    links: model.links,
+                    linkDraft: .constant(""),
+                    linkValidationMessage: nil,
+                    isEditable: false,
+                    onOpenAttachment: model.onOpenAttachment,
+                    onOpenLink: model.onOpenLink
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
     private var comparisonCard: some View {
         if !model.comparableCosts.isEmpty {
             WIIsland(title: i18n.t("Efficiency Comparison"), systemIcon: "arrow.left.arrow.right") {
@@ -142,7 +166,7 @@ struct MileageTripDetailScreen: View {
                         .foregroundStyle(WorthItColor.textPrimary)
                         .lineLimit(1)
 
-                    Text(item.durationText)
+                    Text(item.basisText)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(WorthItColor.textSecondary)
                         .lineLimit(1)
@@ -286,7 +310,7 @@ private struct ComparableCostDetailSheet: View {
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
 
-                    Text(item.durationText)
+                    Text(item.basisText)
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(WorthItColor.textSecondary)
                 }

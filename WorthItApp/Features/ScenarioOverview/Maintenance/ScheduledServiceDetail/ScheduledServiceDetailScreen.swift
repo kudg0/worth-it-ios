@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ScheduledServiceDetailScreen: View {
+    @Environment(\.i18n) private var i18n
+
     let item: ScenarioOverviewView.ScheduledServiceDisplayItem
     let service: ScheduledService?
     let dueSubtitle: (ScenarioOverviewView.ScheduledServiceDisplayItem) -> String
@@ -9,6 +11,7 @@ struct ScheduledServiceDetailScreen: View {
     let serviceIconName: (String) -> String
     let onEdit: (UUID) -> Void
     let onCompleteWithExpense: (UUID) -> Void
+    let onAddToCalendar: (ScenarioOverviewView.ScheduledServiceDisplayItem) -> Void
     let onOpenActions: (UUID) -> Void
     let onOpenResourceAction: (ScenarioResourceAction) -> Void
 
@@ -277,6 +280,29 @@ struct ScheduledServiceDetailScreen: View {
                 .background(WorthItColor.primaryContainer.opacity(0.10), in: RoundedRectangle(cornerRadius: WorthItRadius.l))
             }
             .buttonStyle(.plain)
+
+            if item.canExportToCalendar {
+                Button {
+                    onAddToCalendar(item)
+                } label: {
+                    HStack(spacing: WorthItSpacing.m) {
+                        Image(systemName: "calendar.badge.plus")
+                            .font(.system(size: 15, weight: .bold))
+
+                        Text(i18n.t(.scenarios.maintenance.calendar.addAction))
+                            .font(.system(size: 14, weight: .bold))
+                    }
+                    .foregroundStyle(WorthItColor.textPrimary)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(WorthItColor.surfaceContainerHigh, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: WorthItRadius.l)
+                            .stroke(WorthItColor.outlineSubtle, lineWidth: 1)
+                    }
+                }
+                .buttonStyle(.plain)
+            }
         }
         .frame(maxWidth: .infinity)
     }

@@ -2,13 +2,22 @@ import Foundation
 
 extension ScenarioOverviewView {
     var currentOdometerValue: Int {
-        let currentOdometer = Double(activeScenario.purchaseOdometer ?? 0) + usageEvents.reduce(0) { $0 + $1.distanceValue }
+        let currentOdometer = activeScenario.currentOdometerKm.map(currentOdometerValueFromKilometers)
+            ?? (purchaseOdometerInScenarioUnit + usageEvents.reduce(0) { $0 + usageDistanceInScenarioUnit($1) })
 
         return max(Int(currentOdometer.rounded()), 0)
     }
 
+    var purchaseOdometerInScenarioUnit: Double {
+        distanceValue(Double(activeScenario.purchaseOdometer ?? 0), from: "km", to: mileageDisplayUnit)
+    }
+
+    func currentOdometerValueFromKilometers(_ value: Double) -> Double {
+        distanceValue(value, from: "km", to: mileageDisplayUnit)
+    }
+
     var mileageDisplayUnit: String {
-        usageEvents.first?.distanceUnit ?? "km"
+        activeScenario.baseUnit
     }
 
     var mileageThisMonthValue: Double {
@@ -57,10 +66,10 @@ extension ScenarioOverviewView {
             return currentOdometerValue
         }
 
-        let baseOdometer = Double(activeScenario.purchaseOdometer ?? 0)
+        let baseOdometer = purchaseOdometerInScenarioUnit
         let distanceBeforeEntry = usageEvents
             .filter { $0.id != editingUsageEvent.id && $0.date < editingUsageEvent.date }
-            .reduce(0) { $0 + $1.distanceValue }
+            .reduce(0) { $0 + usageDistanceInScenarioUnit($1) }
 
         return max(Int((baseOdometer + distanceBeforeEntry).rounded()), 0)
     }

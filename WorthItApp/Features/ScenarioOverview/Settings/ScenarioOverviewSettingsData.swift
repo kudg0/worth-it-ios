@@ -39,6 +39,11 @@ extension ScenarioOverviewView {
     }
 
     var scenarioPreferencesSummary: String {
-        "\(activeScenario.currency) · Cyprus · \(mileageDisplayUnit)"
+        let currency = scenarioSettings?.currency ?? activeScenario.currency
+        let region = scenarioSettings?.region ?? activeScenario.region
+        let distanceUnit = scenarioSettings?.distanceUnit ?? activeScenario.baseUnit
+        let regionTitle = scenarioSettingsOptions?.regions.first(where: { $0.id == region })?.title ?? region
+
+        return "\(currency) · \(regionTitle) · \(distanceUnit)"
     }
 }

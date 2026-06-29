@@ -93,7 +93,7 @@ extension ScenarioOverviewView {
                     title: item.title,
                     color: colors[index % colors.count].opacity(0.84),
                     points: item.points.map {
-                        ScenarioCompareChartPoint(date: $0.date, value: $0.value)
+                        ScenarioCompareChartPoint(date: $0.date, value: normalizedBackendDistanceMetricValue($0.value))
                     },
                     isBenchmark: true
                 )

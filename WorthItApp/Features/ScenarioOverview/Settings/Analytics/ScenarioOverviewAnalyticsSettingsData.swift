@@ -110,6 +110,38 @@ extension ScenarioOverviewView {
         selectedMetricId = analyticsDraftDefaultMetric == .perKm
             ? analyticsDraftCostPerKmBasis.overviewMetric.rawValue
             : analyticsDraftDefaultMetric.overviewMetric.rawValue
-        popScenarioTab()
+
+        Task {
+            await persistAnalyticsSettings()
+        }
+    }
+
+    @MainActor
+    func persistAnalyticsSettings() async {
+        do {
+            let settings = try await repository.updateScenarioSettings(
+                scenarioId: activeScenario.id,
+                request: ScenarioSettingsPatch(
+                    currency: activeScenario.currency,
+                    region: activeScenario.region,
+                    distanceUnit: activeScenario.baseUnit,
+                    analytics: ScenarioAnalyticsSettingsPatch(
+                        enabledMetricIds: enabledMetricIdsForSave,
+                        defaultMetricId: selectedMetricId,
+                        costPerKmBasis: costPerKmBasisRawValue,
+                        includesResidualValue: includesVehicleResidualValue,
+                        deltaDisplay: analyticsDeltaDisplayRawValue,
+                        savingsAlternativeId: selectedBreakEvenAlternativeId
+                    )
+                )
+            )
+
+            scenarioSettings = settings
+            applyAnalyticsSettings(settings.analytics)
+            await loadSummary()
+            popScenarioTab()
+        } catch {
+            actionError = WIUpdateErrorText.message(for: error)
+        }
     }
 }

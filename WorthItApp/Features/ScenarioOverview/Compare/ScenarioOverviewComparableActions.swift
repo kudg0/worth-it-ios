@@ -19,7 +19,7 @@ extension ScenarioOverviewView {
             await loadSummary()
             closeComparableEditor()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error)
         }
     }
 
@@ -39,7 +39,7 @@ extension ScenarioOverviewView {
             await loadSummary()
             closeComparableEditor()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error, fallbackKey: .common.errors.update.deleteComparable)
         }
     }
 
@@ -59,11 +59,13 @@ extension ScenarioOverviewView {
         do {
             for alternative in changedAlternatives {
                 _ = try await repository.updateAlternative(
-                    alternativeId: alternative.id,
-                    request: UpdateAlternativeRequest(
-                        name: alternative.name,
-                        pricingMode: alternative.pricingMode,
-                        paramsJson: alternative.paramsJson,
+                        alternativeId: alternative.id,
+                        request: UpdateAlternativeRequest(
+                            name: alternative.name,
+                            category: alternative.category,
+                            presetKey: alternative.presetKey,
+                            pricingMode: alternative.pricingMode,
+                            paramsJson: alternative.paramsJson,
                         note: alternative.note?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? alternative.note : nil,
                         isIncluded: selectedIds.contains(alternative.id)
                     )
@@ -73,7 +75,7 @@ extension ScenarioOverviewView {
             await loadSummary()
             popScenarioTab()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error)
         }
     }
 
@@ -89,22 +91,23 @@ extension ScenarioOverviewView {
             return nil
         }
 
-        let note = comparableNote.trimmingCharacters(in: .whitespacesAndNewlines)
-        let normalizedNote = note.isEmpty ? nil : note
-
         return (
             CreateAlternativeRequest(
                 name: trimmedName,
+                category: comparableCategory,
+                presetKey: comparablePresetKey,
                 pricingMode: comparablePricingModel,
                 paramsJson: params,
-                note: normalizedNote,
+                note: nil,
                 isIncluded: isComparableIncluded
             ),
             UpdateAlternativeRequest(
                 name: trimmedName,
+                category: comparableCategory,
+                presetKey: comparablePresetKey,
                 pricingMode: comparablePricingModel,
                 paramsJson: params,
-                note: normalizedNote,
+                note: nil,
                 isIncluded: isComparableIncluded
             )
         )
@@ -129,14 +132,21 @@ extension ScenarioOverviewView {
         case .mixed:
             guard let pricePerKm = comparableDouble(comparablePricePerKm) else { return nil }
             guard let pricePerMinute = comparableDouble(comparablePricePerMinute) else { return nil }
+            guard let averageSpeedKmh = comparableDouble(comparableAverageSpeedKmh) else { return nil }
             return AlternativeParams(
                 pricePerKm: pricePerKm,
                 pricePerMinute: pricePerMinute,
+                averageSpeedKmh: averageSpeedKmh,
                 includedCostCategories: inheritedCostCategories
             )
         case .perTime:
-            guard let value = comparableDouble(comparableManualTotal) else { return nil }
-            return AlternativeParams(kind: "total", value: value, includedCostCategories: inheritedCostCategories)
+            guard let pricePerMinute = comparableDouble(comparablePricePerMinute) else { return nil }
+            guard let averageSpeedKmh = comparableDouble(comparableAverageSpeedKmh) else { return nil }
+            return AlternativeParams(
+                pricePerMinute: pricePerMinute,
+                averageSpeedKmh: averageSpeedKmh,
+                includedCostCategories: inheritedCostCategories
+            )
         }
     }
 

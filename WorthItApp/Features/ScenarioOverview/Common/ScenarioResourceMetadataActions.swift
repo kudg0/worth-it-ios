@@ -16,6 +16,14 @@ struct ScenarioResourcePhotoData: Transferable {
 }
 
 extension ScenarioOverviewView {
+    var resourceAttachmentMaxBytes: Int {
+        512_000
+    }
+
+    var resourceAttachmentTooLargeMessage: String {
+        "Attachment must be 500 KB or smaller."
+    }
+
     func resourceManagementModel(for event: CostEvent?) -> ScenarioResourceManagementSectionModel? {
         guard let event else { return nil }
 
@@ -164,8 +172,8 @@ extension ScenarioOverviewView {
         guard !isSavingEntry else { return }
 
         let trimmedURL = resourceLinkURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let url = URL(string: trimmedURL), ["http", "https"].contains(url.scheme?.lowercased()) else {
-            actionError = "Enter valid http or https link."
+        guard let url = ScenarioResourceLinkValidator.normalizedURL(from: trimmedURL) else {
+            actionError = ScenarioResourceLinkValidator.errorMessage
             return
         }
 
@@ -182,6 +190,8 @@ extension ScenarioOverviewView {
                     _ = try await repository.createCostEventLink(costEventId: id, request: request)
                 case .scheduledService(let id):
                     _ = try await repository.createScheduledServiceLink(scheduledServiceId: id, request: request)
+                case .usageEvent(let id):
+                    _ = try await repository.createUsageEventLink(usageEventId: id, request: request)
                 }
             case .edit(let link):
                 _ = try await repository.updateResourceLink(
@@ -230,6 +240,9 @@ extension ScenarioOverviewView {
                     _ = try await repository.createCostEventLocation(costEventId: id, request: request)
                 case .scheduledService(let id):
                     _ = try await repository.createScheduledServiceLocation(scheduledServiceId: id, request: request)
+                case .usageEvent:
+                    actionError = "Locations are not available for mileage entries."
+                    return
                 }
             case .edit(let location):
                 _ = try await repository.updateResourceLocation(
@@ -302,10 +315,18 @@ extension ScenarioOverviewView {
         contentType: String,
         owner: ScenarioResourceOwner
     ) async throws {
-        guard !isSavingEntry else { return }
+        guard data.count <= resourceAttachmentMaxBytes else {
+            actionError = resourceAttachmentTooLargeMessage
+            return
+        }
 
+        let wasAlreadySaving = isSavingEntry
         isSavingEntry = true
-        defer { isSavingEntry = false }
+        defer {
+            if !wasAlreadySaving {
+                isSavingEntry = false
+            }
+        }
 
         let request = CreateAttachmentUploadIntentRequest(
             fileName: fileName,
@@ -320,6 +341,8 @@ extension ScenarioOverviewView {
             intent = try await repository.createCostEventAttachmentUploadIntent(costEventId: id, request: request)
         case .scheduledService(let id):
             intent = try await repository.createScheduledServiceAttachmentUploadIntent(scheduledServiceId: id, request: request)
+        case .usageEvent(let id):
+            intent = try await repository.createUsageEventAttachmentUploadIntent(usageEventId: id, request: request)
         }
 
         try await repository.uploadAttachmentData(data, intent: intent)
@@ -371,6 +394,6 @@ extension ScenarioOverviewView {
             return fallback
         }
 
-        return description
+        return WIUpdateErrorText.message(for: error, fallback: fallback)
     }
 }

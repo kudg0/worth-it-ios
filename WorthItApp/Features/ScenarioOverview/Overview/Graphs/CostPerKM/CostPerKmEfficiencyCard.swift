@@ -261,7 +261,7 @@ struct CostPerKmEfficiencyCard: View {
 
         let delta = comparisonValue - selectedPoint.value
         let sign = delta >= 0 ? "+" : "-"
-        return "\(sign)\(model.currencySymbol)\(model.formatDouble(abs(delta), 2))/km"
+        return "\(sign)\(model.currencySymbol)\(model.formatDouble(abs(delta), 2))/\(model.mileageUnit)"
     }
 
     private func comparisonDeltaColor(for series: ScenarioCompareChartSeries) -> Color {

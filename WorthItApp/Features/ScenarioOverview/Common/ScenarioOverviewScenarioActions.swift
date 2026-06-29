@@ -28,7 +28,7 @@ extension ScenarioOverviewView {
             displayedScenario = updatedScenario
             onScenarioChanged(updatedScenario)
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error)
         }
     }
 
@@ -44,7 +44,7 @@ extension ScenarioOverviewView {
             onScenarioDeleted()
             onExitScenario()
         } catch {
-            actionError = String(describing: error)
+            actionError = WIUpdateErrorText.message(for: error, fallbackKey: .common.errors.update.deleteScenario)
         }
     }
 }

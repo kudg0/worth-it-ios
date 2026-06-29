@@ -17,20 +17,27 @@ extension ScenarioOverviewView {
         async let costEventsTask = repository.listCostEvents(scenarioId: activeScenario.id)
         async let usageEventsTask = repository.listUsageEvents(scenarioId: activeScenario.id)
         async let alternativesTask = repository.listAlternatives(scenarioId: activeScenario.id)
+        async let alternativePresetsTask = repository.listAlternativePresets(region: activeScenario.region)
         async let scheduledServicesTask = repository.listScheduledServices(scenarioId: activeScenario.id)
         async let scheduledDueTask = repository.listScheduledServiceDueStates(scenarioId: activeScenario.id)
+        async let scenarioSettingsTask = repository.getScenarioSettings(scenarioId: activeScenario.id)
+        async let settingsOptionsTask = repository.getSettingsOptions()
 
         do {
             analyticsOverview = try await analyticsTask
+            if let analyticsOverview {
+                enabledMetricIds = analyticsOverview.enabledMetricIds.map(\.rawValue).joined(separator: ",")
+                selectedMetricId = analyticsOverview.defaultMetricId.rawValue
+            }
         } catch {
             analyticsOverview = nil
-            analyticsError = String(describing: error)
+            analyticsError = userFacingLoadErrorMessage(for: error)
         }
 
         do {
             currentSummary = try await summaryTask
         } catch {
-            summaryError = String(describing: error)
+            summaryError = userFacingLoadErrorMessage(for: error)
         }
 
         do {
@@ -38,35 +45,41 @@ extension ScenarioOverviewView {
             normalizeSelectedBreakEvenAlternative()
         } catch {
             currentComparison = nil
-            alternativesError = String(describing: error)
+            alternativesError = userFacingLoadErrorMessage(for: error)
         }
 
         do {
             costEvents = try await costEventsTask
         } catch {
             costEvents = []
-            costEventsError = String(describing: error)
+            costEventsError = userFacingLoadErrorMessage(for: error)
         }
 
         do {
             usageEvents = try await usageEventsTask
         } catch {
             usageEvents = []
-            usageEventsError = String(describing: error)
+            usageEventsError = userFacingLoadErrorMessage(for: error)
         }
 
         do {
             alternatives = try await alternativesTask
         } catch {
             alternatives = []
-            alternativesError = alternativesError ?? String(describing: error)
+            alternativesError = alternativesError ?? userFacingLoadErrorMessage(for: error)
+        }
+
+        do {
+            alternativePresets = try await alternativePresetsTask
+        } catch {
+            alternativePresets = []
         }
 
         do {
             scheduledServices = try await scheduledServicesTask
         } catch {
             scheduledServices = []
-            scheduledServicesError = String(describing: error)
+            scheduledServicesError = userFacingLoadErrorMessage(for: error)
         }
 
         do {
@@ -74,7 +87,21 @@ extension ScenarioOverviewView {
             scheduledServiceDueItems = dueResponse.items
         } catch {
             scheduledServiceDueItems = []
-            scheduledServicesError = scheduledServicesError ?? String(describing: error)
+            scheduledServicesError = scheduledServicesError ?? userFacingLoadErrorMessage(for: error)
+        }
+
+        do {
+            let settings = try await scenarioSettingsTask
+            scenarioSettings = settings
+            displayedScenario = activeScenario.applying(settings: settings)
+        } catch {
+            scenarioSettings = nil
+        }
+
+        do {
+            scenarioSettingsOptions = try await settingsOptionsTask
+        } catch {
+            scenarioSettingsOptions = nil
         }
 
         if summaryError == nil {
@@ -84,6 +111,14 @@ extension ScenarioOverviewView {
                 previousMonthSummary = nil
             }
         }
+    }
+
+    func userFacingLoadErrorMessage(for error: Error) -> String {
+        if case APIError.requestFailed(let statusCode, _) = error, statusCode >= 500 {
+            return i18n.t("Worth It could not refresh this data. Try again in a moment.")
+        }
+
+        return i18n.t("Worth It could not refresh this data. Check your connection and try again.")
     }
 
     func selectedBreakEvenStorageKey(for scenarioId: UUID) -> String {
@@ -99,6 +134,13 @@ extension ScenarioOverviewView {
 
         if let selectedBreakEvenAlternativeId,
            rows.contains(where: { $0.alternativeId == selectedBreakEvenAlternativeId }) {
+            return
+        }
+
+        if let preferredId = scenarioSettings?.analytics.savingsAlternativeId,
+           rows.contains(where: { $0.alternativeId == preferredId }) {
+            selectedBreakEvenAlternativeId = preferredId
+            UserDefaults.standard.set(preferredId.uuidString, forKey: selectedBreakEvenStorageKey(for: activeScenario.id))
             return
         }
 
@@ -119,6 +161,36 @@ extension ScenarioOverviewView {
     func selectBreakEvenAlternative(_ id: UUID) {
         selectedBreakEvenAlternativeId = id
         UserDefaults.standard.set(id.uuidString, forKey: selectedBreakEvenStorageKey(for: activeScenario.id))
+        Task { await persistSelectedBreakEvenAlternative(id) }
+    }
+
+    @MainActor
+    func persistSelectedBreakEvenAlternative(_ id: UUID) async {
+        do {
+            let settings = try await repository.updateScenarioSettings(
+                scenarioId: activeScenario.id,
+                request: ScenarioSettingsPatch(
+                    analytics: ScenarioAnalyticsSettingsPatch(savingsAlternativeId: id)
+                )
+            )
+            scenarioSettings = settings
+            await reloadAnalyticsOverview()
+        } catch {
+            actionError = WIUpdateErrorText.message(for: error)
+        }
+    }
+
+    @MainActor
+    func reloadAnalyticsOverview() async {
+        do {
+            let overview = try await repository.getAnalyticsOverview(scenarioId: activeScenario.id)
+            analyticsOverview = overview
+            enabledMetricIds = overview.enabledMetricIds.map(\.rawValue).joined(separator: ",")
+            selectedMetricId = overview.defaultMetricId.rawValue
+            analyticsError = nil
+        } catch {
+            analyticsError = userFacingLoadErrorMessage(for: error)
+        }
     }
 
     func loadSelectedMetricDetail() async {

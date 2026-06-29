@@ -9,6 +9,7 @@ struct WITipInfo: View {
     enum Tone {
         case info
         case primary
+        case danger
     }
 
     let title: String
@@ -24,6 +25,8 @@ struct WITipInfo: View {
                 infoBody
             case .primary:
                 primaryBody
+            case .danger:
+                dangerBody
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -83,6 +86,27 @@ struct WITipInfo: View {
         .background(WorthItColor.surfaceContainerLow, in: RoundedRectangle(cornerRadius: size == .medium ? WorthItRadius.l : WorthItRadius.m))
         .clipShape(RoundedRectangle(cornerRadius: size == .medium ? WorthItRadius.l : WorthItRadius.m))
         .shadow(color: Color.black.opacity(0.20), radius: 20, y: 4)
+    }
+
+    private var dangerBody: some View {
+        HStack(alignment: .top, spacing: size == .medium ? WorthItSpacing.l : WorthItSpacing.m) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: size == .medium ? 24 : 20, weight: .semibold))
+                .foregroundStyle(WorthItColor.danger)
+
+            Text(bodyText)
+                .font(size == .medium ? WorthItTypography.caption.weight(.bold) : WorthItTypography.caption)
+                .lineSpacing(4)
+                .foregroundStyle(WorthItColor.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(tipInsets)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(WorthItColor.danger.opacity(0.10), in: RoundedRectangle(cornerRadius: size == .medium ? WorthItRadius.l : WorthItRadius.m))
+        .overlay {
+            RoundedRectangle(cornerRadius: size == .medium ? WorthItRadius.l : WorthItRadius.m)
+                .stroke(WorthItColor.danger.opacity(0.30), lineWidth: 1)
+        }
     }
 
     private var tipInsets: EdgeInsets {

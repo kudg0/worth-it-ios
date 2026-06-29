@@ -77,13 +77,13 @@ extension ScenarioOverviewView {
     ) -> Double? {
         if compareMetric == .perKm,
            let dynamicAverageRate = dynamicAlternativeAverageRate(for: breakEven) {
-            return dynamicAverageRate
+            return distanceRateInScenarioUnit(dynamicAverageRate, sourceUnit: "km")
         }
 
         if compareMetric == .perKm,
            result?.pricingMode == .distanceCurve,
            let averageRate = distanceCurveAverageRate(from: result?.costBreakdown) {
-            return averageRate
+            return distanceRateInScenarioUnit(averageRate, sourceUnit: "km")
         }
 
         return compareChartValue(point)
@@ -98,7 +98,7 @@ extension ScenarioOverviewView {
     func compareChartValue(_ point: ScenarioComparison.Series.Point) -> Double? {
         switch compareMetric {
         case .perKm:
-            return point.perKm
+            return point.perKm.map { distanceRateInScenarioUnit($0, sourceUnit: "km") }
         case .perMonth:
             return point.perMonth
         case .totalCost:

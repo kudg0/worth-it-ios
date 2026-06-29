@@ -5,7 +5,9 @@ struct ScenarioListItem: Decodable, Identifiable, Hashable {
     let name: String
     let category: String?
     let scenarioType: String
+    let baseUnit: String
     let currency: String
+    let region: String
     let startDate: Date
     let purchasePrice: String
     let purchaseOdometer: Int?
@@ -15,15 +17,54 @@ struct ScenarioListItem: Decodable, Identifiable, Hashable {
     let loanTermMonths: Int?
     let loanAnnualInterestRate: String?
     let isFavorite: Bool
+    let analyticsEnabledMetricIds: [String]?
+    let analyticsDefaultMetricId: String
+    let analyticsCostPerKmBasis: String
+    let analyticsIncludesResidualValue: Bool
+    let analyticsDeltaDisplay: String
+    let analyticsSavingsAlternativeId: UUID?
     let currentOdometerKm: Double?
     let costPerKm: Double?
+}
+
+extension ScenarioListItem {
+    func applying(settings: ScenarioSettings) -> ScenarioListItem {
+        ScenarioListItem(
+            id: id,
+            name: name,
+            category: category,
+            scenarioType: scenarioType,
+            baseUnit: settings.distanceUnit,
+            currency: settings.currency,
+            region: settings.region,
+            startDate: startDate,
+            purchasePrice: purchasePrice,
+            purchaseOdometer: purchaseOdometer,
+            expectedResaleValue: expectedResaleValue,
+            acquisitionType: acquisitionType,
+            loanAmount: loanAmount,
+            loanTermMonths: loanTermMonths,
+            loanAnnualInterestRate: loanAnnualInterestRate,
+            isFavorite: isFavorite,
+            analyticsEnabledMetricIds: settings.analytics.enabledMetricIds,
+            analyticsDefaultMetricId: settings.analytics.defaultMetricId,
+            analyticsCostPerKmBasis: settings.analytics.costPerKmBasis,
+            analyticsIncludesResidualValue: settings.analytics.includesResidualValue,
+            analyticsDeltaDisplay: settings.analytics.deltaDisplay,
+            analyticsSavingsAlternativeId: settings.analytics.savingsAlternativeId,
+            currentOdometerKm: currentOdometerKm,
+            costPerKm: costPerKm
+        )
+    }
 }
 
 struct CreateScenarioRequest: Encodable {
     let name: String
     let category: String
     let scenarioType: String
+    let baseUnit: String
     let currency: String
+    let region: String
     let startDate: Date
     let purchasePrice: Decimal
     let purchaseOdometer: Int?
@@ -38,7 +79,9 @@ struct UpdateScenarioRequest: Encodable {
     let name: String?
     let category: String?
     let scenarioType: String?
+    let baseUnit: String?
     let currency: String?
+    let region: String?
     let startDate: Date?
     let purchasePrice: Decimal?
     let purchaseOdometer: Int?
@@ -48,6 +91,7 @@ struct UpdateScenarioRequest: Encodable {
     let loanTermMonths: Int?
     let loanAnnualInterestRate: Decimal?
     let isFavorite: Bool?
+    let analytics: ScenarioAnalyticsSettingsPatch?
 }
 
 extension UpdateScenarioRequest {
@@ -56,7 +100,9 @@ extension UpdateScenarioRequest {
             name: nil,
             category: nil,
             scenarioType: nil,
+            baseUnit: nil,
             currency: nil,
+            region: nil,
             startDate: nil,
             purchasePrice: nil,
             purchaseOdometer: nil,
@@ -65,8 +111,72 @@ extension UpdateScenarioRequest {
             loanAmount: nil,
             loanTermMonths: nil,
             loanAnnualInterestRate: nil,
-            isFavorite: isFavorite
+            isFavorite: isFavorite,
+            analytics: nil
         )
+    }
+}
+
+struct ScenarioSettings: Decodable, Equatable {
+    let scenarioId: UUID
+    let currency: String
+    let region: String
+    let distanceUnit: String
+    let currencyChangeAllowed: Bool
+    let currencyChangeBlockedReason: String?
+    let analytics: ScenarioAnalyticsSettings
+}
+
+struct ScenarioAnalyticsSettings: Codable, Equatable {
+    let enabledMetricIds: [String]
+    let defaultMetricId: String
+    let costPerKmBasis: String
+    let includesResidualValue: Bool
+    let deltaDisplay: String
+    let savingsAlternativeId: UUID?
+}
+
+struct ScenarioSettingsPatch: Encodable {
+    let currency: String?
+    let region: String?
+    let distanceUnit: String?
+    let analytics: ScenarioAnalyticsSettingsPatch?
+
+    init(
+        currency: String? = nil,
+        region: String? = nil,
+        distanceUnit: String? = nil,
+        analytics: ScenarioAnalyticsSettingsPatch? = nil
+    ) {
+        self.currency = currency
+        self.region = region
+        self.distanceUnit = distanceUnit
+        self.analytics = analytics
+    }
+}
+
+struct ScenarioAnalyticsSettingsPatch: Encodable {
+    let enabledMetricIds: [String]?
+    let defaultMetricId: String?
+    let costPerKmBasis: String?
+    let includesResidualValue: Bool?
+    let deltaDisplay: String?
+    let savingsAlternativeId: UUID?
+
+    init(
+        enabledMetricIds: [String]? = nil,
+        defaultMetricId: String? = nil,
+        costPerKmBasis: String? = nil,
+        includesResidualValue: Bool? = nil,
+        deltaDisplay: String? = nil,
+        savingsAlternativeId: UUID? = nil
+    ) {
+        self.enabledMetricIds = enabledMetricIds
+        self.defaultMetricId = defaultMetricId
+        self.costPerKmBasis = costPerKmBasis
+        self.includesResidualValue = includesResidualValue
+        self.deltaDisplay = deltaDisplay
+        self.savingsAlternativeId = savingsAlternativeId
     }
 }
 
@@ -100,7 +210,6 @@ struct ScenarioSummary: Decodable, Hashable {
     let excludedSharedCostsTotal: Double
     let netOwnershipCost: Double
     let totalDistanceKm: Double
-    let totalDurationMinutes: Double
     let costPerKm: Double?
     let costPerMonth: Double
     let costBreakdownByCategory: CostBreakdown
@@ -124,6 +233,172 @@ enum AlternativePricingMode: String, Codable, CaseIterable, Identifiable {
         case .perTime: "Per Minute"
         case .mixed: "Per KM + Per Minute"
         case .manualEquivalent: "Manual Total"
+        }
+    }
+}
+
+enum AlternativeCategory: String, Codable, CaseIterable, Identifiable {
+    case taxi
+    case carSharing = "car_sharing"
+    case rentalCar = "rental_car"
+    case publicTransport = "public_transport"
+    case bicycle
+    case motorcycle
+    case electricScooter = "electric_scooter"
+    case custom
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .taxi: "Taxi"
+        case .carSharing: "Carsharing"
+        case .rentalCar: "Rental Car"
+        case .publicTransport: "Transport"
+        case .bicycle: "Bicycle"
+        case .motorcycle: "Motorcycle"
+        case .electricScooter: "E-Scooter"
+        case .custom: "Custom"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .taxi: "car.fill"
+        case .carSharing: "car.2.fill"
+        case .rentalCar: "key.fill"
+        case .publicTransport: "bus.fill"
+        case .bicycle: "bicycle"
+        case .motorcycle: "motorcycle"
+        case .electricScooter: "scooter"
+        case .custom: "slider.horizontal.3"
+        }
+    }
+
+    var categoryDescription: String {
+        switch self {
+        case .taxi: "Point-to-point paid rides."
+        case .carSharing: "Shared cars with distance or minute pricing."
+        case .rentalCar: "Rental plans for days or months."
+        case .publicTransport: "Passes, buses, trains, and transit."
+        case .bicycle: "Bike ownership, rental, or maintenance."
+        case .motorcycle: "Motorbike ownership, rental, or running costs."
+        case .electricScooter: "Minute-based electric micromobility."
+        case .custom: "Anything that needs manual assumptions."
+        }
+    }
+
+    var defaultComparableName: String {
+        switch self {
+        case .taxi: "Taxi"
+        case .carSharing: "Carsharing"
+        case .rentalCar: "Car Rental"
+        case .publicTransport: "Public Transport"
+        case .bicycle: "Bicycle"
+        case .motorcycle: "Motorcycle"
+        case .electricScooter: "Electric Scooter"
+        case .custom: "Custom Alternative"
+        }
+    }
+
+    var defaultPricingMode: AlternativePricingMode {
+        switch self {
+        case .taxi:
+            .distanceCurve
+        case .carSharing:
+            .mixed
+        case .rentalCar, .publicTransport:
+            .perPeriod
+        case .electricScooter:
+            .perTime
+        case .bicycle, .motorcycle, .custom:
+            .manualEquivalent
+        }
+    }
+
+    var allowedPricingModes: [AlternativePricingMode] {
+        switch self {
+        case .taxi:
+            [.distanceCurve, .perDistance, .perTime]
+        case .carSharing:
+            [.mixed, .perDistance, .perTime]
+        case .rentalCar:
+            [.perPeriod, .perDistance]
+        case .publicTransport:
+            [.perPeriod]
+        case .bicycle:
+            [.manualEquivalent, .perPeriod, .perDistance, .perTime]
+        case .motorcycle:
+            [.manualEquivalent, .perPeriod, .perDistance]
+        case .electricScooter:
+            [.perTime, .perDistance]
+        case .custom:
+            [.manualEquivalent, .perDistance, .mixed, .perTime, .distanceCurve, .perPeriod]
+        }
+    }
+
+    var defaultPricePerKm: String {
+        switch self {
+        case .carSharing:
+            "0.35"
+        default:
+            ""
+        }
+    }
+
+    var defaultPricePerMinute: String {
+        switch self {
+        case .carSharing:
+            "0.25"
+        case .bicycle, .electricScooter:
+            "0.22"
+        default:
+            ""
+        }
+    }
+
+    var defaultPricePerMonth: String {
+        switch self {
+        case .rentalCar:
+            "500"
+        case .publicTransport:
+            "60"
+        default:
+            ""
+        }
+    }
+
+    var defaultManualTotal: String {
+        switch self {
+        case .bicycle, .motorcycle, .custom:
+            "0"
+        default:
+            ""
+        }
+    }
+
+    var defaultCurvePoints: [ComparableCurveInputPoint] {
+        switch self {
+        case .taxi:
+            [
+                ComparableCurveInputPoint(distanceKm: "3", totalPrice: "9"),
+                ComparableCurveInputPoint(distanceKm: "8", totalPrice: "18"),
+                ComparableCurveInputPoint(distanceKm: "25", totalPrice: "42"),
+            ]
+        default:
+            [
+                ComparableCurveInputPoint(),
+                ComparableCurveInputPoint(),
+            ]
+        }
+    }
+
+    var defaultInheritedCostCategories: Set<String> {
+        switch self {
+        case .rentalCar:
+            ["fuel", "wash"]
+        default:
+            []
         }
     }
 }
@@ -152,6 +427,7 @@ struct AlternativeParams: Codable, Hashable {
     let pricePoints: [AlternativePricePoint]?
     let pricePerMonth: Double?
     let pricePerMinute: Double?
+    let averageSpeedKmh: Double?
     let fixedPerMonth: Double?
     let kind: String?
     let value: Double?
@@ -162,6 +438,7 @@ struct AlternativeParams: Codable, Hashable {
         pricePoints: [AlternativePricePoint]? = nil,
         pricePerMonth: Double? = nil,
         pricePerMinute: Double? = nil,
+        averageSpeedKmh: Double? = nil,
         fixedPerMonth: Double? = nil,
         kind: String? = nil,
         value: Double? = nil,
@@ -171,6 +448,7 @@ struct AlternativeParams: Codable, Hashable {
         self.pricePoints = pricePoints
         self.pricePerMonth = pricePerMonth
         self.pricePerMinute = pricePerMinute
+        self.averageSpeedKmh = averageSpeedKmh
         self.fixedPerMonth = fixedPerMonth
         self.kind = kind
         self.value = value
@@ -183,6 +461,7 @@ struct AlternativeParams: Codable, Hashable {
         try container.encodeIfPresent(pricePoints, forKey: .pricePoints)
         try container.encodeIfPresent(pricePerMonth, forKey: .pricePerMonth)
         try container.encodeIfPresent(pricePerMinute, forKey: .pricePerMinute)
+        try container.encodeIfPresent(averageSpeedKmh, forKey: .averageSpeedKmh)
         try container.encodeIfPresent(fixedPerMonth, forKey: .fixedPerMonth)
         try container.encodeIfPresent(kind, forKey: .kind)
         try container.encodeIfPresent(value, forKey: .value)
@@ -194,6 +473,8 @@ struct AlternativeOption: Decodable, Identifiable, Hashable {
     let id: UUID
     let scenarioId: UUID
     let name: String
+    let category: AlternativeCategory
+    let presetKey: String?
     let pricingMode: AlternativePricingMode
     let paramsJson: AlternativeParams
     let note: String?
@@ -202,8 +483,23 @@ struct AlternativeOption: Decodable, Identifiable, Hashable {
     let updatedAt: Date
 }
 
+struct AlternativePreset: Decodable, Identifiable, Hashable {
+    let key: String
+    let category: AlternativeCategory
+    let title: String
+    let subtitle: String
+    let pricingMode: AlternativePricingMode
+    let paramsJson: AlternativeParams
+    let note: String?
+    let isRecommended: Bool
+
+    var id: String { key }
+}
+
 struct CreateAlternativeRequest: Encodable {
     let name: String
+    let category: AlternativeCategory
+    let presetKey: String?
     let pricingMode: AlternativePricingMode
     let paramsJson: AlternativeParams
     let note: String?
@@ -212,6 +508,8 @@ struct CreateAlternativeRequest: Encodable {
 
 struct UpdateAlternativeRequest: Encodable {
     let name: String
+    let category: AlternativeCategory
+    let presetKey: String?
     let pricingMode: AlternativePricingMode
     let paramsJson: AlternativeParams
     let note: String?
@@ -271,7 +569,6 @@ struct ScenarioComparison: Decodable, Hashable {
         let usageEventId: UUID
         let date: Date
         let distanceKm: Double
-        let durationMinutes: Int
         let carCostPerKm: Double?
         let carTripCost: Double?
         let alternativeCostPerKm: Double?
@@ -293,10 +590,11 @@ struct ScenarioComparison: Decodable, Hashable {
     struct CostBreakdownInputs: Decodable, Hashable {
         let totalDistanceKm: Double
         let monthsOwned: Double
-        let totalDurationMinutes: Double
         let pricePerKm: Double?
         let pricePerMonth: Double?
         let pricePerMinute: Double?
+        let averageSpeedKmh: Double?
+        let effectiveMinutePricePerKm: Double?
         let fixedPerMonth: Double?
         let averageCurvePricePerKm: Double?
         let curvePointRates: [Double]?
@@ -368,6 +666,11 @@ struct ScenarioAnalyticsMetricPayload: Decodable, Hashable {
         let reason: String?
     }
 
+    struct EntityRef: Decodable, Hashable {
+        let type: String
+        let id: String
+    }
+
     struct Card: Decodable, Hashable {
         let title: String
         let value: String
@@ -378,6 +681,7 @@ struct ScenarioAnalyticsMetricPayload: Decodable, Hashable {
         let trend: Trend?
         let progress: Double?
         let tone: String?
+        let entityRef: EntityRef?
     }
 
     struct Trend: Decodable, Hashable {
@@ -433,11 +737,6 @@ struct ScenarioAnalyticsMetricPayload: Decodable, Hashable {
             let value: String
             let numericValue: Double?
             let unit: String?
-        }
-
-        struct EntityRef: Decodable, Hashable {
-            let type: String
-            let id: String
         }
 
         struct Item: Decodable, Hashable, Identifiable {
@@ -504,9 +803,12 @@ struct ResourceAttachment: Decodable, Identifiable, Hashable {
     let ownerType: String
     let costEventId: UUID?
     let scheduledServiceId: UUID?
+    let usageEventId: UUID?
     let storageProvider: String
     let storageBucket: String
     let storageKey: String
+    let optimizedStorageKey: String?
+    let thumbnailStorageKey: String?
     let originalFileName: String
     let contentType: String
     let byteSize: Int
@@ -522,6 +824,7 @@ struct ResourceLink: Decodable, Identifiable, Hashable {
     let ownerType: String
     let costEventId: UUID?
     let scheduledServiceId: UUID?
+    let usageEventId: UUID?
     let label: String?
     let url: URL
     let createdAt: Date
@@ -605,8 +908,9 @@ struct UsageEvent: Decodable, Identifiable, Hashable {
     let odometerValue: Double?
     let odometerUnit: String
     let odometerKm: String?
-    let durationMinutes: Int?
     let note: String?
+    let attachments: [ResourceAttachment]?
+    let links: [ResourceLink]?
     let createdAt: Date
     let updatedAt: Date
 }
@@ -616,7 +920,6 @@ struct CreateUsageEventRequest: Encodable {
     let date: Date
     let distanceValue: Double?
     let odometerValue: Double?
-    let durationMinutes: Int?
     let note: String?
 }
 
@@ -625,7 +928,6 @@ struct UpdateUsageEventRequest: Encodable {
     let date: Date?
     let distanceValue: Double?
     let odometerValue: Double?
-    let durationMinutes: Int?
     let note: String?
 }
 
