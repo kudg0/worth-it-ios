@@ -2,6 +2,35 @@
 
 Please review yourself through this `AGENTS.md`.
 
+## Roadmap Source Of Truth
+
+- All unfinished backend and iOS product work lives in
+  ../assets-invest-comparator/docs/product-work-plan.md.
+- Do not create another backlog in this README, AGENTS.md, a feature document,
+  or source comments.
+- A focused feature plan may expand one task, but it must name the canonical
+  task ID and must not maintain a competing status.
+- Re-audit IN WORKTREE tasks before editing because concurrent local changes are
+  not shipped work.
+
+## Roadmap Task Claim And Close-Out
+
+- Before editing, claim one canonical task ID and re-audit its current truth,
+  dependencies, acceptance, and verification against the code and worktrees.
+- In the same work session, update that task in
+  `../assets-invest-comparator/docs/product-work-plan.md`. Use `VERIFIED DONE`
+  only after every acceptance criterion and required check passes, exact
+  evidence is recorded, and the result is attributable to a commit/PR. Use
+  `IN WORKTREE — VERIFIED` when every check passes locally but the work is not
+  committed; otherwise use `PARTIAL` or `IN WORKTREE — UNVERIFIED` and record
+  the remaining work or blocker.
+- The final handoff must name the resulting roadmap status and task ID. Never
+  report work as done, shipped, or closed while its canonical status is open.
+- After editing the sibling canonical roadmap, run `pnpm roadmap:lint` from
+  `../assets-invest-comparator`. If the linter/rules/fixtures changed, also run
+  `pnpm roadmap:lint:test`. A failing check blocks handoff and commit.
+- Do not copy task status or create a second backlog in this file or elsewhere.
+
 Default communication mode for every new chat:
 
 - Enable `caveman:caveman` automatically from chat start.

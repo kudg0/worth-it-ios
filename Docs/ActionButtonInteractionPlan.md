@@ -1,6 +1,10 @@
 # Action Button Interaction Foundation
 
-Status: planned
+Canonical task: UX-001
+
+The canonical status, dependencies, acceptance, and execution order live in the
+[cross-repository roadmap](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md).
+This document is the detailed interaction specification only.
 
 ## Goal
 
@@ -14,6 +18,9 @@ Primary references:
 
 - [Apple Human Interface Guidelines — Buttons](https://developer.apple.com/design/human-interface-guidelines/buttons)
 - [Apple Human Interface Guidelines — Accessibility](https://developer.apple.com/design/human-interface-guidelines/accessibility)
+- [Apple Human Interface Guidelines — Undo and redo](https://developer.apple.com/design/human-interface-guidelines/undo-and-redo)
+- [Apple Human Interface Guidelines — Alerts](https://developer.apple.com/design/human-interface-guidelines/alerts)
+- [Apple Support — Edit Home Screen widgets](https://support.apple.com/en-gb/guide/iphone/iphb8f1bf206/ios)
 - [Apple UI Design Dos and Don'ts — Hit Targets](https://developer.apple.com/design/tips/)
 - [SwiftUI Gestures documentation](https://developer.apple.com/documentation/swiftui/gestures)
 - [SwiftUI hit-testing and content-shape APIs](https://developer.apple.com/documentation/swiftui/view-input-and-events)
@@ -25,6 +32,11 @@ Relevant rules:
 - Custom controls need a visible pressed state.
 - When an interaction is an instantaneous action, prefer SwiftUI `Button` over a raw tap gesture so standard behavior and accessibility remain intact.
 - `contentShape` defines the interaction region; `allowsHitTesting` controls whether a view participates in hit testing.
+- Button copy should describe the action it performs. Do not hide dismissal behind
+  a Reset label/icon.
+- Show the result of reverting a batch of edits and make it easy to Undo. Apple
+  advises against confirmation alerts for common actions that are directly
+  reversible; an uncommon irreversible reset needs explicit confirmation.
 
 ## Current widget-editor bug
 
@@ -38,6 +50,37 @@ The current `OverviewMetricsGrid` creates several overlapping interaction proble
 - `.allowsHitTesting(true)` on the toolbar does not by itself make transparent space consume touches or resolve competing gestures beneath the controls.
 
 This is a gesture hierarchy/state-ordering bug plus an undersized target, not only a missing padding issue.
+
+## Widget Reset behavior
+
+Product semantics belong to OVW-001; this document owns only interaction and
+accessibility behavior.
+
+The current source already separates the commands: Reset calls
+`onResetLayout()` and stays in edit mode, while Done calls `finishEditing()`.
+Keep that separation. Based on the Apple guidance above, the product inference
+is:
+
+- `Reset layout` restores the canonical default widgets/order and leaves the
+  editor open so the result is visible.
+- Show localized `Default layout restored` feedback with an actionable `Undo`
+  that restores the exact visible pre-reset layout.
+- `Done` is the sole normal exit from edit mode. Never implement an implicit
+  Reset-and-close behind `arrow.counterclockwise`; a combined action would need
+  an explicit label and a new product decision.
+- Disable Reset when the normalized layout is already the default. It must not
+  emit a no-op save.
+- When Undo is available, avoid a confirmation interruption. Until Undo exists,
+  an irreversible reset needs an explicit Reset/Cancel confirmation and still
+  leaves the editor open after Reset.
+- Use `arrow.counterclockwise` for Reset and reserve undo imagery/copy for Undo.
+  The localized accessibility hint explains that Reset restores defaults and
+  keeps the editor open.
+
+OVW-001 owns snapshot, save ordering, rollback/retry, reload persistence, and
+Undo semantics. UX-001 owns the 48-point target, touch consumption, result
+announcement/action focus, and proof that Reset neither dismisses nor opens a
+tile underneath.
 
 ## Worth It interaction standard
 
@@ -75,6 +118,8 @@ This is a gesture hierarchy/state-ordering bug plus an undersized target, not on
 - Async actions expose loading/progress and prevent duplicate submission where duplication is harmful.
 - Destructive actions use semantic button roles and confirmation where appropriate; target size rules remain identical.
 - Haptics are optional reinforcement, never the only feedback.
+- Editor commands are single-purpose. Reset changes layout; Done exits. A label
+  or icon must not perform an additional hidden navigation/dismissal effect.
 
 ### Accessibility
 
@@ -145,8 +190,11 @@ Implementation requirements:
 4. While `isEditingLayout` is true, do not install the metric-opening interaction on tiles. Use a separate editing branch rather than a closure that checks mutable state after recognition.
 5. Keep drag/drop and Remove interactions active in edit mode.
 6. End edit mode only from the `Done` action; the completing touch must be consumed before the normal tile hierarchy is restored.
-7. Verify Reset cannot trigger a tile, including after it exits edit mode.
-8. Preserve current layout animation without animating the interaction layer into an ambiguous overlap.
+7. Keep Reset in edit mode. Its completing touch performs exactly one reset and
+   cannot trigger a tile, Done, drag, or Remove action underneath/adjacent to it.
+8. Announce the restored-default result and expose the localized Undo action
+   without moving VoiceOver focus into an underlying tile.
+9. Preserve current layout animation without animating the interaction layer into an ambiguous overlap.
 
 ## Repository-wide audit
 
@@ -182,7 +230,14 @@ Prioritize:
 - Assert edit mode closes.
 - Assert no metric detail opens and selected metric/navigation state stays unchanged.
 - Repeat using points near every edge of the 48 pt target but outside the visible 34 pt circle.
-- Repeat for Reset and widget Remove.
+- From a customized layout, tap Reset at the center and near every edge. Assert
+  defaults appear, edit mode stays active, exactly one reset fires, no metric
+  detail opens, and localized feedback/Undo is accessible.
+- Invoke Undo and assert the exact previous enabled set/order returns while edit
+  mode remains active. Reset at defaults is disabled/no-op.
+- Exercise Reset -> Done and rapid Reset -> Undo ordering; no touch reaches a
+  tile while the editor state changes.
+- Repeat edge/rapid/post-scroll checks for widget Remove.
 - Repeat with rapid taps and after scrolling the grid.
 
 ### Design System tests
@@ -209,6 +264,8 @@ Prioritize:
 - Worth It icon action components default to 48 x 48 pt targets.
 - No overlay action activates content underneath it.
 - No mode-changing action lets its finishing touch activate a newly enabled underlying action.
+- Widget Reset shows defaults and remains in edit mode; it never dismisses or
+  activates content underneath. Done remains the explicit editor exit.
 - Every icon action has localized accessibility copy and visible press feedback.
 - Widget `Done`, Reset, and Remove pass center, edge, rapid-tap, and scroll regression tests.
 - New action buttons use DS components or the shared interaction metrics.

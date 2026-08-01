@@ -1,6 +1,10 @@
 # Achievement Medal Redesign
 
-Status: planned
+Canonical tasks: ACH-100 through ACH-107
+
+The canonical status, dependencies, and execution order live in the
+[cross-repository roadmap](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md).
+This document expands the medal program and does not own backlog status.
 
 ## Product goal
 
@@ -19,7 +23,7 @@ The redesign must migrate the existing system instead of layering a second achie
 - `AchievementGlyph` silently falls back to `car-ring` for an unknown backend value. The new resolver must expose a diagnostic fallback so missing art is discoverable before release.
 - `WIAchievementProgressRing` provides progress and sweep motion, but continuous `TimelineView` animation can run in many map cells at once. The redesign must limit animation to visible/focused content and respect Reduce Motion.
 - `AchievementRecentUnlocks` exists but is not connected to the hub.
-- `listAchievementAwards()` exists in the repository but is not used by the current Achievements UI. Award records are needed for exact tier, earned date, and unseen-unlock handling.
+- `listAchievementAwards()` exists in the repository but is not used by the current Achievements UI. Award records are needed for exact tier and the immutable awarded date. ACH-005 reads recent history without consuming it; ACH-101 defines, and ACH-104 alone consumes, the unseen cursor/ack lifecycle.
 - Share icons already appear on map/detail surfaces, but currently have no share implementation.
 - Game Center IDs exist in the payload, but the app has no GameKit reporting flow or entitlement integration yet.
 - Achievements use handwritten models outside the generated OpenAPI contract, creating backend drift risk.

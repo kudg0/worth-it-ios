@@ -1,6 +1,11 @@
 # Iteration 3: OEM Vehicle Data Integration
 
-Status: **Deferred — post-legal entity**
+Canonical task: OEM-001
+
+The canonical status and entry dependencies live in the
+[cross-repository roadmap](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md).
+This document is a discovery appendix; provider and pricing facts must be
+revalidated before implementation.
 
 This work is intentionally outside the initial product iterations. Do not start a production OEM integration until the entry gates below are met.
 
