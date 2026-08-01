@@ -31,12 +31,6 @@ Please review yourself through this `AGENTS.md`.
   `pnpm roadmap:lint:test`. A failing check blocks handoff and commit.
 - Do not copy task status or create a second backlog in this file or elsewhere.
 
-Default communication mode for every new chat:
-
-- Enable `caveman:caveman` automatically from chat start.
-- Use Russian mode by default: `ru-full`.
-- Keep this mode active for whole chat unless user says `normal mode`, `stop caveman`, or `обычный режим`.
-
 ## Design Source
 
 - Main Stitch project: https://stitch.withgoogle.com/projects/7705134958589101922?pli=1
