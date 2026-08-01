@@ -69,11 +69,16 @@ extension ScenarioOverviewView {
         case .overview:
             ScenarioOverviewScreen(
                 metrics: availableMetrics,
+                hiddenMetrics: hiddenMetrics,
                 selectedMetric: selectedMetricBinding,
                 selectedMetricId: currentSelectedMetricId,
                 showsEfficiencyCard: hasEfficiencyChartData,
                 efficiencyModel: overviewEfficiencyModel,
                 onOpenMetric: openMetricDetail,
+                onMoveMetric: moveOverviewMetric,
+                onHideMetric: hideOverviewMetric,
+                onShowMetric: showOverviewMetric,
+                onResetMetricsLayout: resetOverviewMetricsLayout,
                 onAddExpense: openAddEntryChooserFromOverview,
                 onOpenUsage: { navigateScenarioTab(.mileage) },
                 onOpenCompare: { navigateScenarioTab(.compare) }
@@ -133,6 +138,7 @@ extension ScenarioOverviewView {
                 pricingModel: $comparablePricingModel,
                 pricePerKm: $comparablePricePerKm,
                 pricePerMinute: $comparablePricePerMinute,
+                baseFare: $comparableBaseFare,
                 averageSpeedKmh: $comparableAverageSpeedKmh,
                 curvePoints: $comparableCurvePoints,
                 pricePerMonth: $comparablePricePerMonth,

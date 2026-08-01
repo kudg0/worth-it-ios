@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct RecentExpenseItem: Identifiable {
+struct ExpenseListItem: Identifiable {
     let id: String
     let title: String
     let subtitle: String
@@ -12,7 +12,7 @@ struct RecentExpenseItem: Identifiable {
 }
 
 struct RecentExpensesList: View {
-    let items: [RecentExpenseItem]
+    let items: [ExpenseListItem]
     let onOpenHistory: () -> Void
 
     var body: some View {

@@ -23,6 +23,15 @@ struct AchievementMapScreen: View {
         )
     }
 
+    private var isSelectedLevelAchieved: Bool {
+        selectedLevelSummary.isUnlocked && selectedLevelSummary.total > 0 && selectedLevelSummary.earned >= selectedLevelSummary.total
+    }
+
+    private var summaryRingState: WIAchievementRingState {
+        if !selectedLevelSummary.isUnlocked { return .locked }
+        return isSelectedLevelAchieved ? .earned : .inProgress
+    }
+
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -61,7 +70,7 @@ struct AchievementMapScreen: View {
             .buttonStyle(.plain)
 
             VStack(spacing: WorthItSpacing.xs) {
-                Text(i18n.t("Achievement Map"))
+                Text(i18n.t(.achievements.map.title))
                     .font(.system(size: 14, weight: .bold))
                     .tracking(0.7)
                     .textCase(.uppercase)
@@ -84,42 +93,31 @@ struct AchievementMapScreen: View {
         HStack(spacing: WorthItSpacing.m) {
             WIAchievementProgressRing(
                 progress: selectedLevelSummary.isUnlocked ? selectedLevelSummary.progress : 0,
+                state: summaryRingState,
                 lineWidth: 4,
-                trackColor: selectedLevelSummary.isUnlocked ? WorthItColor.primaryContainer : WorthItColor.textTertiary.opacity(0.56),
-                progressColor: selectedLevelSummary.isUnlocked ? WorthItColor.accentGoldBright : WorthItColor.textTertiary.opacity(0.56),
-                showsPulse: false,
+                trackColor: selectedLevelSummary.isUnlocked ? WorthItColor.primaryContainer.opacity(0.58) : WorthItColor.textTertiary.opacity(0.56),
+                progressColor: isSelectedLevelAchieved ? WorthItColor.accentGoldBright : WorthItColor.primaryContainer,
+                showsPulse: selectedLevelSummary.isUnlocked && !isSelectedLevelAchieved,
+                pulseSpeed: 1.65,
+                sweepLineScale: 0.30,
                 initialFillDelay: .zero
             ) {
-                HStack(alignment: .lastTextBaseline, spacing: 0) {
-                    Text("\(selectedLevelSummary.earned)")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(WorthItColor.accentGold)
-                    Text("/\(selectedLevelSummary.total)")
-                        .font(.system(size: 9, weight: .medium))
-                        .foregroundStyle(WorthItColor.textSecondary)
-                }
-                .monospacedDigit()
+                summaryRingContent
             }
             .frame(width: 48, height: 48)
 
             VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
-                Text(i18n.t("Total Progress"))
+                Text(i18n.t(.achievements.map.totalProgress))
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(WorthItColor.textPrimary)
-                Text(i18n.t("Mastery Level \(selectedLevel)"))
+                    .foregroundStyle(selectedLevelSummary.isUnlocked ? WorthItColor.textPrimary : WorthItColor.textSecondary)
+                Text(summarySubtitle)
                     .font(.system(size: 10, weight: .medium))
                     .tracking(0.5)
                     .textCase(.uppercase)
-                    .foregroundStyle(WorthItColor.primaryContainer)
+                    .foregroundStyle(selectedLevelSummary.isUnlocked ? WorthItColor.primaryContainer : WorthItColor.textTertiary)
             }
 
             Spacer()
-
-            Image(systemName: "info.circle")
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(WorthItColor.textTertiary)
-                .frame(width: 32, height: 32)
-                .background(WorthItColor.surfaceLowest, in: Circle())
         }
         .padding(WorthItSpacing.l)
         .background(WorthItColor.surfaceContainerLow, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
@@ -129,16 +127,41 @@ struct AchievementMapScreen: View {
         }
     }
 
+    @ViewBuilder
+    private var summaryRingContent: some View {
+        if selectedLevelSummary.isUnlocked {
+            HStack(alignment: .lastTextBaseline, spacing: 0) {
+                Text("\(selectedLevelSummary.earned)")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(isSelectedLevelAchieved ? WorthItColor.accentGold : WorthItColor.primaryContainer)
+                Text("/\(selectedLevelSummary.total)")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(WorthItColor.textSecondary)
+            }
+            .monospacedDigit()
+        } else {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(WorthItColor.textTertiary)
+        }
+    }
+
+    private var summarySubtitle: String {
+        selectedLevelSummary.isUnlocked
+            ? i18n.t(.achievements.map.masteryLevelFormat, selectedLevel)
+            : i18n.t(.achievements.levelRing.status.locked)
+    }
+
     private var levelTabs: some View {
         WISegmentedControl(
-            items: levels.map { (title: i18n.t("Level \($0.id)"), value: $0.id) },
+            items: levels.map { (title: i18n.t(.achievements.common.level.titleFormat, $0.id), value: $0.id) },
             selection: $selectedLevel,
             layout: .scroll
         )
     }
 
     private var lanes: some View {
-        VStack(spacing: WorthItSpacing.xxxxl) {
+        VStack(spacing: WorthItSpacing.xl) {
             ForEach(categorySummaries) { summary in
                 AchievementMapLane(
                     summary: summary,

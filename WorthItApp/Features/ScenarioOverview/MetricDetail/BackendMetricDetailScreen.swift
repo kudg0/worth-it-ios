@@ -72,6 +72,7 @@ enum BackendMetricDetailSections {
 
     struct SectionIsland: View {
         let section: ScenarioAnalyticsMetricPayload.Detail.Section
+        var expenseItems: [ExpenseListItem]? = nil
 
         var body: some View {
             WIIsland(title: section.title, systemIcon: "list.bullet.rectangle") {
@@ -102,32 +103,46 @@ enum BackendMetricDetailSections {
                     }
                 }
 
-                ForEach(section.items) { item in
-                    VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text(item.title.capitalized)
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundStyle(WorthItColor.textPrimary)
-                            Spacer(minLength: WorthItSpacing.l)
-                            if let value = item.value {
-                                Text(value)
-                                    .font(.system(size: 14, weight: .bold))
+                if let expenseItems {
+                    ForEach(expenseItems) { item in
+                        WIInfoListRow(
+                            title: item.title,
+                            subtitle: item.subtitle,
+                            value: item.value,
+                            detail: item.detail,
+                            systemIcon: item.systemIcon,
+                            accentColor: item.accentColor,
+                            action: item.action
+                        )
+                    }
+                } else {
+                    ForEach(section.items) { item in
+                        VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
+                            HStack(alignment: .firstTextBaseline) {
+                                Text(item.title.capitalized)
+                                    .font(.system(size: 14, weight: .semibold))
                                     .foregroundStyle(WorthItColor.textPrimary)
+                                Spacer(minLength: WorthItSpacing.l)
+                                if let value = item.value {
+                                    Text(value)
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundStyle(WorthItColor.textPrimary)
+                                }
                             }
-                        }
 
-                        if let subtitle = item.subtitle {
-                            Text(subtitle)
-                                .font(WorthItTypography.caption)
-                                .foregroundStyle(WorthItColor.textTertiary)
-                                .lineLimit(2)
-                        }
+                            if let subtitle = item.subtitle {
+                                Text(subtitle)
+                                    .font(WorthItTypography.caption)
+                                    .foregroundStyle(WorthItColor.textTertiary)
+                                    .lineLimit(2)
+                            }
 
-                        if let status = item.status {
-                            Text(status)
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundStyle(WorthItColor.textSecondary)
-                                .lineLimit(2)
+                            if let status = item.status {
+                                Text(status)
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .foregroundStyle(WorthItColor.textSecondary)
+                                    .lineLimit(2)
+                            }
                         }
                     }
                 }
@@ -180,6 +195,7 @@ struct BackendMetricDetailErrorView: View {
 
 struct BackendMetricBreakdownView: View {
     let payload: ScenarioAnalyticsMetricPayload
+    var primarySectionExpenseItems: [ExpenseListItem]? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.xxxxl) {
@@ -187,8 +203,11 @@ struct BackendMetricBreakdownView: View {
                 BackendMetricDetailSections.SummaryIsland(summaries: summaries)
             }
 
-            ForEach(payload.detail?.sections ?? []) { section in
-                BackendMetricDetailSections.SectionIsland(section: section)
+            ForEach(Array((payload.detail?.sections ?? []).enumerated()), id: \.element.id) { index, section in
+                BackendMetricDetailSections.SectionIsland(
+                    section: section,
+                    expenseItems: index == 0 ? primarySectionExpenseItems : nil
+                )
             }
         }
     }

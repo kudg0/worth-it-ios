@@ -18,6 +18,7 @@ struct ScenarioListItem: Decodable, Identifiable, Hashable {
     let loanAnnualInterestRate: String?
     let isFavorite: Bool
     let analyticsEnabledMetricIds: [String]?
+    let analyticsMetricOrderIds: [String]?
     let analyticsDefaultMetricId: String
     let analyticsCostPerKmBasis: String
     let analyticsIncludesResidualValue: Bool
@@ -47,6 +48,7 @@ extension ScenarioListItem {
             loanAnnualInterestRate: loanAnnualInterestRate,
             isFavorite: isFavorite,
             analyticsEnabledMetricIds: settings.analytics.enabledMetricIds,
+            analyticsMetricOrderIds: settings.analytics.metricOrderIds,
             analyticsDefaultMetricId: settings.analytics.defaultMetricId,
             analyticsCostPerKmBasis: settings.analytics.costPerKmBasis,
             analyticsIncludesResidualValue: settings.analytics.includesResidualValue,
@@ -129,6 +131,7 @@ struct ScenarioSettings: Decodable, Equatable {
 
 struct ScenarioAnalyticsSettings: Codable, Equatable {
     let enabledMetricIds: [String]
+    let metricOrderIds: [String]
     let defaultMetricId: String
     let costPerKmBasis: String
     let includesResidualValue: Bool
@@ -157,6 +160,7 @@ struct ScenarioSettingsPatch: Encodable {
 
 struct ScenarioAnalyticsSettingsPatch: Encodable {
     let enabledMetricIds: [String]?
+    let metricOrderIds: [String]?
     let defaultMetricId: String?
     let costPerKmBasis: String?
     let includesResidualValue: Bool?
@@ -165,6 +169,7 @@ struct ScenarioAnalyticsSettingsPatch: Encodable {
 
     init(
         enabledMetricIds: [String]? = nil,
+        metricOrderIds: [String]? = nil,
         defaultMetricId: String? = nil,
         costPerKmBasis: String? = nil,
         includesResidualValue: Bool? = nil,
@@ -172,6 +177,7 @@ struct ScenarioAnalyticsSettingsPatch: Encodable {
         savingsAlternativeId: UUID? = nil
     ) {
         self.enabledMetricIds = enabledMetricIds
+        self.metricOrderIds = metricOrderIds
         self.defaultMetricId = defaultMetricId
         self.costPerKmBasis = costPerKmBasis
         self.includesResidualValue = includesResidualValue
@@ -357,6 +363,17 @@ enum AlternativeCategory: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    var defaultBaseFare: String {
+        switch self {
+        case .carSharing:
+            "1.00"
+        case .bicycle, .electricScooter:
+            "1.00"
+        default:
+            ""
+        }
+    }
+
     var defaultPricePerMonth: String {
         switch self {
         case .rentalCar:
@@ -427,6 +444,7 @@ struct AlternativeParams: Codable, Hashable {
     let pricePoints: [AlternativePricePoint]?
     let pricePerMonth: Double?
     let pricePerMinute: Double?
+    let baseFare: Double?
     let averageSpeedKmh: Double?
     let fixedPerMonth: Double?
     let kind: String?
@@ -438,6 +456,7 @@ struct AlternativeParams: Codable, Hashable {
         pricePoints: [AlternativePricePoint]? = nil,
         pricePerMonth: Double? = nil,
         pricePerMinute: Double? = nil,
+        baseFare: Double? = nil,
         averageSpeedKmh: Double? = nil,
         fixedPerMonth: Double? = nil,
         kind: String? = nil,
@@ -448,6 +467,7 @@ struct AlternativeParams: Codable, Hashable {
         self.pricePoints = pricePoints
         self.pricePerMonth = pricePerMonth
         self.pricePerMinute = pricePerMinute
+        self.baseFare = baseFare
         self.averageSpeedKmh = averageSpeedKmh
         self.fixedPerMonth = fixedPerMonth
         self.kind = kind
@@ -461,6 +481,7 @@ struct AlternativeParams: Codable, Hashable {
         try container.encodeIfPresent(pricePoints, forKey: .pricePoints)
         try container.encodeIfPresent(pricePerMonth, forKey: .pricePerMonth)
         try container.encodeIfPresent(pricePerMinute, forKey: .pricePerMinute)
+        try container.encodeIfPresent(baseFare, forKey: .baseFare)
         try container.encodeIfPresent(averageSpeedKmh, forKey: .averageSpeedKmh)
         try container.encodeIfPresent(fixedPerMonth, forKey: .fixedPerMonth)
         try container.encodeIfPresent(kind, forKey: .kind)
@@ -654,6 +675,7 @@ enum ScenarioAnalyticsMetricId: String, Decodable, Hashable, CaseIterable {
 struct ScenarioAnalyticsOverview: Decodable, Hashable {
     let scenarioId: UUID
     let enabledMetricIds: [ScenarioAnalyticsMetricId]
+    let metricOrderIds: [ScenarioAnalyticsMetricId]
     let defaultMetricId: ScenarioAnalyticsMetricId
     let generatedAt: Date
     let asOfDate: Date

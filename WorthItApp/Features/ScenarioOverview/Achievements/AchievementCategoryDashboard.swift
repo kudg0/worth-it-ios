@@ -56,7 +56,7 @@ private struct AchievementCategoryDashboardCard: View {
 
                         Spacer()
 
-                        Text(i18n.t("\(summary.earned) of \(summary.total) earned"))
+                        Text(i18n.t(.achievements.categoryDashboard.earnedCountFormat, summary.earned, summary.total))
                             .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(WorthItColor.textTertiary)
                     }
@@ -68,18 +68,9 @@ private struct AchievementCategoryDashboardCard: View {
             }
             .buttonStyle(.plain)
 
-            if let lead = items.first {
-                AchievementCategoryLeadRow(
-                    achievement: lead,
-                    selectedLevel: selectedLevel,
-                    isLevelUnlocked: isLevelUnlocked,
-                    onOpenAchievement: onOpenAchievement
-                )
-            }
-
             VStack(spacing: WorthItSpacing.s) {
-                ForEach(items.dropFirst()) { item in
-                    AchievementCategorySubRow(
+                ForEach(items) { item in
+                    AchievementCategoryAchievementCard(
                         achievement: item,
                         selectedLevel: selectedLevel,
                         isLevelUnlocked: isLevelUnlocked,
@@ -87,7 +78,23 @@ private struct AchievementCategoryDashboardCard: View {
                     )
                 }
             }
-            .padding(.leading, WorthItSpacing.l)
+
+            Button {
+                onOpenCategory(summary.id)
+            } label: {
+                HStack(spacing: WorthItSpacing.s) {
+                    Text(i18n.t(.achievements.common.actions.viewAll))
+                        .font(.system(size: 14, weight: .semibold))
+
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 13, weight: .bold))
+                }
+                .foregroundStyle(WorthItColor.primaryContainer)
+                .frame(maxWidth: .infinity)
+                .frame(height: 44)
+                .background(WorthItColor.surfaceMetric, in: RoundedRectangle(cornerRadius: WorthItRadius.m))
+            }
+            .buttonStyle(.plain)
         }
         .padding(WorthItSpacing.xl)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -101,66 +108,7 @@ private extension AchievementCategorySummary {
     }
 }
 
-private struct AchievementCategoryLeadRow: View {
-    @Environment(\.i18n) private var i18n
-
-    let achievement: AchievementProgress
-    let selectedLevel: Int
-    let isLevelUnlocked: Bool
-    let onOpenAchievement: (AchievementProgress) -> Void
-
-    private var isEarnedOnCurrentLevel: Bool {
-        isLevelUnlocked && achievement.isTierEarned(in: selectedLevel)
-    }
-
-    var body: some View {
-        Button {
-            onOpenAchievement(achievement)
-        } label: {
-            HStack(spacing: WorthItSpacing.m) {
-                AchievementBadgeImage(medalGlyph: achievement.medalGlyph, state: badgeState, size: 44)
-
-                VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
-                    Text(achievement.title)
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(WorthItColor.textPrimary)
-
-                    Text(statusText)
-                        .font(.system(size: 12, weight: .regular))
-                        .foregroundStyle(WorthItColor.textSecondary)
-                }
-
-                Spacer()
-
-                Image(systemName: trailingIcon)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(isEarnedOnCurrentLevel ? WorthItColor.accentGold : WorthItColor.textTertiary)
-            }
-            .padding(.horizontal, WorthItSpacing.l)
-            .frame(height: 70)
-            .background(WorthItColor.surfaceMetric, in: RoundedRectangle(cornerRadius: WorthItRadius.m))
-            .opacity(isLevelUnlocked ? 1 : 0.62)
-        }
-        .buttonStyle(.plain)
-    }
-
-    private var statusText: String {
-        if !isLevelUnlocked { return i18n.t("Locked") }
-        return isEarnedOnCurrentLevel ? i18n.t("Earned") : i18n.t("\(Int(achievement.tierProgress(in: selectedLevel) * 100))% complete")
-    }
-
-    private var badgeState: AchievementBadgeState {
-        if !isLevelUnlocked { return .locked }
-        return isEarnedOnCurrentLevel ? .earned : .inProgress
-    }
-
-    private var trailingIcon: String {
-        if !isLevelUnlocked { return "lock.fill" }
-        return isEarnedOnCurrentLevel ? "checkmark.seal.fill" : "chevron.right"
-    }
-}
-
-private struct AchievementCategorySubRow: View {
+private struct AchievementCategoryAchievementCard: View {
     @Environment(\.i18n) private var i18n
 
     let achievement: AchievementProgress
@@ -177,37 +125,49 @@ private struct AchievementCategorySubRow: View {
             onOpenAchievement(achievement)
         } label: {
             HStack(spacing: WorthItSpacing.s) {
-                Image(systemName: rowIcon)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(isEarnedOnCurrentLevel ? WorthItColor.accentGold : WorthItColor.textTertiary)
-                    .frame(width: 16)
+                AchievementBadgeImage(medalGlyph: achievement.medalGlyph, state: badgeState, size: 36)
 
-                Text(achievement.title)
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(WorthItColor.textSecondary)
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: WorthItSpacing.xs) {
+                    Text(achievement.title)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(WorthItColor.textPrimary)
+
+                    Text(statusText)
+                        .font(.system(size: 11, weight: .regular))
+                        .foregroundStyle(WorthItColor.textSecondary)
+                }
 
                 Spacer()
 
-                Text(statusText)
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(WorthItColor.textTertiary)
-                    .monospacedDigit()
+                Image(systemName: trailingIcon)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(isEarnedOnCurrentLevel ? WorthItColor.accentGold : WorthItColor.textTertiary)
             }
-            .frame(height: 32)
-            .contentShape(Rectangle())
+            .padding(.horizontal, WorthItSpacing.m)
+            .frame(height: 56)
+            .background(WorthItColor.surfaceMetric, in: RoundedRectangle(cornerRadius: WorthItRadius.m))
             .opacity(isLevelUnlocked ? 1 : 0.62)
         }
         .buttonStyle(.plain)
     }
 
-    private var rowIcon: String {
-        if !isLevelUnlocked { return "lock.fill" }
-        return isEarnedOnCurrentLevel ? "checkmark" : "lock"
+    private var statusText: String {
+        if !isLevelUnlocked { return i18n.t(.achievements.common.status.locked) }
+        return isEarnedOnCurrentLevel
+            ? i18n.t(.achievements.common.status.earned)
+            : i18n.t(
+                .achievements.common.status.percentCompleteFormat,
+                AchievementPercentFormatter.percentText(achievement.tierProgress(in: selectedLevel))
+            )
     }
 
-    private var statusText: String {
-        if !isLevelUnlocked { return i18n.t("Locked") }
-        return isEarnedOnCurrentLevel ? i18n.t("Earned") : "\(Int(achievement.tierProgress(in: selectedLevel) * 100))%"
+    private var badgeState: AchievementBadgeState {
+        if !isLevelUnlocked { return .locked }
+        return isEarnedOnCurrentLevel ? .earned : .inProgress
+    }
+
+    private var trailingIcon: String {
+        if !isLevelUnlocked { return "lock.fill" }
+        return isEarnedOnCurrentLevel ? "checkmark.seal.fill" : "chevron.right"
     }
 }

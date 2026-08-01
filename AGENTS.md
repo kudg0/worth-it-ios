@@ -30,5 +30,11 @@ Default communication mode for every new chat:
 
 - All new user-facing app text must go through `WorthItApp/Resources/Localizable.xcstrings`.
 - Prefer typed keys from `I18nKey.generated.swift` via `i18n.t(...)` or `@Environment(\.i18n)`.
+- Translation keys must be semantic dot-delimited identifiers, not English UI copy. Use keys like
+  `achievements.levelRing.status.locked` or `scenarioOverview.actions.logMileage`; do not call
+  `i18n.t("LOCKED")`, `i18n.t("Save")`, or interpolate Swift values inside key strings.
+- Dynamic localized copy must use catalog format values with typed keys, for example
+  `i18n.t(.achievements.common.level.titleFormat, level)`, while backend/user data stays plain data
+  and must not become a translation key.
 - After adding semantic localization keys, run `python3 Scripts/generate_i18n_keys.py`.
 - Do not add new hardcoded English strings in SwiftUI views, API error mappers, alerts, buttons, placeholders, or validation messages.

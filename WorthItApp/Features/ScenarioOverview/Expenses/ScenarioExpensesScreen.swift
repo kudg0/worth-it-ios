@@ -5,7 +5,7 @@ struct ScenarioExpensesScreen: View {
         let costEventsError: String?
         let isEmpty: Bool
         let hero: ExpenseHero.Model
-        let currentMonthItems: [RecentExpenseItem]
+        let currentMonthItems: [ExpenseListItem]
         let maintenance: MaintenanceSection.Model
         let onOpenHistory: () -> Void
         let onRetry: () -> Void

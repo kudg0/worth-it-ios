@@ -18,12 +18,18 @@ struct WISegmentedControl<Selection: Hashable>: View {
                 .frame(height: 44)
                 .background(WorthItColor.pageBackground, in: Capsule())
         case .scroll:
-            ScrollView(.horizontal, showsIndicators: false) {
-                segments
-                    .padding(5)
-                    .background(WorthItColor.pageBackground, in: Capsule())
-            }
+            scrollSegments
         }
+    }
+
+    private var scrollSegments: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            segments
+                .padding(5)
+                .background(WorthItColor.pageBackground, in: Capsule())
+        }
+        .frame(height: 44)
+        .mask(scrollFadeMask)
     }
 
     private var segments: some View {
@@ -51,5 +57,15 @@ struct WISegmentedControl<Selection: Hashable>: View {
 
     private func segmentBackground(for value: Selection) -> Color {
         selection == value ? WorthItColor.primaryContainer : WorthItColor.surfaceContainer
+    }
+
+    private var scrollFadeMask: some View {
+        HStack(spacing: 0) {
+            LinearGradient(colors: [.clear, .black], startPoint: .leading, endPoint: .trailing)
+                .frame(width: 18)
+            Rectangle().fill(.black)
+            LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
+                .frame(width: 18)
+        }
     }
 }

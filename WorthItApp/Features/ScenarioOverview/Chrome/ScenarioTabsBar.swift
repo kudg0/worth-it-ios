@@ -4,29 +4,33 @@ struct ScenarioTabsBar: View {
     let selectedTab: ScenarioOverviewView.ScenarioTab
     let onSelect: (ScenarioOverviewView.ScenarioTab) -> Void
 
-    var body: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal) {
-                HStack(spacing: 10) {
-                    chip("Overview", tab: .overview)
-                    chip("Maintenance", tab: .expenses)
-                    chip("Mileage", tab: .mileage)
-                    chip("Insights", tab: .insights)
-                    chip("Compare", tab: .compare)
-                    chip("Achievements", tab: .achievements)
-                }
-                .padding(.horizontal, WorthItSpacing.xxl)
-                .padding(.vertical, WorthItSpacing.l)
-            }
-            .scrollIndicators(.hidden)
-            .background(WorthItColor.pageBackground.opacity(0.46))
-            .onChange(of: selectedTab) { _, tab in
-                guard tab != .settings else { return }
+    @State private var visibleTab: ScenarioOverviewView.ScenarioTab?
 
-                withAnimation(.easeInOut(duration: 0.20)) {
-                    proxy.scrollTo(tab, anchor: .center)
-                }
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 10) {
+                chip("Overview", tab: .overview)
+                chip("Maintenance", tab: .expenses)
+                chip("Mileage", tab: .mileage)
+                chip("Insights", tab: .insights)
+                chip("Compare", tab: .compare)
+                chip("Achievements", tab: .achievements)
             }
+            .scrollTargetLayout()
+            .padding(.horizontal, WorthItSpacing.xxl)
+            .padding(.vertical, WorthItSpacing.l)
+        }
+        .scrollIndicators(.hidden)
+        .scrollPosition(id: $visibleTab, anchor: .center)
+        .background(WorthItColor.pageBackground.opacity(0.46))
+        .task(id: selectedTab) {
+            syncVisibleTab(animated: false)
+            try? await Task.sleep(for: .milliseconds(120))
+            guard !Task.isCancelled else { return }
+            syncVisibleTab(animated: true)
+        }
+        .onChange(of: selectedTab) { _, _ in
+            syncVisibleTab(animated: true)
         }
     }
 
@@ -48,5 +52,16 @@ struct ScenarioTabsBar: View {
         }
         .buttonStyle(.plain)
         .id(tab)
+    }
+
+    private func syncVisibleTab(animated: Bool) {
+        guard selectedTab != .settings else { return }
+        if animated {
+            withAnimation(.easeInOut(duration: 0.20)) {
+                visibleTab = selectedTab
+            }
+        } else {
+            visibleTab = selectedTab
+        }
     }
 }

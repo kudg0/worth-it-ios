@@ -10,7 +10,7 @@ struct AchievementRecentUnlocks: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: WorthItSpacing.m) {
-            Text(i18n.t("Recent Unlocks"))
+            Text(i18n.t(.achievements.recent.title))
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(WorthItColor.textPrimary)
                 .padding(.horizontal, WorthItSpacing.xs)
@@ -37,7 +37,7 @@ struct AchievementRecentUnlocks: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(WorthItColor.textTertiary)
 
-            Text(i18n.t("No earned milestones yet. Keep logging ownership data."))
+            Text(i18n.t(.achievements.recent.empty))
                 .font(.system(size: 12, weight: .regular))
                 .foregroundStyle(WorthItColor.textSecondary)
         }

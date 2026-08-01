@@ -53,24 +53,24 @@ private struct AchievementHeroRingPage: View {
         level.isUnlocked && level.total > 0 && level.earned >= level.total
     }
 
-    private var ringTrackColor: Color {
-        level.isUnlocked ? WorthItColor.primaryContainer : WorthItColor.textTertiary.opacity(0.62)
-    }
-
-    private var ringProgressColor: Color {
-        level.isUnlocked ? WorthItColor.accentGoldBright : WorthItColor.textTertiary.opacity(0.62)
+    private var ringState: WIAchievementRingState {
+        if !level.isUnlocked { return .locked }
+        return isAchieved ? .earned : .inProgress
     }
 
     var body: some View {
         WIAchievementProgressRing(
             progress: progress,
+            state: ringState,
             lineWidth: 14,
-            trackColor: ringTrackColor,
-            progressColor: ringProgressColor,
-            showsPulse: level.isUnlocked
+            trackColor: level.isUnlocked ? WorthItColor.primaryContainer.opacity(0.58) : WorthItColor.textTertiary.opacity(0.62),
+            progressColor: isAchieved ? WorthItColor.accentGoldBright : WorthItColor.primaryContainer,
+            showsPulse: level.isUnlocked && !isAchieved,
+            pulseSpeed: 1.55,
+            sweepLineScale: 0.30
         ) {
             VStack(spacing: WorthItSpacing.s) {
-                Text(i18n.t("LEVEL \(level.id)"))
+                Text(i18n.t(.achievements.levelRing.labelFormat, level.id))
                     .font(.system(size: 11, weight: .semibold))
                     .tracking(1)
                     .foregroundStyle(level.isUnlocked ? WorthItColor.primaryContainer : WorthItColor.textTertiary)
@@ -79,7 +79,7 @@ private struct AchievementHeroRingPage: View {
                     HStack(alignment: .lastTextBaseline, spacing: 0) {
                         Text("\(level.earned)")
                             .font(.system(size: 48, weight: .light))
-                            .foregroundStyle(WorthItColor.accentGold)
+                            .foregroundStyle(isAchieved ? WorthItColor.accentGold : WorthItColor.primaryContainer)
                             .monospacedDigit()
 
                         Text("/\(max(level.total, 0))")
@@ -109,18 +109,18 @@ private struct AchievementHeroRingPage: View {
 
     private var accessibilityLabel: String {
         if isAchieved {
-            return i18n.t("Level \(level.id) achieved, \(level.earned) of \(level.total) required achievements earned")
+            return i18n.t(.achievements.levelRing.accessibility.achievedFormat, level.id, level.earned, level.total)
         }
 
         if level.isUnlocked {
-            return i18n.t("Level \(level.id), \(level.earned) of \(level.total) required achievements earned")
+            return i18n.t(.achievements.levelRing.accessibility.progressFormat, level.id, level.earned, level.total)
         }
 
-        return i18n.t("Level \(level.id) locked")
+        return i18n.t(.achievements.levelRing.accessibility.lockedFormat, level.id)
     }
 
     private var statusText: String {
-        if !level.isUnlocked { return i18n.t("LOCKED") }
-        return isAchieved ? i18n.t("ACHIEVED") : i18n.t("REQUIRED")
+        if !level.isUnlocked { return i18n.t(.achievements.levelRing.status.locked) }
+        return isAchieved ? i18n.t(.achievements.levelRing.status.achieved) : i18n.t(.achievements.levelRing.status.inProgress)
     }
 }

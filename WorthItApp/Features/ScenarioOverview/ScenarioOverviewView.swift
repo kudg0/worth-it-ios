@@ -39,7 +39,8 @@ struct ScenarioOverviewView: View {
     let onExitScenario: () -> Void
 
     @AppStorage("scenarioOverview.selectedMetric") var selectedMetricId = OverviewMetric.costPerKm.rawValue
-    @AppStorage("scenarioOverview.enabledMetrics") var enabledMetricIds = ""
+    @State var enabledMetricIds = ""
+    @State var metricOrderIds = ""
     @AppStorage("scenarioOverview.costPerKmIncludesFinancing") var costPerKmIncludesFinancing = false
     @AppStorage("scenarioOverview.includesVehicleResidualValue") var includesVehicleResidualValue = true
     @AppStorage("scenarioOverview.costPerKmBasis") var costPerKmBasisRawValue = ScenarioAnalyticsCostPerKmBasis.sincePurchase.rawValue
@@ -162,6 +163,7 @@ struct ScenarioOverviewView: View {
     @State var analyticsError: String?
     @State var metricDetailError: String?
     @State var isLoadingMetricDetail = false
+    @State var metricLayoutSaveTask: Task<Void, Never>?
     @State var costEventsError: String?
     @State var usageEventsError: String?
     @State var alternativesError: String?
@@ -181,6 +183,7 @@ struct ScenarioOverviewView: View {
     @State var comparablePricingModel: AlternativePricingMode = .distanceCurve
     @State var comparablePricePerKm = ""
     @State var comparablePricePerMinute = ""
+    @State var comparableBaseFare = ""
     @State var comparableAverageSpeedKmh = ""
     @State var comparableCurvePoints = Self.emptyComparableCurvePoints()
     @State var comparablePricePerMonth = ""

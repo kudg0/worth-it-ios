@@ -132,22 +132,33 @@ extension ScenarioOverviewView {
         case .mixed:
             guard let pricePerKm = comparableDouble(comparablePricePerKm) else { return nil }
             guard let pricePerMinute = comparableDouble(comparablePricePerMinute) else { return nil }
-            guard let averageSpeedKmh = comparableDouble(comparableAverageSpeedKmh) else { return nil }
             return AlternativeParams(
                 pricePerKm: pricePerKm,
                 pricePerMinute: pricePerMinute,
-                averageSpeedKmh: averageSpeedKmh,
+                baseFare: comparableOptionalDouble(comparableBaseFare),
+                averageSpeedKmh: customComparableAverageSpeed,
                 includedCostCategories: inheritedCostCategories
             )
         case .perTime:
             guard let pricePerMinute = comparableDouble(comparablePricePerMinute) else { return nil }
-            guard let averageSpeedKmh = comparableDouble(comparableAverageSpeedKmh) else { return nil }
             return AlternativeParams(
                 pricePerMinute: pricePerMinute,
-                averageSpeedKmh: averageSpeedKmh,
+                baseFare: comparableOptionalDouble(comparableBaseFare),
+                averageSpeedKmh: customComparableAverageSpeed,
                 includedCostCategories: inheritedCostCategories
             )
         }
+    }
+
+    private var customComparableAverageSpeed: Double? {
+        guard comparableCategory == .custom else { return nil }
+        return comparableDouble(comparableAverageSpeedKmh)
+    }
+
+    private func comparableOptionalDouble(_ value: String) -> Double? {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        return comparableDouble(trimmed)
     }
 
     private var inheritedCostCategories: [String]? {

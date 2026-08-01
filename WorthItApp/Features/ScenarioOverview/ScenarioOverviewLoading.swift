@@ -27,6 +27,7 @@ extension ScenarioOverviewView {
             analyticsOverview = try await analyticsTask
             if let analyticsOverview {
                 enabledMetricIds = analyticsOverview.enabledMetricIds.map(\.rawValue).joined(separator: ",")
+                metricOrderIds = analyticsOverview.metricOrderIds.map(\.rawValue).joined(separator: ",")
                 selectedMetricId = analyticsOverview.defaultMetricId.rawValue
             }
         } catch {

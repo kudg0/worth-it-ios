@@ -291,6 +291,7 @@ extension ScenarioOverviewView {
         comparablePricingModel = editablePricingMode(for: alternative)
         comparablePricePerKm = alternative.paramsJson.pricePerKm.map(formatEditableNumber) ?? ""
         comparablePricePerMinute = alternative.paramsJson.pricePerMinute.map(formatEditableNumber) ?? ""
+        comparableBaseFare = alternative.paramsJson.baseFare.map(formatEditableNumber) ?? ""
         comparableAverageSpeedKmh = alternative.paramsJson.averageSpeedKmh.map(formatEditableNumber) ?? defaultAverageSpeedKmh(for: alternative.category)
         comparableCurvePoints = curvePoints(for: alternative)
         comparablePricePerMonth = alternative.paramsJson.pricePerMonth.map(formatEditableNumber) ?? ""
@@ -323,6 +324,7 @@ extension ScenarioOverviewView {
         comparablePricingModel = .distanceCurve
         comparablePricePerKm = ""
         comparablePricePerMinute = ""
+        comparableBaseFare = ""
         comparableAverageSpeedKmh = ""
         comparableCurvePoints = Self.emptyComparableCurvePoints()
         comparablePricePerMonth = ""
@@ -338,6 +340,7 @@ extension ScenarioOverviewView {
         comparablePricingModel = category.defaultPricingMode
         comparablePricePerKm = category.defaultPricePerKm
         comparablePricePerMinute = category.defaultPricePerMinute
+        comparableBaseFare = category.defaultBaseFare
         comparableAverageSpeedKmh = defaultAverageSpeedKmh(for: category)
         comparableCurvePoints = category.defaultCurvePoints
         comparablePricePerMonth = category.defaultPricePerMonth

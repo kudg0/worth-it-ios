@@ -2,6 +2,14 @@ import SwiftUI
 
 extension ScenarioOverviewView {
     var availableMetrics: [MetricSlide] {
+        orderedMetricSlides(allMetricSlides.filter { enabledMetricSet.contains($0.id.rawValue) })
+    }
+
+    var hiddenMetrics: [MetricSlide] {
+        orderedMetricSlides(allMetricSlides.filter { !enabledMetricSet.contains($0.id.rawValue) })
+    }
+
+    var allMetricSlides: [MetricSlide] {
         if let analyticsOverview {
             let backendSlides = analyticsOverview.metrics.compactMap { metricSlide($0) }
             if !backendSlides.isEmpty {
@@ -10,7 +18,6 @@ extension ScenarioOverviewView {
         }
 
         return OverviewMetric.allCases
-            .filter { enabledMetricSet.contains($0.rawValue) }
             .compactMap(metricSlide)
     }
 
@@ -31,6 +38,99 @@ extension ScenarioOverviewView {
         enabled.insert(OverviewMetric.currentMonthCostPerKm.rawValue)
         enabled.insert(OverviewMetric.paybackDistance.rawValue)
         return enabled
+    }
+
+    var metricOrder: [String] {
+        metricOrderIds
+            .split(separator: ",")
+            .map(String.init)
+    }
+
+    func orderedMetricSlides(_ slides: [MetricSlide]) -> [MetricSlide] {
+        let indexedOrder = Dictionary(uniqueKeysWithValues: metricOrder.enumerated().map { ($0.element, $0.offset) })
+        return slides.sorted { first, second in
+            let firstIndex = indexedOrder[first.id.rawValue] ?? Int.max
+            let secondIndex = indexedOrder[second.id.rawValue] ?? Int.max
+            if firstIndex != secondIndex {
+                return firstIndex < secondIndex
+            }
+            let firstDefaultIndex = OverviewMetric.allCases.firstIndex(of: first.id) ?? Int.max
+            let secondDefaultIndex = OverviewMetric.allCases.firstIndex(of: second.id) ?? Int.max
+            return firstDefaultIndex < secondDefaultIndex
+        }
+    }
+
+    func moveOverviewMetric(_ source: OverviewMetric, before target: OverviewMetric) {
+        var order = availableMetrics.map(\.id.rawValue)
+        guard
+            let from = order.firstIndex(of: source.rawValue),
+            let to = order.firstIndex(of: target.rawValue),
+            from != to
+        else { return }
+
+        let moved = order.remove(at: from)
+        order.insert(moved, at: to)
+        metricOrderIds = order.joined(separator: ",")
+        scheduleOverviewMetricLayoutSave()
+    }
+
+    func hideOverviewMetric(_ metric: OverviewMetric) {
+        let enabled = availableMetrics
+            .map(\.id.rawValue)
+            .filter { $0 != metric.rawValue }
+        guard !enabled.isEmpty else { return }
+        enabledMetricIds = enabled.joined(separator: ",")
+        scheduleOverviewMetricLayoutSave()
+    }
+
+    func showOverviewMetric(_ metric: OverviewMetric) {
+        var enabled = availableMetrics.map(\.id.rawValue)
+        if !enabled.contains(metric.rawValue) {
+            enabled.append(metric.rawValue)
+        }
+        enabledMetricIds = enabled.joined(separator: ",")
+
+        var order = metricOrder
+        if !order.contains(metric.rawValue) {
+            order.append(metric.rawValue)
+            metricOrderIds = order.joined(separator: ",")
+        }
+        scheduleOverviewMetricLayoutSave()
+    }
+
+    func resetOverviewMetricsLayout() {
+        enabledMetricIds = ""
+        metricOrderIds = ""
+        scheduleOverviewMetricLayoutSave()
+    }
+
+    func scheduleOverviewMetricLayoutSave() {
+        metricLayoutSaveTask?.cancel()
+        metricLayoutSaveTask = Task {
+            try? await Task.sleep(for: .milliseconds(450))
+            guard !Task.isCancelled else { return }
+            await saveOverviewMetricLayout()
+        }
+    }
+
+    @MainActor
+    func saveOverviewMetricLayout() async {
+        do {
+            let settings = try await repository.updateScenarioSettings(
+                scenarioId: activeScenario.id,
+                request: ScenarioSettingsPatch(
+                    analytics: ScenarioAnalyticsSettingsPatch(
+                        enabledMetricIds: enabledMetricIdsForSave,
+                        metricOrderIds: metricOrderIdsForSave
+                    )
+                )
+            )
+            scenarioSettings = settings
+            onScenarioChanged(activeScenario.applying(settings: settings))
+            applyAnalyticsSettings(settings.analytics)
+        } catch {
+            actionError = friendlyScenarioSettingsError(error)
+        }
     }
 
     var selectedMetricBinding: Binding<String> {
@@ -271,6 +371,12 @@ extension ScenarioOverviewView {
 
         guard abs(delta) > .ulpOfOne else {
             return "No change vs \(comparisonMonth)"
+        }
+
+        if let deltaPercent = trend.deltaPercent, deltaPercent.isFinite {
+            let sign = deltaPercent < 0 ? "-" : ""
+            let displayValue = compactTrendNumber(abs(deltaPercent), fractionDigits: 1)
+            return "\(sign)\(displayValue)% vs \(comparisonMonth)"
         }
 
         let sign = delta < 0 ? "-" : ""

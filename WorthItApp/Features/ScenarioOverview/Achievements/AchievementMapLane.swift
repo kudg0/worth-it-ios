@@ -40,7 +40,7 @@ struct AchievementMapLane: View {
                 .background(WorthItColor.surfaceContainerLow, in: Capsule())
             }
 
-            LazyVGrid(columns: columns, alignment: .center, spacing: WorthItSpacing.xxl) {
+            LazyVGrid(columns: columns, alignment: .center, spacing: WorthItSpacing.l) {
                 ForEach(achievements) { achievement in
                     AchievementMapNode(
                         achievement: achievement,
@@ -51,6 +51,9 @@ struct AchievementMapLane: View {
                 }
             }
         }
+        .padding(WorthItSpacing.xl)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(WorthItColor.surfaceIsland, in: RoundedRectangle(cornerRadius: WorthItRadius.xxl))
     }
 }
 
@@ -77,52 +80,59 @@ private struct AchievementMapNode: View {
         achievement.tierProgress(in: selectedLevel)
     }
 
+    private var nodeFrameSize: CGFloat { 72 }
+    private var earnedBadgeSize: CGFloat { 72 }
+    private var progressBadgeSize: CGFloat { 58 }
+
     var body: some View {
         Button {
             onOpenAchievement(achievement)
         } label: {
             VStack(spacing: WorthItSpacing.s) {
-            ZStack {
-                if isLocked {
-                    Circle()
-                        .fill(WorthItColor.surfaceContainerLow.opacity(0.50))
-                        .overlay {
-                            Circle().stroke(WorthItColor.outlineSelected, lineWidth: 1)
+                ZStack {
+                    if isLocked {
+                        Circle()
+                            .fill(WorthItColor.surfaceContainerLow.opacity(0.50))
+                            .overlay {
+                                Circle().stroke(WorthItColor.outlineSelected, lineWidth: 1)
+                            }
+                            .frame(width: progressBadgeSize, height: progressBadgeSize)
+
+                        Image(systemName: "lock.fill")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundStyle(WorthItColor.textTertiary.opacity(0.55))
+                    } else if !isEarned {
+                        WIAchievementProgressRing(
+                            progress: progress,
+                            state: .inProgress,
+                            lineWidth: 2.5,
+                            trackColor: WorthItColor.primaryContainer.opacity(0.42),
+                            progressColor: WorthItColor.primaryContainer,
+                            showsPulse: true,
+                            pulseSpeed: 1.75,
+                            sweepLineScale: 0.26,
+                            initialFillDelay: .zero
+                        ) {
+                            Image(AchievementGlyph.assetName(for: achievement.medalGlyph))
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(WorthItColor.primaryContainer)
+                                .frame(width: 20, height: 20)
                         }
-                    Image(systemName: "lock.fill")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(WorthItColor.textTertiary.opacity(0.55))
-                } else if !isEarned {
-                    WIAchievementProgressRing(
-                        progress: progress,
-                        lineWidth: 2.5,
-                        trackColor: WorthItColor.primaryContainer.opacity(0.58),
-                        progressColor: WorthItColor.primaryContainer,
-                        showsPulse: false,
-                        initialFillDelay: .zero
-                    ) {
-                        Image(AchievementGlyph.assetName(for: achievement.medalGlyph))
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundStyle(WorthItColor.primaryContainer)
-                            .frame(width: 22, height: 22)
+                        .frame(width: progressBadgeSize, height: progressBadgeSize)
+                    } else {
+                        AchievementBadgeImage(medalGlyph: achievement.medalGlyph, state: badgeState, size: earnedBadgeSize)
                     }
-                } else {
-                    AchievementBadgeImage(medalGlyph: achievement.medalGlyph, state: badgeState, size: 64)
                 }
-            }
-            .frame(width: 64, height: 64)
+                .frame(width: nodeFrameSize, height: nodeFrameSize)
 
-            Text(achievement.title)
-                .font(.system(size: 10, weight: isEarned ? .semibold : .medium))
-                .foregroundStyle(isLocked ? WorthItColor.textTertiary.opacity(0.42) : WorthItColor.textPrimary)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .frame(height: 30, alignment: .top)
-
-            Spacer(minLength: 0)
-                .frame(height: 14)
+                Text(achievement.title)
+                    .font(.system(size: 10, weight: isEarned ? .semibold : .medium))
+                    .foregroundStyle(isLocked ? WorthItColor.textTertiary.opacity(0.42) : WorthItColor.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .frame(height: 30, alignment: .top)
             }
         }
         .buttonStyle(.plain)

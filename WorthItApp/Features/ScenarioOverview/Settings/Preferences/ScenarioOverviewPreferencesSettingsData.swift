@@ -90,6 +90,7 @@ extension ScenarioOverviewView {
         do {
             let analytics = ScenarioAnalyticsSettingsPatch(
                 enabledMetricIds: enabledMetricIdsForSave,
+                metricOrderIds: metricOrderIdsForSave,
                 defaultMetricId: selectedMetricId,
                 costPerKmBasis: costPerKmBasisRawValue,
                 includesResidualValue: includesVehicleResidualValue,
@@ -134,8 +135,18 @@ extension ScenarioOverviewView {
         return ids.isEmpty ? ScenarioOverviewMetric.allCases.map(\.rawValue) : ids
     }
 
+    var metricOrderIdsForSave: [String] {
+        let ids = metricOrderIds
+            .split(separator: ",")
+            .map(String.init)
+            .filter { !$0.isEmpty }
+
+        return ids.isEmpty ? enabledMetricIdsForSave : ids
+    }
+
     func applyAnalyticsSettings(_ settings: ScenarioAnalyticsSettings) {
         enabledMetricIds = settings.enabledMetricIds.joined(separator: ",")
+        metricOrderIds = settings.metricOrderIds.joined(separator: ",")
         selectedMetricId = settings.defaultMetricId
         costPerKmBasisRawValue = settings.costPerKmBasis
         includesVehicleResidualValue = settings.includesResidualValue

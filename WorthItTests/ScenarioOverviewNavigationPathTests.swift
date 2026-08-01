@@ -25,3 +25,28 @@ final class ScenarioOverviewNavigationPathTests: XCTestCase {
         XCTAssertEqual(path, ["metricDetail"])
     }
 }
+
+final class OverviewMetricEditorInteractionTests: XCTestCase {
+    func testDoneConsumesFinishingTouchBeforeMetricCanOpen() {
+        var state = OverviewMetricEditorInteractionState()
+
+        state.enterEditing()
+        XCTAssertFalse(state.canOpenMetric)
+
+        state.finishEditing()
+        XCTAssertFalse(state.isEditing)
+        XCTAssertFalse(state.canOpenMetric, "Done touch must not open the metric underneath")
+
+        state.releaseFinishingTouch()
+        XCTAssertTrue(state.canOpenMetric)
+    }
+
+    func testInteractionTargetsMeetWorthItStandard() {
+        XCTAssertGreaterThanOrEqual(
+            WorthItInteraction.iconButtonTarget,
+            WorthItInteraction.minimumTouchTarget
+        )
+        XCTAssertEqual(WorthItInteraction.minimumTouchTarget, 44)
+        XCTAssertEqual(WorthItInteraction.iconButtonTarget, 48)
+    }
+}

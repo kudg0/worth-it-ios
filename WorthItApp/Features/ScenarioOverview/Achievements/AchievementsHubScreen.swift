@@ -105,7 +105,7 @@ struct AchievementsHubScreen: View {
 
             if let errorMessage {
                 ScenarioLoadErrorCard(
-                    title: i18n.t("Achievements unavailable"),
+                    title: i18n.t(.achievements.errors.unavailable.title),
                     message: errorMessage,
                     onRetry: { Task { await loadAchievements() } }
                 )
@@ -149,6 +149,7 @@ struct AchievementsHubScreen: View {
                         achievement: achievement,
                         selectedLevel: selectedLevel,
                         isLevelUnlocked: isSelectedLevelUnlocked,
+                        similarAchievements: similarAchievements(for: achievement),
                         showsLocalHeader: false,
                         onClose: {
                             if let returnCategory {
@@ -156,12 +157,19 @@ struct AchievementsHubScreen: View {
                             } else {
                                 route = .hub
                             }
+                        },
+                        onOpenSimilarAchievement: { similar in
+                            route = .detail(
+                                achievementKey: similar.achievementKey,
+                                title: similar.title,
+                                returnCategory: similar.category
+                            )
                         }
                     )
                 } else {
                     ScenarioLoadErrorCard(
-                        title: i18n.t("Achievement unavailable"),
-                        message: i18n.t("Open achievements again to refresh this milestone."),
+                        title: i18n.t(.achievements.errors.achievementUnavailable.title),
+                        message: i18n.t(.achievements.errors.refreshMilestone.message),
                         onRetry: { route = .map(initialCategory: returnCategory) }
                     )
                     .padding(.horizontal, WorthItSpacing.xxl)
@@ -198,14 +206,14 @@ struct AchievementsHubScreen: View {
 
     private func categoryTitle(_ category: String) -> String {
         switch category {
-        case "costs", "economics": i18n.t("Economics")
-        case "usage": i18n.t("Usage")
-        case "tracking": i18n.t("Consistency")
-        case "lifecycle": i18n.t("Lifecycle")
-        case "comparison": i18n.t("Alternatives")
-        case "value": i18n.t("Value")
-        case "evidence": i18n.t("Evidence")
-        default: i18n.t("\(category.capitalized)")
+        case "costs", "economics": i18n.t(.achievements.categories.economics)
+        case "usage": i18n.t(.achievements.categories.usage)
+        case "tracking": i18n.t(.achievements.categories.consistency)
+        case "lifecycle": i18n.t(.achievements.categories.lifecycle)
+        case "comparison": i18n.t(.achievements.categories.alternatives)
+        case "value": i18n.t(.achievements.categories.value)
+        case "evidence": i18n.t(.achievements.categories.evidence)
+        default: category.capitalized
         }
     }
 
@@ -230,6 +238,19 @@ struct AchievementsHubScreen: View {
         )
     }
 
+    private func similarAchievements(for achievement: AchievementProgress) -> [AchievementProgress] {
+        selectedLevelAchievements
+            .filter { item in
+                item.category == achievement.category && item.achievementKey != achievement.achievementKey
+            }
+            .sorted { lhs, rhs in
+                let lhsEarned = lhs.isTierEarned(in: selectedLevel)
+                let rhsEarned = rhs.isTierEarned(in: selectedLevel)
+                if lhsEarned != rhsEarned { return !lhsEarned && rhsEarned }
+                return lhs.tierProgress(in: selectedLevel) > rhs.tierProgress(in: selectedLevel)
+            }
+    }
+
     private func loadAchievements() async {
         isLoading = true
         errorMessage = nil
@@ -238,7 +259,7 @@ struct AchievementsHubScreen: View {
             achievements = try await repository.listAchievements()
             selectedLevel = achievements.first?.currentLevel ?? 1
         } catch {
-            errorMessage = i18n.t("Open achievements again to refresh ownership milestones.")
+            errorMessage = i18n.t(.achievements.errors.refreshOwnership.message)
         }
 
         isLoading = false

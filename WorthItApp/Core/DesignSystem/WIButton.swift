@@ -25,10 +25,10 @@ struct WIButton: View {
                     .font(.system(size: 16, weight: .bold))
             }
             .frame(maxWidth: .infinity)
-            .frame(height: height)
+            .frame(height: max(height, WorthItInteraction.minimumTouchTarget))
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(WIButtonPressStyle())
         .foregroundStyle(foregroundColor)
         .background(backgroundColor, in: RoundedRectangle(cornerRadius: WorthItRadius.l))
         .overlay {
@@ -68,6 +68,17 @@ struct WIButton: View {
         case .outline:
             WorthItColor.outlineInput
         }
+    }
+}
+
+private struct WIButtonPressStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.985 : 1)
+            .opacity(configuration.isPressed ? 0.80 : 1)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: configuration.isPressed)
     }
 }
 

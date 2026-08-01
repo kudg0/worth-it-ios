@@ -2,11 +2,16 @@ import SwiftUI
 
 struct ScenarioOverviewScreen: View {
     let metrics: [ScenarioOverviewView.MetricSlide]
+    let hiddenMetrics: [ScenarioOverviewView.MetricSlide]
     let selectedMetric: Binding<String>
     let selectedMetricId: String
     let showsEfficiencyCard: Bool
     let efficiencyModel: CostPerKmEfficiencyCard.Model
     let onOpenMetric: (ScenarioOverviewView.OverviewMetric) -> Void
+    let onMoveMetric: (ScenarioOverviewView.OverviewMetric, ScenarioOverviewView.OverviewMetric) -> Void
+    let onHideMetric: (ScenarioOverviewView.OverviewMetric) -> Void
+    let onShowMetric: (ScenarioOverviewView.OverviewMetric) -> Void
+    let onResetMetricsLayout: () -> Void
     let onAddExpense: () -> Void
     let onOpenUsage: () -> Void
     let onOpenCompare: () -> Void
@@ -31,6 +36,14 @@ struct ScenarioOverviewScreen: View {
             }
         }
 
-        OverviewMetricsGrid(metrics: metrics, onOpenMetric: onOpenMetric)
+        OverviewMetricsGrid(
+            metrics: metrics,
+            hiddenMetrics: hiddenMetrics,
+            onOpenMetric: onOpenMetric,
+            onMoveMetric: onMoveMetric,
+            onHideMetric: onHideMetric,
+            onShowMetric: onShowMetric,
+            onResetLayout: onResetMetricsLayout
+        )
     }
 }

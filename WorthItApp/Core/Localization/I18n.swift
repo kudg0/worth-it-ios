@@ -12,6 +12,14 @@ struct I18n: Equatable {
         String(localized: String.LocalizationValue(key.value), locale: locale)
     }
 
+    func t(_ key: I18nKey, _ arguments: CVarArg...) -> String {
+        t(key, arguments: arguments)
+    }
+
+    func t(_ key: I18nKey, arguments: [CVarArg]) -> String {
+        String(format: t(key), locale: locale, arguments: arguments)
+    }
+
     // Legacy bridge for screens that have not been migrated to typed keys yet.
     func t(_ key: String.LocalizationValue) -> String {
         String(localized: key, locale: locale)
@@ -34,6 +42,10 @@ extension EnvironmentValues {
 enum i18n {
     static func t(_ key: I18nKey) -> String {
         I18n(localeIdentifier: "en").t(key)
+    }
+
+    static func t(_ key: I18nKey, _ arguments: CVarArg...) -> String {
+        I18n(localeIdentifier: "en").t(key, arguments: arguments)
     }
 
     // Legacy bridge for screens that have not been migrated to typed keys yet.

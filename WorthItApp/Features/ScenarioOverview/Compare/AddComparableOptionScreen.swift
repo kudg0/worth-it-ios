@@ -6,6 +6,7 @@ struct AddComparableOptionScreen: View {
     let pricingModel: Binding<AlternativePricingMode>
     let pricePerKm: Binding<String>
     let pricePerMinute: Binding<String>
+    let baseFare: Binding<String>
     let averageSpeedKmh: Binding<String>
     let curvePoints: Binding<[ComparableCurveInputPoint]>
     let pricePerMonth: Binding<String>
@@ -89,6 +90,8 @@ struct AddComparableOptionScreen: View {
                     )
                 case .mixed:
                     VStack(spacing: WorthItSpacing.xxl) {
+                        baseFareField
+
                         WITextField(
                             label: i18n.t("Cost per KM"),
                             placeholder: i18n.t("0.00"),
@@ -107,13 +110,7 @@ struct AddComparableOptionScreen: View {
                             keyboardType: .decimalPad
                         )
 
-                        WITextField(
-                            label: i18n.t("Average Speed"),
-                            placeholder: i18n.t("70"),
-                            text: averageSpeedKmh,
-                            trailingText: "km/h",
-                            keyboardType: .decimalPad
-                        )
+                        averageSpeedField
                     }
                 case .distanceCurve:
                     VStack(spacing: WorthItSpacing.l) {
@@ -170,6 +167,8 @@ struct AddComparableOptionScreen: View {
                     )
                 case .perTime:
                     VStack(spacing: WorthItSpacing.xxl) {
+                        baseFareField
+
                         WITextField(
                             label: i18n.t("Cost per Minute"),
                             placeholder: i18n.t("0.00"),
@@ -179,13 +178,7 @@ struct AddComparableOptionScreen: View {
                             keyboardType: .decimalPad
                         )
 
-                        WITextField(
-                            label: i18n.t("Average Speed"),
-                            placeholder: i18n.t("70"),
-                            text: averageSpeedKmh,
-                            trailingText: "km/h",
-                            keyboardType: .decimalPad
-                        )
+                        averageSpeedField
                     }
                 case .manualEquivalent:
                     WITextField(
@@ -197,6 +190,30 @@ struct AddComparableOptionScreen: View {
                     )
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private var baseFareField: some View {
+        WITextField(
+            label: i18n.t("Base Fare"),
+            placeholder: i18n.t("0.00"),
+            text: baseFare,
+            leadingText: currencySymbol,
+            keyboardType: .decimalPad
+        )
+    }
+
+    @ViewBuilder
+    private var averageSpeedField: some View {
+        if selectedCategory == .custom {
+            WITextField(
+                label: i18n.t("Average Speed"),
+                placeholder: i18n.t("70"),
+                text: averageSpeedKmh,
+                trailingText: "km/h",
+                keyboardType: .decimalPad
+            )
         }
     }
 

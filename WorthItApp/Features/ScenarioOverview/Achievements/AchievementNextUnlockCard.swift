@@ -24,7 +24,7 @@ struct AchievementNextUnlockCard: View {
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(WorthItColor.textPrimary)
 
-                        Text(i18n.t("Next Milestone Unlock"))
+                        Text(i18n.t(.achievements.next.subtitle.closest))
                             .font(.system(size: 12, weight: .regular))
                             .foregroundStyle(WorthItColor.textSecondary)
                     }
@@ -68,11 +68,11 @@ struct AchievementNextUnlockCard: View {
     private var helperText: String {
         guard let tierIndex = achievement.tierIndex(in: selectedLevel),
               achievement.tiers.indices.contains(tierIndex) else {
-            return i18n.t("This achievement family is complete.")
+            return i18n.t(.achievements.next.complete)
         }
 
         let nextTargetValue = achievement.tiers[tierIndex].targetValue
         let remaining = max(0, nextTargetValue - achievement.currentValue)
-        return i18n.t("Add \(Int(ceil(remaining))) more toward \(achievement.tierLabel(in: selectedLevel)) to unlock.")
+        return i18n.t(.achievements.next.helperFormat, Int(ceil(remaining)), achievement.tierLabel(in: selectedLevel))
     }
 }

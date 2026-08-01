@@ -1,24 +1,13 @@
 import SwiftUI
 
 extension ScenarioOverviewView {
-    var currentMonthRecentExpenseItems: [RecentExpenseItem] {
-        let expenseItems = currentMonthExpenseEvents.map { event in
-            RecentExpenseItem(
-                id: event.id.uuidString,
-                title: expenseTitle(for: event),
-                subtitle: expenseSubtitle(for: event),
-                value: expenseAmount(event),
-                detail: nil,
-                systemIcon: expenseIconName(for: event.category),
-                accentColor: expenseAccentColor(for: event),
-                action: { openExpenseDetail(event.id) }
-            )
-        }
+    var currentMonthRecentExpenseItems: [ExpenseListItem] {
+        let expenseItems = currentMonthExpenseEvents.map(expenseListItem)
 
         let loanInterest = currentMonthLoanInterest
         guard loanInterest > 0 else { return expenseItems }
 
-        let loanItem = RecentExpenseItem(
+        let loanItem = ExpenseListItem(
             id: "loan-interest-\(expenseHistoryMonthIdentifier(for: currentMonthStart))",
             title: i18n.t("Loan interest accrued"),
             subtitle: i18n.t("Financing cost • \(expenseHistoryMonthLabel(for: currentMonthStart))"),
@@ -30,6 +19,25 @@ extension ScenarioOverviewView {
         )
 
         return [loanItem] + expenseItems
+    }
+
+    var totalExpenseListItems: [ExpenseListItem] {
+        costEvents
+            .sorted { $0.date > $1.date }
+            .map(expenseListItem)
+    }
+
+    private func expenseListItem(for event: CostEvent) -> ExpenseListItem {
+        ExpenseListItem(
+            id: event.id.uuidString,
+            title: expenseTitle(for: event),
+            subtitle: expenseSubtitle(for: event),
+            value: expenseAmount(event),
+            detail: nil,
+            systemIcon: expenseIconName(for: event.category),
+            accentColor: expenseAccentColor(for: event),
+            action: { openExpenseDetail(event.id) }
+        )
     }
 
     func expenseHistoryGroupTotal(_ group: ExpenseMonthGroup) -> String {

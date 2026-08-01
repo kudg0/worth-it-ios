@@ -12,12 +12,172 @@ struct I18nKey: Hashable {
 }
 
 extension I18nKey {
+    static let achievements = AchievementsKeys()
     static let auth = AuthKeys()
     static let brand = BrandKeys()
     static let common = CommonKeys()
     static let profile = ProfileKeys()
+    static let scenario = ScenarioKeys()
     static let scenarios = ScenariosKeys()
     static let tabs = TabsKeys()
+}
+
+struct AchievementsKeys {
+    let categories = CategoriesKeys()
+    let categoryDashboard = CategoryDashboardKeys()
+    let common = CommonKeys()
+    let detail = DetailKeys()
+    let errors = ErrorsKeys()
+    let levelRing = LevelRingKeys()
+    let map = MapKeys()
+    let next = NextKeys()
+    let recent = RecentKeys()
+
+    struct CategoriesKeys {
+        let alternatives = I18nKey("achievements.categories.alternatives")
+        let consistency = I18nKey("achievements.categories.consistency")
+        let economics = I18nKey("achievements.categories.economics")
+        let evidence = I18nKey("achievements.categories.evidence")
+        let lifecycle = I18nKey("achievements.categories.lifecycle")
+        let usage = I18nKey("achievements.categories.usage")
+        let value = I18nKey("achievements.categories.value")
+    }
+
+    struct CategoryDashboardKeys {
+        let earnedCountFormat = I18nKey("achievements.categoryDashboard.earnedCountFormat")
+    }
+
+    struct CommonKeys {
+        let actions = ActionsKeys()
+        let level = LevelKeys()
+        let status = StatusKeys()
+
+        struct ActionsKeys {
+            let viewAll = I18nKey("achievements.common.actions.viewAll")
+        }
+
+        struct LevelKeys {
+            let titleFormat = I18nKey("achievements.common.level.titleFormat")
+        }
+
+        struct StatusKeys {
+            let earned = I18nKey("achievements.common.status.earned")
+            let locked = I18nKey("achievements.common.status.locked")
+            let percentCompleteFormat = I18nKey("achievements.common.status.percentCompleteFormat")
+        }
+    }
+
+    struct DetailKeys {
+        let body = BodyKeys()
+        let notice = NoticeKeys()
+        let progressPill = ProgressPillKeys()
+        let `protocol` = ProtocolKeys()
+        let requirement = RequirementKeys()
+        let similar = SimilarKeys()
+        let stats = StatsKeys()
+        let status = StatusKeys()
+
+        struct BodyKeys {
+            let earnedFormat = I18nKey("achievements.detail.body.earnedFormat")
+            let progressFormat = I18nKey("achievements.detail.body.progressFormat")
+            let unlockLevelFirstFormat = I18nKey("achievements.detail.body.unlockLevelFirstFormat")
+        }
+
+        struct NoticeKeys {
+            let levelRequiredFormat = I18nKey("achievements.detail.notice.levelRequiredFormat")
+        }
+
+        struct ProgressPillKeys {
+            let earned = I18nKey("achievements.detail.progressPill.earned")
+            let valueFormat = I18nKey("achievements.detail.progressPill.valueFormat")
+        }
+
+        struct ProtocolKeys {
+            let title = I18nKey("achievements.detail.protocol.title")
+        }
+
+        struct RequirementKeys {
+            let achievementReached = I18nKey("achievements.detail.requirement.achievementReached")
+            let reachFormat = I18nKey("achievements.detail.requirement.reachFormat")
+            let unlockLevelFormat = I18nKey("achievements.detail.requirement.unlockLevelFormat")
+        }
+
+        struct SimilarKeys {
+            let title = I18nKey("achievements.detail.similar.title")
+        }
+
+        struct StatsKeys {
+            let current = I18nKey("achievements.detail.stats.current")
+            let left = I18nKey("achievements.detail.stats.left")
+            let needed = I18nKey("achievements.detail.stats.needed")
+        }
+
+        struct StatusKeys {
+            let levelLockedFormat = I18nKey("achievements.detail.status.levelLockedFormat")
+        }
+    }
+
+    struct ErrorsKeys {
+        let achievementUnavailable = AchievementUnavailableKeys()
+        let refreshMilestone = RefreshMilestoneKeys()
+        let refreshOwnership = RefreshOwnershipKeys()
+        let unavailable = UnavailableKeys()
+
+        struct AchievementUnavailableKeys {
+            let title = I18nKey("achievements.errors.achievementUnavailable.title")
+        }
+
+        struct RefreshMilestoneKeys {
+            let message = I18nKey("achievements.errors.refreshMilestone.message")
+        }
+
+        struct RefreshOwnershipKeys {
+            let message = I18nKey("achievements.errors.refreshOwnership.message")
+        }
+
+        struct UnavailableKeys {
+            let title = I18nKey("achievements.errors.unavailable.title")
+        }
+    }
+
+    struct LevelRingKeys {
+        let accessibility = AccessibilityKeys()
+        let labelFormat = I18nKey("achievements.levelRing.labelFormat")
+        let status = StatusKeys()
+
+        struct AccessibilityKeys {
+            let achievedFormat = I18nKey("achievements.levelRing.accessibility.achievedFormat")
+            let lockedFormat = I18nKey("achievements.levelRing.accessibility.lockedFormat")
+            let progressFormat = I18nKey("achievements.levelRing.accessibility.progressFormat")
+        }
+
+        struct StatusKeys {
+            let achieved = I18nKey("achievements.levelRing.status.achieved")
+            let inProgress = I18nKey("achievements.levelRing.status.inProgress")
+            let locked = I18nKey("achievements.levelRing.status.locked")
+        }
+    }
+
+    struct MapKeys {
+        let masteryLevelFormat = I18nKey("achievements.map.masteryLevelFormat")
+        let title = I18nKey("achievements.map.title")
+        let totalProgress = I18nKey("achievements.map.totalProgress")
+    }
+
+    struct NextKeys {
+        let complete = I18nKey("achievements.next.complete")
+        let helperFormat = I18nKey("achievements.next.helperFormat")
+        let subtitle = SubtitleKeys()
+
+        struct SubtitleKeys {
+            let closest = I18nKey("achievements.next.subtitle.closest")
+        }
+    }
+
+    struct RecentKeys {
+        let empty = I18nKey("achievements.recent.empty")
+        let title = I18nKey("achievements.recent.title")
+    }
 }
 
 struct AuthKeys {
@@ -367,6 +527,24 @@ struct ProfileKeys {
     }
 }
 
+struct ScenarioKeys {
+    let overview = OverviewKeys()
+
+    struct OverviewKeys {
+        let widgets = WidgetsKeys()
+
+        struct WidgetsKeys {
+            let add = I18nKey("scenario.overview.widgets.add")
+            let cancel = I18nKey("scenario.overview.widgets.cancel")
+            let done = I18nKey("scenario.overview.widgets.done")
+            let empty = I18nKey("scenario.overview.widgets.empty")
+            let removeFormat = I18nKey("scenario.overview.widgets.removeFormat")
+            let reset = I18nKey("scenario.overview.widgets.reset")
+            let sheetTitle = I18nKey("scenario.overview.widgets.sheetTitle")
+        }
+    }
+}
+
 struct ScenariosKeys {
     let actions = ActionsKeys()
     let card = CardKeys()
@@ -438,4 +616,4 @@ struct TabsKeys {
     let scenarios = I18nKey("tabs.scenarios")
 }
 
-// Skipped 118 legacy non-semantic catalog keys.
+// Skipped 116 legacy non-semantic catalog keys.

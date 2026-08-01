@@ -12,7 +12,10 @@ extension ScenarioOverviewView {
                     metricSpecificDetail(metric)
 
                     if selectedDetailMetric != .paybackDistance, let selectedDetailMetricPayload {
-                        BackendMetricBreakdownView(payload: selectedDetailMetricPayload)
+                        BackendMetricBreakdownView(
+                            payload: selectedDetailMetricPayload,
+                            primarySectionExpenseItems: selectedDetailMetric == .totalExpenses ? totalExpenseListItems : nil
+                        )
                     } else if let metricDetailError {
                         BackendMetricDetailErrorView(message: friendlyMetricDetailError(metricDetailError)) {
                             Task { await loadSelectedMetricDetail() }
