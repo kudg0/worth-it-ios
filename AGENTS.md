@@ -17,6 +17,18 @@ Please review yourself through this `AGENTS.md`.
 
 - Before editing, claim one canonical task ID and re-audit its current truth,
   dependencies, acceptance, and verification against the code and worktrees.
+- Do not implement from narrative Scope/Acceptance alone. Every new active WIP
+  claim must have `Execution packet version: 1` in the sibling canonical task
+  with exact child/finding IDs, allowed files, forbidden scope, preconditions,
+  commands and expected results, stop conditions, and handoff. Run sibling
+  `pnpm roadmap:lint` after recording it; a missing/contradictory packet blocks
+  Swift or product edits.
+- One packet owns one independently verifiable boundary. Split before work if a
+  packet mixes backend and iOS implementation, local and remote proof, migration
+  and rollout, or implementation and negative testing.
+- Cross-repository, security, migration, release, generated-artifact, and
+  remote-CI packets use a task branch/worktree. Do not implement them directly
+  on local main or push/merge main before independent review.
 - In the same work session, update that task in
   `../assets-invest-comparator/docs/product-work-plan.md`. Use `VERIFIED DONE`
   only after every acceptance criterion and required check passes, exact
@@ -26,6 +38,11 @@ Please review yourself through this `AGENTS.md`.
   the remaining work or blocker.
 - The final handoff must name the resulting roadmap status and task ID. Never
   report work as done, shipped, or closed while its canonical status is open.
+- The implementer posts a `Review request` with exact commits, commands/counts,
+  clean/dirty state, warnings, skipped checks, and remaining acceptance. Only an
+  independent reviewer may record `Final review verdict: PASS` and advance a
+  packetized task to VERIFIED DONE. Map every finding ID to a correction commit;
+  do not erase review history or leave resolved IDs in Remaining/blocker.
 - After editing the sibling canonical roadmap, run `pnpm roadmap:lint` from
   `../assets-invest-comparator`. If the linter/rules/fixtures changed, also run
   `pnpm roadmap:lint:test`. A failing check blocks handoff and commit.
