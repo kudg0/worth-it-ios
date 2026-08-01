@@ -72,6 +72,7 @@ extension ScenarioOverviewView {
                 hiddenMetrics: hiddenMetrics,
                 selectedMetric: selectedMetricBinding,
                 selectedMetricId: currentSelectedMetricId,
+                editorInteraction: $overviewMetricEditorInteraction,
                 showsEfficiencyCard: hasEfficiencyChartData,
                 efficiencyModel: overviewEfficiencyModel,
                 onOpenMetric: openMetricDetail,

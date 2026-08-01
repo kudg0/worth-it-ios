@@ -27,6 +27,15 @@ final class ScenarioOverviewNavigationPathTests: XCTestCase {
 }
 
 final class OverviewMetricEditorInteractionTests: XCTestCase {
+    func testLongPressEntryBlocksMetricNavigation() {
+        var state = OverviewMetricEditorInteractionState()
+
+        state.enterEditing()
+
+        XCTAssertTrue(state.isEditing)
+        XCTAssertFalse(state.canOpenMetric, "A long press must enter edit mode without opening the metric")
+    }
+
     func testDoneConsumesFinishingTouchBeforeMetricCanOpen() {
         var state = OverviewMetricEditorInteractionState()
 
@@ -48,5 +57,18 @@ final class OverviewMetricEditorInteractionTests: XCTestCase {
         )
         XCTAssertEqual(WorthItInteraction.minimumTouchTarget, 44)
         XCTAssertEqual(WorthItInteraction.iconButtonTarget, 48)
+    }
+}
+
+final class ScenarioOverviewTransitionDirectionTests: XCTestCase {
+    func testMetricDetailAndOverviewUseOppositeDirections() {
+        XCTAssertEqual(
+            ScenarioOverviewContentTransitionDirection.metricDetailPresentation,
+            .backward
+        )
+        XCTAssertEqual(
+            ScenarioOverviewContentTransitionDirection.metricDetailDismissal,
+            .forward
+        )
     }
 }

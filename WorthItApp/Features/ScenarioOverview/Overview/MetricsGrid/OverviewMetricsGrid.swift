@@ -1,6 +1,18 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+enum OverviewMetricEditorLayout {
+    static let scrollCoordinateSpace = "scenario-overview-scroll"
+}
+
+struct OverviewMetricGridMinYPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat?
+
+    static func reduce(value: inout CGFloat?, nextValue: () -> CGFloat?) {
+        value = nextValue() ?? value
+    }
+}
+
 struct OverviewMetricEditorInteractionState: Equatable {
     private(set) var isEditing = false
     private(set) var isFinishingTouch = false
@@ -35,7 +47,7 @@ struct OverviewMetricsGrid: View {
     let onShowMetric: (ScenarioOverviewView.OverviewMetric) -> Void
     let onResetLayout: () -> Void
 
-    @State private var editorInteraction = OverviewMetricEditorInteractionState()
+    @Binding var editorInteraction: OverviewMetricEditorInteractionState
     @State private var draggedMetric: ScenarioOverviewView.OverviewMetric?
     @State private var showsWidgetPicker = false
 
@@ -49,12 +61,12 @@ struct OverviewMetricsGrid: View {
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
-            LazyVGrid(columns: columns, spacing: WorthItSpacing.l) {
+        LazyVGrid(columns: columns, spacing: WorthItSpacing.l) {
                 ForEach(metrics) { metric in
                     let tile = OverviewMetricTile(
                         metric: metric,
                         isEditingLayout: isEditingLayout,
+                        onEnterEditing: enterEditMode,
                         onOpenMetric: { metric in
                             guard editorInteraction.canOpenMetric else { return }
                             onOpenMetric(metric)
@@ -84,21 +96,23 @@ struct OverviewMetricsGrid: View {
                 if isEditingLayout {
                     addWidgetCard
                 }
-            }
-
-            if isEditingLayout {
-                editorToolbar
-                    .padding(.top, -(WorthItSpacing.xxl + WorthItSpacing.xl))
-                    .zIndex(2)
+        }
+        .contentShape(.interaction, Rectangle())
+        .background {
+            GeometryReader { proxy in
+                Color.clear.preference(
+                    key: OverviewMetricGridMinYPreferenceKey.self,
+                    value: proxy.frame(in: .named(OverviewMetricEditorLayout.scrollCoordinateSpace)).minY
+                )
             }
         }
-        .contentShape(Rectangle())
         .onLongPressGesture(minimumDuration: 0.45) {
             enterEditMode()
         }
         .task {
 #if DEBUG
-            if ProcessInfo.processInfo.arguments.contains("-widgetEditorQA") {
+            if ProcessInfo.processInfo.arguments.contains("-widgetEditorQA")
+                || ProcessInfo.processInfo.arguments.contains("-widgetEditorAutoEdit") {
                 editorInteraction.enterEditing()
             }
 #endif
@@ -114,41 +128,6 @@ struct OverviewMetricsGrid: View {
             .presentationDetents([.medium])
             .presentationDragIndicator(.visible)
         }
-    }
-
-    private var editorToolbar: some View {
-        HStack(spacing: WorthItSpacing.s) {
-            WIIconButton(
-                systemName: "arrow.counterclockwise",
-                accessibilityLabel: i18n.t(.scenario.overview.widgets.reset),
-                style: .toolbar
-            ) {
-                withAnimation(.smooth(duration: 0.25)) {
-                    onResetLayout()
-                }
-            }
-
-            Spacer()
-
-            WIIconButton(
-                systemName: "checkmark",
-                accessibilityLabel: i18n.t(.scenario.overview.widgets.done),
-                style: .primary
-            ) {
-                withAnimation(.smooth(duration: 0.25)) {
-                    editorInteraction.finishEditing()
-                }
-                Task { @MainActor in
-                    try? await Task.sleep(for: .milliseconds(180))
-                    editorInteraction.releaseFinishingTouch()
-                }
-            }
-        }
-        .padding(.horizontal, WorthItSpacing.xs)
-        .frame(height: WorthItInteraction.iconButtonTarget)
-        .background(WorthItColor.pageBackground.opacity(0.001))
-        .contentShape(.interaction, Rectangle())
-        .allowsHitTesting(true)
     }
 
     private var addWidgetCard: some View {
@@ -188,11 +167,53 @@ struct OverviewMetricsGrid: View {
     }
 }
 
+struct OverviewMetricEditorToolbar: View {
+    @Environment(\.i18n) private var i18n
+
+    @Binding var editorInteraction: OverviewMetricEditorInteractionState
+    let onResetLayout: () -> Void
+
+    var body: some View {
+        HStack(spacing: WorthItSpacing.s) {
+            WIIconButton(
+                systemName: "arrow.counterclockwise",
+                accessibilityLabel: i18n.t(.scenario.overview.widgets.reset),
+                style: .toolbar
+            ) {
+                withAnimation(.smooth(duration: 0.25)) {
+                    onResetLayout()
+                }
+            }
+
+            Spacer()
+
+            WIIconButton(
+                systemName: "checkmark",
+                accessibilityLabel: i18n.t(.scenario.overview.widgets.done),
+                style: .primary
+            ) {
+                withAnimation(.smooth(duration: 0.25)) {
+                    editorInteraction.finishEditing()
+                }
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(180))
+                    editorInteraction.releaseFinishingTouch()
+                }
+            }
+        }
+        .padding(.horizontal, WorthItSpacing.xs)
+        .frame(maxWidth: .infinity)
+        .frame(height: WorthItInteraction.iconButtonTarget)
+        .contentShape(.interaction, Rectangle())
+    }
+}
+
 private struct OverviewMetricTile: View {
     @Environment(\.i18n) private var i18n
 
     let metric: ScenarioOverviewView.MetricSlide
     let isEditingLayout: Bool
+    let onEnterEditing: () -> Void
     let onOpenMetric: (ScenarioOverviewView.OverviewMetric) -> Void
     let onHide: () -> Void
 
@@ -208,6 +229,12 @@ private struct OverviewMetricTile: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(metric.title)
+                .simultaneousGesture(
+                    LongPressGesture(minimumDuration: 0.45)
+                        .onEnded { _ in
+                            onEnterEditing()
+                        }
+                )
             }
         }
     }
@@ -478,9 +505,12 @@ struct WidgetEditorQAHarness: View {
     @State private var metrics = Self.sampleMetrics
     @State private var hiddenMetrics: [ScenarioMetricSlide] = []
     @State private var openedMetric: ScenarioOverviewMetric?
+    @State private var upperWidgetTapCount = 0
+    @State private var editorInteraction = OverviewMetricEditorInteractionState()
+    @State private var gridMinY: CGFloat?
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             WorthItColor.pageBackground.ignoresSafeArea()
 
             ScrollView {
@@ -494,6 +524,21 @@ struct WidgetEditorQAHarness: View {
                         .foregroundStyle(openedMetric == nil ? WorthItColor.accentGold : WorthItColor.danger)
                         .accessibilityIdentifier("widget-editor-qa-status")
 
+                    Button {
+                        upperWidgetTapCount += 1
+                    } label: {
+                        Text("Efficiency Comparison — taps: \(upperWidgetTapCount)")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(WorthItColor.textPrimary)
+                            .frame(maxWidth: .infinity, minHeight: 96)
+                            .background(
+                                WorthItColor.surfaceContainerLow,
+                                in: RoundedRectangle(cornerRadius: WorthItRadius.l)
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("widget-editor-qa-upper-widget")
+
                     OverviewMetricsGrid(
                         metrics: metrics,
                         hiddenMetrics: hiddenMetrics,
@@ -501,13 +546,34 @@ struct WidgetEditorQAHarness: View {
                         onMoveMetric: moveMetric,
                         onHideMetric: hideMetric,
                         onShowMetric: showMetric,
-                        onResetLayout: resetMetrics
+                        onResetLayout: resetMetrics,
+                        editorInteraction: $editorInteraction
                     )
                 }
                 .padding(.horizontal, WorthItSpacing.xxl)
                 .padding(.top, 88)
                 .padding(.bottom, 120)
             }
+            .coordinateSpace(name: OverviewMetricEditorLayout.scrollCoordinateSpace)
+
+            if editorInteraction.isEditing, let gridMinY {
+                OverviewMetricEditorToolbar(
+                    editorInteraction: $editorInteraction,
+                    onResetLayout: resetMetrics
+                )
+                .padding(.horizontal, WorthItSpacing.xxl)
+                .padding(
+                    .top,
+                    max(
+                        WorthItSpacing.s,
+                        gridMinY - WorthItInteraction.iconButtonTarget - WorthItSpacing.s
+                    )
+                )
+                .zIndex(10)
+            }
+        }
+        .onPreferenceChange(OverviewMetricGridMinYPreferenceKey.self) { minY in
+            gridMinY = minY
         }
         .environment(\.i18n, I18n(localeIdentifier: "en"))
     }

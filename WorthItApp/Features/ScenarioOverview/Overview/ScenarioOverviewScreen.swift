@@ -5,6 +5,7 @@ struct ScenarioOverviewScreen: View {
     let hiddenMetrics: [ScenarioOverviewView.MetricSlide]
     let selectedMetric: Binding<String>
     let selectedMetricId: String
+    let editorInteraction: Binding<OverviewMetricEditorInteractionState>
     let showsEfficiencyCard: Bool
     let efficiencyModel: CostPerKmEfficiencyCard.Model
     let onOpenMetric: (ScenarioOverviewView.OverviewMetric) -> Void
@@ -43,7 +44,8 @@ struct ScenarioOverviewScreen: View {
             onMoveMetric: onMoveMetric,
             onHideMetric: onHideMetric,
             onShowMetric: onShowMetric,
-            onResetLayout: onResetMetricsLayout
+            onResetLayout: onResetMetricsLayout,
+            editorInteraction: editorInteraction
         )
     }
 }

@@ -139,9 +139,12 @@ enum ScenarioOverviewTab: Hashable {
     }
 }
 
-enum ScenarioOverviewContentTransitionDirection {
+enum ScenarioOverviewContentTransitionDirection: Equatable {
     case forward
     case backward
+
+    static let metricDetailPresentation: Self = .backward
+    static let metricDetailDismissal: Self = .forward
 
     var insertionEdge: Edge {
         switch self {

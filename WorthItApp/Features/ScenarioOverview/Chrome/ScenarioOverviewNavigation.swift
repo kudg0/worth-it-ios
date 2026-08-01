@@ -159,7 +159,9 @@ extension ScenarioOverviewView {
         let result = ScenarioOverviewNavigationPath.popped(scenarioTabPath)
         guard let previousTab = result.tab else { return }
 
-        contentTransitionDirection = .backward
+        contentTransitionDirection = selectedTab == .metricDetail
+            ? .metricDetailDismissal
+            : .backward
         withAnimation(.smooth(duration: 0.30)) {
             scenarioTabPath = result.path
             if selectedTab == .logExpense {
@@ -425,6 +427,7 @@ extension ScenarioOverviewView {
         selectedMetricTrendDate = nil
         selectedEfficiencyChartDate = nil
         selectedMetricTrendRange = .oneYear
+        contentTransitionDirection = .metricDetailPresentation
 
         withAnimation(.easeInOut(duration: 0.20)) {
             scenarioTabPath = [.overview]

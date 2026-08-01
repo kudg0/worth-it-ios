@@ -46,6 +46,8 @@ struct ScenarioOverviewView: View {
     @AppStorage("scenarioOverview.costPerKmBasis") var costPerKmBasisRawValue = ScenarioAnalyticsCostPerKmBasis.sincePurchase.rawValue
     @AppStorage("scenarioOverview.analyticsDeltaDisplay") var analyticsDeltaDisplayRawValue = ScenarioAnalyticsDeltaDisplay.absolute.rawValue
     @State var selectedTab: ScenarioTab = .overview
+    @State var overviewMetricEditorInteraction = OverviewMetricEditorInteractionState()
+    @State var overviewMetricGridMinY: CGFloat?
     @State var achievementRoute: AchievementNavigationRoute = .hub
     @State var expenseHistoryFilter: ExpenseHistoryFilter = .all
     @State var selectedExpenseHistoryBarLabel: String?
@@ -224,15 +226,42 @@ struct ScenarioOverviewView: View {
                         tabContent
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     } else {
-                        ScrollView {
-                            VStack(spacing: 40) {
-                                tabContent
+                        ZStack(alignment: .top) {
+                            ScrollView {
+                                VStack(spacing: 40) {
+                                    tabContent
+                                }
+                                .padding(.horizontal, WorthItSpacing.xxl)
+                                .padding(.top, WorthItSpacing.xxxxl + WorthItSpacing.xl)
+                                .padding(.bottom, scrollBottomPadding)
                             }
-                            .padding(.horizontal, WorthItSpacing.xxl)
-                            .padding(.top, WorthItSpacing.xxxxl + WorthItSpacing.xl)
-                            .padding(.bottom, scrollBottomPadding)
+                            .scrollIndicators(.hidden)
+                            .coordinateSpace(name: OverviewMetricEditorLayout.scrollCoordinateSpace)
+
+                            if selectedTab == .overview,
+                               overviewMetricEditorInteraction.isEditing,
+                               let overviewMetricGridMinY {
+                                OverviewMetricEditorToolbar(
+                                    editorInteraction: $overviewMetricEditorInteraction,
+                                    onResetLayout: resetOverviewMetricsLayout
+                                )
+                                .padding(.horizontal, WorthItSpacing.xxl)
+                                .padding(
+                                    .top,
+                                    max(
+                                        WorthItSpacing.s,
+                                        overviewMetricGridMinY
+                                            - WorthItInteraction.iconButtonTarget
+                                            - WorthItSpacing.s
+                                    )
+                                )
+                                .transition(.opacity.combined(with: .scale(scale: 0.96)))
+                                .zIndex(10)
+                            }
                         }
-                        .scrollIndicators(.hidden)
+                        .onPreferenceChange(OverviewMetricGridMinYPreferenceKey.self) { minY in
+                            overviewMetricGridMinY = minY
+                        }
                     }
                 }
                 .id(selectedTab)
@@ -544,6 +573,11 @@ struct ScenarioOverviewView: View {
             allowsMultipleSelection: false
         ) { result in
             Task { await stageExpenseFileImport(result) }
+        }
+        .onChange(of: selectedTab) { _, tab in
+            if tab != .overview && overviewMetricEditorInteraction.isEditing {
+                overviewMetricEditorInteraction = OverviewMetricEditorInteractionState()
+            }
         }
         .task(id: scenario.id) {
             displayedScenario = scenario
