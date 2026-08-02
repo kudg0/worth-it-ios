@@ -13,40 +13,68 @@ Please review yourself through this `AGENTS.md`.
 - Re-audit IN WORKTREE tasks before editing because concurrent local changes are
   not shipped work.
 
+## Lead And Subagent Operating Model
+
+- The lead is the only user-facing orchestrator. The lead owns decomposition,
+  canonical roadmap state, integration, verification, and the final answer.
+  Subagents are bounded workers that report results to the lead.
+- Solo execution is the default. Delegate only a concrete, independently
+  verifiable slice when it gives a real speed, specialist-quality, or context-
+  isolation benefit. Do not spawn a child for status watching, packet creation,
+  or a quick check the lead can finish faster.
+- Give a child one self-contained packet with the outcome, deliverable, minimum
+  needed context, base/worktree, allowed writes, forbidden scope, checks, and
+  stop state. Do not assume the child inherited or understood the lead's chat.
+- A packet authorizes exactly one task. `DONE`, `BLOCKED`, `UNSAFE`, or
+  `STALE_PACKET` ends it. A child must not choose the next roadmap task, prepare
+  its own follow-up packet, edit the canonical roadmap, commit, or push unless
+  that exact action is explicitly allowed.
+- After dispatch, the lead continues useful independent work or waits for an
+  event/completion notification. Do not poll children for status. The lead
+  consumes one concise handoff, validates it, and decides the next task.
+
 ## Roadmap Task Claim And Close-Out
 
-- Before editing, claim one canonical task ID and re-audit its current truth,
-  dependencies, acceptance, and verification against the code and worktrees.
-- Do not implement from narrative Scope/Acceptance alone. Every new active WIP
-  claim must have `Execution packet version: 1` in the sibling canonical task
-  with exact child/finding IDs, allowed files, forbidden scope, preconditions,
-  commands and expected results, stop conditions, and handoff. Run sibling
-  `pnpm roadmap:lint` after recording it; a missing/contradictory packet blocks
-  Swift or product edits.
-- One packet owns one independently verifiable boundary. Split before work if a
-  packet mixes backend and iOS implementation, local and remote proof, migration
-  and rollout, or implementation and negative testing.
-- Cross-repository, security, migration, release, generated-artifact, and
-  remote-CI packets use a task branch/worktree. Do not implement them directly
-  on local main or push/merge main before independent review.
-- In the same work session, update that task in
-  `../assets-invest-comparator/docs/product-work-plan.md`. Use `VERIFIED DONE`
-  only after every acceptance criterion and required check passes, exact
-  evidence is recorded, and the result is attributable to a commit/PR. Use
-  `IN WORKTREE — VERIFIED` when every check passes locally but the work is not
-  committed; otherwise use `PARTIAL` or `IN WORKTREE — UNVERIFIED` and record
-  the remaining work or blocker.
-- The final handoff must name the resulting roadmap status and task ID. Never
-  report work as done, shipped, or closed while its canonical status is open.
-- The implementer posts a `Review request` with exact commits, commands/counts,
-  clean/dirty state, warnings, skipped checks, and remaining acceptance. Only an
-  independent reviewer may record `Final review verdict: PASS` and advance a
-  packetized task to VERIFIED DONE. Map every finding ID to a correction commit;
-  do not erase review history or leave resolved IDs in Remaining/blocker.
-- After editing the sibling canonical roadmap, run `pnpm roadmap:lint` from
-  `../assets-invest-comparator`. If the linter/rules/fixtures changed, also run
-  `pnpm roadmap:lint:test`. A failing check blocks handoff and commit.
-- Do not copy task status or create a second backlog in this file or elsewhere.
+- Default to the lightweight workflow for ordinary product work. Solo work needs
+  no child packet. Delegated work gets one canonical task, one concise packet,
+  one coordination assert, one isolated worktree, one lead review, and at most
+  one correction round.
+- Run the sibling `roadmap-coordination.mjs assert` before starting, after a
+  `LEAD-EDITING` pause, or after packet/epoch changes. Do not run it before every
+  edit, shell command, build, or simulator action when state is unchanged.
+- A packet names the outcome, allowed/forbidden scope, exact worktree/base,
+  write set, checks, stop conditions, handoff, steward, and reviewer. Reuse the
+  existing template; do not build new governance for an ordinary feature.
+- Use full digest and approval-ledger ceremony plus independent final review
+  only for security/authentication, migrations/schema, API or generated-client
+  contracts, releases/deployments, and similarly irreversible work.
+- Every commit still requires lead review of the exact candidate followed by
+  explicit user approval. Commit, push, merge, release, and deployment are
+  separate permissions. “Continue” or “finish” is not commit approval.
+- A normal lead review returns `PASS` or one bounded actionable finding. Permit one
+  correction round; ask the user before a second review/correction cycle.
+- Do not improve roadmap lint, coordination scripts, packet schemas, or agent
+  governance during product implementation. Backlog non-blocking process
+  defects. Stop only when a defect makes the requested work unsafe.
+- Give evidence to the Roadmap steward, who alone updates the sibling canonical
+  roadmap in the same work session. Do not create another status source.
+- Run sibling `pnpm roadmap:lint` after roadmap edits. Run its fixture suite only
+  for explicitly requested linter/rule work.
+
+## Parallel Work
+
+- Start with one child; use two in parallel when both slices are genuinely
+  independent, with a hard cap of three. Each gets a
+  separate branch/worktree with disjoint files/resources. Roadmap/linter,
+  lockfiles, migrations/schema, generated contracts and localization keys,
+  release configuration, and shared design-system primitives stay serial.
+- Batch close-out and next-task preparation into one lead pass. Avoid repeated
+  claim/close/open cycles when one safe transition is enough.
+- Use `LEAD-EDITING` only while shared instructions actually change. Workers
+  finish the current atomic command and return `WAIT`; the steward publishes one
+  new `OPEN` epoch after freeze.
+- Only the Roadmap steward runs `lock`, `open`, or `recover`. Never hand-edit
+  shared coordination state.
 
 ## Design Source
 
