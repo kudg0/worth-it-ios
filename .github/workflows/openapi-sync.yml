@@ -35,7 +35,7 @@ jobs:
       - name: Check out iOS repository
         uses: actions/checkout@v4
 
-      - name: Read immutable backend provenance
+      - name: Read exact backend provenance reference
         id: provenance
         run: |
           commit="$(python3 - <<'PY'
@@ -50,19 +50,33 @@ jobs:
           )"
           echo "commit=$commit" >> "$GITHUB_OUTPUT"
 
-      - name: Check out exact backend artifact
+      - name: Create read-only backend installation token
+        id: backend-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.OPENAPI_READER_APP_CLIENT_ID }}
+          private-key: ${{ secrets.OPENAPI_READER_APP_PRIVATE_KEY }}
+          owner: kudg0
+          repositories: assets-invest-comparator
+          permission-contents: read
+
+      - name: Check out exact backend provenance artifact
         uses: actions/checkout@v4
         with:
           repository: kudg0/assets-invest-comparator
           ref: ${{ steps.provenance.outputs.commit }}
+          token: ${{ steps.backend-token.outputs.token }}
+          persist-credentials: false
           path: .openapi-backend
 
-      - name: Verify provenance and semantic equality
+      - name: Verify authoritative backend provenance and iOS artifact
         run: |
           python3 Scripts/openapi_sync.py check \
             --backend-file .openapi-backend/docs/openapi.json \
             --backend-repository kudg0/assets-invest-comparator \
-            --expected-backend-commit "${{ steps.provenance.outputs.commit }}"
+            --expected-backend-commit "${{ steps.provenance.outputs.commit }}" \
+            --ios-file Sources/WorthItAPI/openapi.json \
+            --provenance Sources/WorthItAPI/openapi-source.json
           python3 Scripts/openapi_sync.py self-test
 
       - name: Build generated Swift contract in a fresh scratch directory

@@ -47,6 +47,25 @@ def valid_commit(value: str) -> bool:
     return len(value) == 40 and all(character in "0123456789abcdef" for character in value)
 
 
+def valid_digest(value: object) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(character in "0123456789abcdef" for character in value)
+
+
+def validate_provenance(provenance: object, backend_repository: str) -> dict:
+    if not isinstance(provenance, dict):
+        fail("provenance must be an object")
+    if provenance.get("schemaVersion") != SCHEMA_VERSION:
+        fail("provenance schemaVersion mismatch")
+    if provenance.get("backendRepository") != backend_repository:
+        fail("provenance backendRepository mismatch")
+    if not valid_commit(provenance.get("backendCommit", "")):
+        fail("provenance backendCommit is not an exact lowercase SHA")
+    for key in ("backendArtifactByteSha256", "backendArtifactSemanticSha256"):
+        if not valid_digest(provenance.get(key)):
+            fail(f"provenance {key} is not a lowercase SHA-256 digest")
+    return provenance
+
+
 def sync(arguments: argparse.Namespace) -> None:
     backend_file = Path(arguments.backend_file)
     ios_file = Path(arguments.ios_file)
@@ -79,9 +98,7 @@ def check(arguments: argparse.Namespace) -> None:
     provenance_file = Path(arguments.provenance)
     backend = read_json(backend_file)
     ios = read_json(ios_file)
-    provenance = read_json(provenance_file)
-    if not isinstance(provenance, dict):
-        fail("provenance must be an object")
+    provenance = validate_provenance(read_json(provenance_file), arguments.backend_repository)
     required = {
         "schemaVersion": SCHEMA_VERSION,
         "backendRepository": arguments.backend_repository,
@@ -92,8 +109,6 @@ def check(arguments: argparse.Namespace) -> None:
     for key, expected in required.items():
         if provenance.get(key) != expected:
             fail(f"provenance {key} mismatch")
-    if not valid_commit(provenance["backendCommit"]):
-        fail("provenance backendCommit is not an exact SHA")
     ios_semantic_digest = semantic_sha256(ios)
     if ios_semantic_digest != required["backendArtifactSemanticSha256"]:
         fail("semantic OpenAPI drift")
@@ -102,6 +117,20 @@ def check(arguments: argparse.Namespace) -> None:
         f" backend-commit={provenance['backendCommit']}"
         f" backend-byte-sha256={required['backendArtifactByteSha256']}"
         f" semantic-sha256={ios_semantic_digest}"
+    )
+
+
+def consumer_check(arguments: argparse.Namespace) -> None:
+    ios = read_json(Path(arguments.ios_file))
+    provenance = validate_provenance(read_json(Path(arguments.provenance)), arguments.backend_repository)
+    ios_semantic_digest = semantic_sha256(ios)
+    if ios_semantic_digest != provenance["backendArtifactSemanticSha256"]:
+        fail("consumer semantic OpenAPI drift")
+    print(
+        "PASS consumer-check"
+        f" recorded-backend-commit={provenance['backendCommit']}"
+        f" consumer-semantic-sha256={ios_semantic_digest}"
+        " backend-byte-sha256=recorded-not-independently-verified"
     )
 
 
@@ -118,6 +147,11 @@ def self_test() -> None:
             backend_commit="0" * 40,
         )
         sync(values)
+        consumer_values = argparse.Namespace(
+            ios_file=str(ios), provenance=str(provenance),
+            backend_repository="kudg0/assets-invest-comparator",
+        )
+        consumer_check(consumer_values)
         ios.write_text('{"openapi":"3.1.0","info":{"title":"Drift"}}\n', encoding="utf-8")
         check_values = argparse.Namespace(**vars(values), expected_backend_commit="0" * 40)
         try:
@@ -127,9 +161,29 @@ def self_test() -> None:
                 raise
         else:
             fail("self-test drift did not fail")
+        try:
+            consumer_check(consumer_values)
+        except SystemExit as error:
+            if "consumer semantic OpenAPI drift" not in str(error):
+                raise
+        else:
+            fail("self-test consumer drift did not fail")
         sync(values)
         check(check_values)
-    print("PASS self-test drift-fails-and-resync-recovers")
+        consumer_check(consumer_values)
+        original = json.loads(provenance.read_text(encoding="utf-8"))
+        for key, invalid in (("backendRepository", "wrong/repository"), ("backendCommit", "A" * 40), ("backendArtifactByteSha256", "x"), ("backendArtifactSemanticSha256", "x")):
+            changed = dict(original)
+            changed[key] = invalid
+            provenance.write_text(json.dumps(changed), encoding="utf-8")
+            try:
+                consumer_check(consumer_values)
+            except SystemExit:
+                pass
+            else:
+                fail(f"self-test malformed provenance did not fail: {key}")
+        provenance.write_text(json.dumps(original), encoding="utf-8")
+    print("PASS self-test consumer-pass, drift-fails, resync-recovers, malformed-provenance-fails")
 
 
 def parser() -> argparse.ArgumentParser:
@@ -145,6 +199,10 @@ def parser() -> argparse.ArgumentParser:
             command.add_argument("--backend-commit", required=True)
         else:
             command.add_argument("--expected-backend-commit", required=True)
+    consumer = commands.add_parser("consumer-check")
+    consumer.add_argument("--ios-file", default="Sources/WorthItAPI/openapi.json")
+    consumer.add_argument("--provenance", default="Sources/WorthItAPI/openapi-source.json")
+    consumer.add_argument("--backend-repository", required=True)
     commands.add_parser("self-test")
     return result
 
@@ -155,6 +213,8 @@ def main() -> None:
         sync(arguments)
     elif arguments.command == "check":
         check(arguments)
+    elif arguments.command == "consumer-check":
+        consumer_check(arguments)
     else:
         self_test()
 
