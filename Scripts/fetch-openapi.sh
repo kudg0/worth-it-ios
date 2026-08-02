@@ -2,17 +2,16 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-OPENAPI_URL="${OPENAPI_URL:-http://localhost:3000/docs/json}"
 OPENAPI_FILE="${OPENAPI_FILE:-}"
-TARGET_FILE="$ROOT_DIR/Sources/WorthItAPI/openapi.json"
-TMP_FILE="$TARGET_FILE.tmp"
+BACKEND_REPOSITORY="${BACKEND_REPOSITORY:-}"
+BACKEND_COMMIT="${BACKEND_COMMIT:-}"
 
-if [[ -n "$OPENAPI_FILE" ]]; then
-  cp "$OPENAPI_FILE" "$TMP_FILE"
-else
-  curl -fsS "$OPENAPI_URL" -o "$TMP_FILE"
+if [[ -z "$OPENAPI_FILE" || -z "$BACKEND_REPOSITORY" || -z "$BACKEND_COMMIT" ]]; then
+  echo "OPENAPI_FILE, BACKEND_REPOSITORY, and BACKEND_COMMIT are required for provenance-safe sync" >&2
+  exit 2
 fi
-python3 -m json.tool "$TMP_FILE" > "$TARGET_FILE"
-rm -f "$TMP_FILE"
 
-echo "Updated OpenAPI contract from ${OPENAPI_FILE:-$OPENAPI_URL}"
+python3 "$ROOT_DIR/Scripts/openapi_sync.py" sync \
+  --backend-file "$OPENAPI_FILE" \
+  --backend-repository "$BACKEND_REPOSITORY" \
+  --backend-commit "$BACKEND_COMMIT"

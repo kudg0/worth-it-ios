@@ -1,0 +1,82 @@
+name: OpenAPI consumer sync
+
+on:
+  pull_request:
+    paths:
+      - Sources/WorthItAPI/openapi.json
+      - Sources/WorthItAPI/openapi-source.json
+      - Scripts/openapi_sync.py
+      - Scripts/fetch-openapi.sh
+      - Package.swift
+      - Package.resolved
+      - Sources/WorthItAPI/openapi-generator-config.yaml
+      - .github/workflows/openapi-sync.yml
+  push:
+    branches:
+      - main
+    paths:
+      - Sources/WorthItAPI/openapi.json
+      - Sources/WorthItAPI/openapi-source.json
+      - Scripts/openapi_sync.py
+      - Scripts/fetch-openapi.sh
+      - Package.swift
+      - Package.resolved
+      - Sources/WorthItAPI/openapi-generator-config.yaml
+      - .github/workflows/openapi-sync.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-openapi-consumer:
+    runs-on: macos-latest
+    steps:
+      - name: Check out iOS repository
+        uses: actions/checkout@v4
+
+      - name: Read immutable backend provenance
+        id: provenance
+        run: |
+          commit="$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          source = json.loads(Path("Sources/WorthItAPI/openapi-source.json").read_text())
+          commit = source["backendCommit"]
+          if len(commit) != 40 or any(character not in "0123456789abcdef" for character in commit):
+              raise SystemExit("invalid backendCommit provenance")
+          print(commit)
+          PY
+          )"
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+
+      - name: Check out exact backend artifact
+        uses: actions/checkout@v4
+        with:
+          repository: kudg0/assets-invest-comparator
+          ref: ${{ steps.provenance.outputs.commit }}
+          path: .openapi-backend
+
+      - name: Verify provenance and semantic equality
+        run: |
+          python3 Scripts/openapi_sync.py check \
+            --backend-file .openapi-backend/docs/openapi.json \
+            --backend-repository kudg0/assets-invest-comparator \
+            --expected-backend-commit "${{ steps.provenance.outputs.commit }}"
+          python3 Scripts/openapi_sync.py self-test
+
+      - name: Build generated Swift contract in a fresh scratch directory
+        run: |
+          scratch="$(mktemp -d)"
+          swift build --scratch-path "$scratch" 2>&1 | tee swift-build.log
+          if grep -E -i 'unsupported.*(link|location)|(link|location).*not:\{\}' swift-build.log; then
+            echo "unsupported link/location schema warning detected" >&2
+            exit 1
+          fi
+
+      - name: Upload complete Swift build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swift-build-log
+          path: swift-build.log
