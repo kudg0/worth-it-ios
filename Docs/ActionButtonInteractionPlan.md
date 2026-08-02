@@ -3,7 +3,7 @@
 Canonical task: UX-001
 
 The canonical status, dependencies, acceptance, and execution order live in the
-[cross-repository roadmap](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md).
+[UX-001 GitHub issue](https://github.com/kudg0/assets-invest-comparator/issues/35).
 This document is the detailed interaction specification only.
 
 ## Goal

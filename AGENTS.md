@@ -4,19 +4,25 @@ Please review yourself through this `AGENTS.md`.
 
 ## Roadmap Source Of Truth
 
-- All unfinished backend and iOS product work lives in
-  ../assets-invest-comparator/docs/product-work-plan.md.
-- Do not create another backlog in this README, AGENTS.md, a feature document,
-  or source comments.
-- A focused feature plan may expand one task, but it must name the canonical
-  task ID and must not maintain a competing status.
+- All unfinished backend and iOS product work lives in GitHub Issues in
+  `kudg0/assets-invest-comparator`. Start from the
+  [Worth It roadmap index](https://github.com/kudg0/assets-invest-comparator/issues/172)
+  and open the issue titled with the exact task ID.
+- One canonical task has one issue titled `[TASK-ID] Task title` and marker
+  `<!-- worth-it-roadmap-task:TASK-ID -->`. Its body owns status, priority,
+  dependencies, acceptance, packet, review evidence, and remaining work.
+- The sibling `docs/product-work-plan.md` is an archived migration snapshot,
+  not current status. Do not create another backlog in README, AGENTS.md, a
+  feature document, archive, or source comments.
+- A focused feature plan may expand one task, but it must link the canonical
+  issue and must not maintain a competing status.
 - Re-audit IN WORKTREE tasks before editing because concurrent local changes are
   not shipped work.
 
 ## Lead And Subagent Operating Model
 
 - The lead is the only user-facing orchestrator. The lead owns decomposition,
-  canonical roadmap state, integration, verification, and the final answer.
+  canonical task issue state, integration, verification, and the final answer.
   Subagents are bounded workers that report results to the lead.
 - Solo execution is the default. Delegate only a concrete, independently
   verifiable slice when it gives a real speed, specialist-quality, or context-
@@ -26,9 +32,9 @@ Please review yourself through this `AGENTS.md`.
   needed context, base/worktree, allowed writes, forbidden scope, checks, and
   stop state. Do not assume the child inherited or understood the lead's chat.
 - A packet authorizes exactly one task. `DONE`, `BLOCKED`, `UNSAFE`, or
-  `STALE_PACKET` ends it. A child must not choose the next roadmap task, prepare
-  its own follow-up packet, edit the canonical roadmap, commit, or push unless
-  that exact action is explicitly allowed.
+  `STALE_PACKET` ends it. A child must not choose the next task, prepare its own
+  follow-up packet, edit canonical task issues, commit, or push unless that exact
+  action is explicitly allowed.
 - After dispatch, the lead continues useful independent work or waits for an
   event/completion notification. Do not poll children for status. The lead
   consumes one concise handoff, validates it, and decides the next task.
@@ -36,12 +42,11 @@ Please review yourself through this `AGENTS.md`.
 ## Roadmap Task Claim And Close-Out
 
 - Default to the lightweight workflow for ordinary product work. Solo work needs
-  no child packet. Delegated work gets one canonical task, one concise packet,
-  one coordination assert, one isolated worktree, one lead review, and at most
-  one correction round.
-- Run the sibling `roadmap-coordination.mjs assert` before starting, after a
-  `LEAD-EDITING` pause, or after packet/epoch changes. Do not run it before every
-  edit, shell command, build, or simulator action when state is unchanged.
+  no child packet. Delegated work gets one canonical issue, one concise packet,
+  one isolated worktree, one lead review, and at most one correction round.
+- Before product edits, fetch and claim the exact issue. Add `Active claim` and
+  the complete `Execution packet version: 1` record to its body. The live
+  roadmap lint allows at most three simultaneous claims.
 - A packet names the outcome, allowed/forbidden scope, exact worktree/base,
   write set, checks, stop conditions, handoff, steward, and reviewer. Reuse the
   existing template; do not build new governance for an ordinary feature.
@@ -56,10 +61,14 @@ Please review yourself through this `AGENTS.md`.
 - Do not improve roadmap lint, coordination scripts, packet schemas, or agent
   governance during product implementation. Backlog non-blocking process
   defects. Stop only when a defect makes the requested work unsafe.
-- Give evidence to the Roadmap steward, who alone updates the sibling canonical
-  roadmap in the same work session. Do not create another status source.
-- Run sibling `pnpm roadmap:lint` after roadmap edits. Run its fixture suite only
-  for explicitly requested linter/rule work.
+- Give evidence to the Roadmap steward, who alone updates the canonical issue in
+  the same work session. Do not create another status source.
+- `VERIFIED DONE` requires all acceptance and checks, attributable commit/PR
+  evidence, independent PASS when required, and closing the issue with reason
+  `completed`. Every other status remains open.
+- GitHub Actions runs the authoritative live issue lint. The sibling
+  `pnpm roadmap:lint` command requires `GITHUB_TOKEN` or `GH_TOKEN` with
+  read access; its fixture suite is required only for linter/rule changes.
 
 ## Parallel Work
 
@@ -70,11 +79,8 @@ Please review yourself through this `AGENTS.md`.
   release configuration, and shared design-system primitives stay serial.
 - Batch close-out and next-task preparation into one lead pass. Avoid repeated
   claim/close/open cycles when one safe transition is enough.
-- Use `LEAD-EDITING` only while shared instructions actually change. Workers
-  finish the current atomic command and return `WAIT`; the steward publishes one
-  new `OPEN` epoch after freeze.
-- Only the Roadmap steward runs `lock`, `open`, or `recover`. Never hand-edit
-  shared coordination state.
+- Update shared instructions serially. Workers finish their current atomic
+  command and return `WAIT` when a lead-owned instruction edit overlaps them.
 
 ## Design Source
 

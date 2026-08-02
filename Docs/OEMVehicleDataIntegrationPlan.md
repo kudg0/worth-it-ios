@@ -3,7 +3,7 @@
 Canonical task: OEM-001
 
 The canonical status and entry dependencies live in the
-[cross-repository roadmap](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md).
+[OEM-001 GitHub issue](https://github.com/kudg0/assets-invest-comparator/issues/167).
 This document is a discovery appendix; provider and pricing facts must be
 revalidated before implementation.
 

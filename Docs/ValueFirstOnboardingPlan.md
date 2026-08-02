@@ -1,11 +1,10 @@
 # Value-First Onboarding and Deferred Account Capture
 
-Canonical tasks: [ONB-100 through ONB-105](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md#onb-100--program-value-first-first-run-and-deferred-account-capture)
+Canonical tasks: [ONB-100 through ONB-105](https://github.com/kudg0/assets-invest-comparator/issues/172)
 
 The canonical status, dependencies, priority, and acceptance criteria live in
-the backend repository's `docs/product-work-plan.md`. This document is the
-focused product, motion, state, privacy, and handoff specification. It must not
-become a second backlog.
+the matching GitHub task issues. This document is the focused product, motion,
+state, privacy, and handoff specification. It must not become a second backlog.
 
 ## Decision summary
 

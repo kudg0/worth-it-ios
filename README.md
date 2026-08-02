@@ -5,7 +5,8 @@ Native SwiftUI client for Worth It.
 Target architecture: the backend contract is consumed through OpenAPI rather
 than by importing backend source. The current production repositories still use
 handwritten HTTP/wire models for many endpoints; migration and drift protection
-are tracked as CONTRACT-001 in the canonical roadmap.
+are tracked in the
+[CONTRACT-001 GitHub issue](https://github.com/kudg0/assets-invest-comparator/issues/7).
 
 ## Contract
 
@@ -27,15 +28,12 @@ swift-openapi-generator.
 
 ## Product roadmap
 
-There is one roadmap for backend and iOS:
-
-- Local sibling checkout:
-  ../assets-invest-comparator/docs/product-work-plan.md
-- Repository:
-  [assets-invest-comparator/docs/product-work-plan.md](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md)
+Canonical backend and iOS tasks live in the
+[GitHub roadmap](https://github.com/kudg0/assets-invest-comparator/issues/172). The sibling
+`docs/product-work-plan.md` is an archived migration snapshot only.
 
 Do not add task status or a second backlog to this README. Focused documents in
-Docs expand canonical task IDs:
+Docs expand and link canonical GitHub task IDs:
 
 - Docs/ActionButtonInteractionPlan.md — UX-001
 - Docs/AchievementMedalRedesignPlan.md — ACH-100 through ACH-107

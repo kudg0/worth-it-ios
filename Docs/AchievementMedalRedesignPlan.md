@@ -3,7 +3,7 @@
 Canonical tasks: ACH-100 through ACH-107
 
 The canonical status, dependencies, and execution order live in the
-[cross-repository roadmap](https://github.com/kudg0/assets-invest-comparator/blob/main/docs/product-work-plan.md).
+[GitHub roadmap](https://github.com/kudg0/assets-invest-comparator/issues/172).
 This document expands the medal program and does not own backlog status.
 
 ## Product goal
