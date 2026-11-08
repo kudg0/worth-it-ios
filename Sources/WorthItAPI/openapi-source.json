@@ -1,7 +1,7 @@
 {
-  "backendArtifactByteSha256": "db157793b6818a6e11fc2d5f18d6c45a93aba1418cd7703fe429640d7e7a7754",
-  "backendArtifactSemanticSha256": "aed830dbabb3376ea90eb09d90309ba51b6789acbad0abf7b29c1e22926c0bcd",
-  "backendCommit": "0b0182a6465b89fdb48efed107e2f07a58270d39",
+  "backendArtifactByteSha256": "41cb5446868080343475746a975922148b88b5abe6c27c00ec68b29c01ac774b",
+  "backendArtifactSemanticSha256": "2ff759b72738cfafb94394401d602af663c97646a549a2700d116e90c46c0e78",
+  "backendCommit": "7aa2569f95b3a7aadc4c5f4dddac141af5b577fc",
   "backendRepository": "kudg0/assets-invest-comparator",
   "schemaVersion": 1
 }

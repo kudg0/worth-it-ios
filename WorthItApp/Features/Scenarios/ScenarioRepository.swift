@@ -24,8 +24,7 @@ struct ScenarioRepository: Sendable {
     }
 
     func getSettingsOptions() async throws -> UserSettingsOptions {
-        let response: UserSettingsOptionsResponse = try await client.get("/me/settings/options")
-        return response.options
+        try await SettingsAPI(client: client).getOptions()
     }
 
     func deleteScenario(scenarioId: UUID) async throws {

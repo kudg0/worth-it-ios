@@ -82,42 +82,20 @@ struct AuthRepository {
     }
 
     func getSettings(token: String) async throws -> UserSettings {
-        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
-        let response: UserSettingsResponse = try await client.get("/me/settings")
-        return response.settings
+        try await SettingsAPI(client: HTTPAPIClient(baseURL: baseURL, authToken: token)).getSettings()
     }
 
     func getSettingsOptions(token: String) async throws -> UserSettingsOptions {
-        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
-        let response: UserSettingsOptionsResponse = try await client.get("/me/settings/options")
-        return response.options
+        try await SettingsAPI(client: HTTPAPIClient(baseURL: baseURL, authToken: token)).getOptions()
     }
 
     func updateSettings(_ patch: UserSettingsPatch, token: String) async throws -> UserSettings {
-        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
-        let response: UserSettingsResponse = try await client.patch(
-            "/me/settings",
-            body: UpdateUserSettingsRequest(
-                distanceUnit: patch.distanceUnit,
-                currency: patch.currency,
-                locale: patch.locale
-            )
-        )
-
-        return response.settings
+        try await SettingsAPI(client: HTTPAPIClient(baseURL: baseURL, authToken: token)).update(patch)
     }
 
     private func updateDefaults(for region: String, token: String) async throws {
         let defaults = RegionDefaults(regionName: region)
-        let client = HTTPAPIClient(baseURL: baseURL, authToken: token)
-        let _: UserSettingsResponse = try await client.patch(
-            "/me/settings",
-            body: UpdateUserSettingsRequest(
-                distanceUnit: defaults.distanceUnit,
-                currency: defaults.currency,
-                locale: defaults.locale
-            )
-        )
+        _ = try await updateSettings(UserSettingsPatch(distanceUnit: defaults.distanceUnit, currency: defaults.currency, locale: defaults.locale), token: token)
     }
 }
 
@@ -243,48 +221,6 @@ private struct UserProfileResponse: Decodable {
             email: email,
             image: image
         )
-    }
-}
-
-private struct UpdateUserSettingsRequest: Encodable {
-    let distanceUnit: String?
-    let currency: String?
-    let locale: String?
-}
-
-private struct UserSettingsResponse: Decodable {
-    let userId: UUID
-    let distanceUnit: String
-    let currency: String
-    let locale: String
-
-    var settings: UserSettings {
-        UserSettings(distanceUnit: distanceUnit, currency: currency, locale: locale)
-    }
-}
-
-struct UserSettingsOptionsResponse: Decodable {
-    let regions: [UserSettingsOptionResponse]
-    let currencies: [UserSettingsOptionResponse]
-    let distanceUnits: [UserSettingsOptionResponse]
-
-    var options: UserSettingsOptions {
-        UserSettingsOptions(
-            regions: regions.map(\.option),
-            currencies: currencies.map(\.option),
-            distanceUnits: distanceUnits.map(\.option)
-        )
-    }
-}
-
-struct UserSettingsOptionResponse: Decodable {
-    let id: String
-    let label: String
-    let groupId: String?
-    let groupLabel: String?
-
-    var option: UserSettingsOption {
-        UserSettingsOption(id: id, title: label, groupId: groupId, groupTitle: groupLabel)
     }
 }
 

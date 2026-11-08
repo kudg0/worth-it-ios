@@ -112,6 +112,7 @@
 		84F9A87CE3A56F2A88D054A6 /* LogExpenseScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E6FCDF60873B492B7E67162 /* LogExpenseScreen.swift */; };
 		86D7259DC74C6A508EE296E7 /* ScenarioAnalyticsModelScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A192B2BEE877F97453DF19D6 /* ScenarioAnalyticsModelScreen.swift */; };
 		87CF0246D5F312C8C38F2F3F /* ScenarioOverviewCostPerKmDetailModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D38A93F6143E171575881CCF /* ScenarioOverviewCostPerKmDetailModels.swift */; };
+		883DB2BEA772BA6B8DD4E3F3 /* SettingsAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FBF2210EC2296C8FA948D2D /* SettingsAPITests.swift */; };
 		8B8C7628D4BC8B60BB7D8BDD /* GenericMetricChartPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2014227518F6F054E1559DF4 /* GenericMetricChartPanel.swift */; };
 		8C657A94191870FE8AFF4D75 /* ScenarioOverviewCostPerKmBreakdownData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CED68C0608980F6B7E9AD0D /* ScenarioOverviewCostPerKmBreakdownData.swift */; };
 		8C7C6C7AC35A1283A973A411 /* ScenarioOverviewScheduledServiceCalendarExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E525308C16E8A88529881FA5 /* ScenarioOverviewScheduledServiceCalendarExport.swift */; };
@@ -142,6 +143,7 @@
 		B1F9651FC456B48BE468944F /* AchievementMapLane.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569FDD1D4E42CFF0FF81A5EF /* AchievementMapLane.swift */; };
 		B20F6D6E65C2634C5CB61091 /* MileageHistoryList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E730DC15EBDDB50A4E2E0DC /* MileageHistoryList.swift */; };
 		B266B5FEEDF27D402E61FA9A /* ScheduleServiceDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 978842C3717CC45716D4E041 /* ScheduleServiceDivider.swift */; };
+		B29E3FF4C4FB4CA3E35A60B0 /* SettingsAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 363853743272CF36109AC0BE /* SettingsAPI.swift */; };
 		B348D3657FF386663F7CB92E /* ScheduleServiceTriggerSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F57456B94082988DB7BD349 /* ScheduleServiceTriggerSection.swift */; };
 		B5410C710745E5DF10D59F64 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5733A9FBF7142934CB2F7FD /* ProfileView.swift */; };
 		B629958E0CCAB3A193B5CEE0 /* AchievementMapScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7CC5ED1545531352E1D575 /* AchievementMapScreen.swift */; };
@@ -276,6 +278,7 @@
 		1E730DC15EBDDB50A4E2E0DC /* MileageHistoryList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MileageHistoryList.swift; sourceTree = "<group>"; };
 		1F01BE76F0709341EB0963D9 /* ScenarioOverviewNavigationTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewNavigationTypes.swift; sourceTree = "<group>"; };
 		1F7B45627ADCBB2659E9E58B /* ScenarioOverviewLoading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewLoading.swift; sourceTree = "<group>"; };
+		1FBF2210EC2296C8FA948D2D /* SettingsAPITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAPITests.swift; sourceTree = "<group>"; };
 		2014227518F6F054E1559DF4 /* GenericMetricChartPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericMetricChartPanel.swift; sourceTree = "<group>"; };
 		22467492D59388A2E0DEC09E /* WISegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WISegmentedControl.swift; sourceTree = "<group>"; };
 		23EE9DB9E405DF43F154E452 /* ExpensesEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpensesEmptyState.swift; sourceTree = "<group>"; };
@@ -293,10 +296,12 @@
 		32F9BF2921FF4C5D173CB822 /* ScenarioOverviewExpenseHistoryBars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewExpenseHistoryBars.swift; sourceTree = "<group>"; };
 		33A5FCE35A9DE8E6F0AF33CA /* AchievementDetailScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementDetailScreen.swift; sourceTree = "<group>"; };
 		3595119EAE12C3168D44A278 /* WIToastBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIToastBanner.swift; sourceTree = "<group>"; };
+		363853743272CF36109AC0BE /* SettingsAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsAPI.swift; sourceTree = "<group>"; };
 		36F046FFB84D7619A93FDCA8 /* WIUpdateErrorBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIUpdateErrorBanner.swift; sourceTree = "<group>"; };
 		38E6EF52928B30A895612325 /* ScenarioOverviewScenarioActions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewScenarioActions.swift; sourceTree = "<group>"; };
 		3C7FED96E9438F2D2353738B /* MileageHistoryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MileageHistoryScreen.swift; sourceTree = "<group>"; };
 		427E5B2336AAA63F77AEF3D4 /* ScenarioOverviewDateFormatters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenarioOverviewDateFormatters.swift; sourceTree = "<group>"; };
+		FF2B9E6413E88B19BF50C4D6 /* worth-it-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "worth-it-ios"; path = .; sourceTree = SOURCE_ROOT; };
 		4321FD80F6C3A93A6AF50682 /* MileageTripDetailCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MileageTripDetailCards.swift; sourceTree = "<group>"; };
 		435D4A6DE7597A9B46701C3F /* WIIsland.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WIIsland.swift; sourceTree = "<group>"; };
 		43B198A203EB29BA0CA9C94B /* ExpenseSpendMiniBars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseSpendMiniBars.swift; sourceTree = "<group>"; };
@@ -466,7 +471,6 @@
 		FB5AC00595E04C1687DA8BFB /* ScheduledServicesScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledServicesScreen.swift; sourceTree = "<group>"; };
 		FB7D5768DD7FF7AAA56ED5C8 /* LogMileageScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogMileageScreen.swift; sourceTree = "<group>"; };
 		FC9568D94EC8CCA5A1FF849F /* ScenariosListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScenariosListView.swift; sourceTree = "<group>"; };
-		FF2B9E6413E88B19BF50C4D6 /* worth-it-ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "worth-it-ios"; path = .; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -967,6 +971,7 @@
 			children = (
 				93806CD2D958DB8FE0775EDB /* APIEnvironment.swift */,
 				ECA7DB47A9FBEA2F8EDAE7AB /* HTTPAPIClient.swift */,
+				363853743272CF36109AC0BE /* SettingsAPI.swift */,
 				DE1FAD3F5E463C53A0F047CC /* WIUpdateErrorText.swift */,
 			);
 			path = API;
@@ -976,6 +981,7 @@
 			isa = PBXGroup;
 			children = (
 				F71B6FEA0AD8FA1B291935E8 /* ScenarioOverviewNavigationPathTests.swift */,
+				1FBF2210EC2296C8FA948D2D /* SettingsAPITests.swift */,
 			);
 			path = WorthItTests;
 			sourceTree = "<group>";
@@ -1256,6 +1262,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BAFFCDEE6954E397A6C84F8C /* ScenarioOverviewNavigationPathTests.swift in Sources */,
+				883DB2BEA772BA6B8DD4E3F3 /* SettingsAPITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1461,6 +1468,7 @@
 				204B19A6B06375F38CD723C8 /* ScheduledServiceRow.swift in Sources */,
 				96A2D1A0D03DE8A3B82753BD /* ScheduledServicesScreen.swift in Sources */,
 				42FF36098BC1D5015BE58306 /* ServiceCalendarExporter.swift in Sources */,
+				B29E3FF4C4FB4CA3E35A60B0 /* SettingsAPI.swift in Sources */,
 				04BED99126CBD32AE8B8C88E /* WIAchievementProgressRing.swift in Sources */,
 				F25930BC46BC87FD6DD6EA22 /* WIButton.swift in Sources */,
 				340C64A3695F72EE6492AA86 /* WIDateField.swift in Sources */,
